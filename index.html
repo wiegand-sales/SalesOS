@@ -614,6 +614,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
         <button class="page-tab-btn" id="settingsTabBtn_board" onclick="setSettingsTab('board')"><i class="ti ti-layout-kanban"></i> Board</button>
         <button class="page-tab-btn" id="settingsTabBtn_project" onclick="setSettingsTab('project')"><i class="ti ti-target-arrow"></i> Projekt</button>
         <button class="page-tab-btn" id="settingsTabBtn_system" onclick="setSettingsTab('system')"><i class="ti ti-database"></i> System</button>
+        <button class="page-tab-btn" id="settingsTabBtn_csv" onclick="setSettingsTab('csv')"><i class="ti ti-table"></i> Import/Export</button>
         <button class="page-tab-btn" id="settingsTabBtn_notify" onclick="setSettingsTab('notify')"><i class="ti ti-mail"></i> Auto. Benachrichtigungen</button>
       </div>
       <div class="view-scroll" id="settingsContent"></div>
@@ -769,7 +770,7 @@ function applyStateData(data){
   if(data.LABELS)LABELS=data.LABELS;
   if(data.AGENTS)AGENTS=data.AGENTS;
   if(data.ARTICLES)ARTICLES=data.ARTICLES;
-  if(data.PROJECT)PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[]},data.PROJECT);
+  if(data.PROJECT)PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[]},data.PROJECT);
   if(data.nextId)nextId=data.nextId;
   if(data.nextLabelId)nextLabelId=data.nextLabelId;
   if(data.nextPrinterId)nextPrinterId=data.nextPrinterId;
@@ -2058,7 +2059,7 @@ function setSettingsTab(tab){
   renderSettings();
 }
 function renderSettings(){
-  ['team','board','project','system','notify'].forEach(t=>{
+  ['team','board','project','system','csv','notify'].forEach(t=>{
     const btn=document.getElementById('settingsTabBtn_'+t);
     if(btn)btn.classList.toggle('active',settingsTab===t);
   });
@@ -2139,6 +2140,46 @@ function renderSettings(){
       <input type="checkbox" ${!r.open?'checked':''} onchange="toggleRisk(${r.id})" title="Erledigt/behoben" style="width:16px;height:16px">
       <button class="check-item-del" onclick="deleteRisk(${r.id})"><i class="ti ti-trash"></i></button>
     </div>`).join('')||'<p style="font-size:12px;color:var(--text3)">Keine Risiken erfasst.</p>';
+
+  let lastGroup=null;
+  const csvFieldsHtml=getCsvFields().map((f,idx)=>{
+    const reg=FIELD_REGISTRY[f.key];
+    const optionsHtml=GROUP_ORDER.map(group=>{
+      const opts=Object.entries(FIELD_REGISTRY).filter(([,r])=>r.group===group)
+        .map(([key,r])=>`<option value="${key}" ${f.key===key?'selected':''}>${esc(r.label)}</option>`).join('');
+      return `<optgroup label="${esc(group)}">${opts}</optgroup>`;
+    }).join('');
+    const importDisabled=!reg||!reg.importable;
+    const overwriteDisabled=importDisabled||!f.importActive;
+    let dividerHtml='';
+    if(reg&&reg.group!==lastGroup){
+      lastGroup=reg.group;
+      dividerHtml=`<tr style="background:var(--surface-1,#f6f7f5)"><td colspan="6" style="padding:5px 8px;font-weight:600;font-size:12px">${esc(reg.group)}</td></tr>`;
+    }
+    return dividerHtml+`<tr style="border-top:0.5px solid var(--border-c,#e5e5e0)">
+      <td style="padding:6px"><select style="width:100%" onchange="setCsvFieldKey(${idx},this.value)">${optionsHtml}</select></td>
+      <td style="padding:6px"><input type="text" value="${esc(f.csvName)}" style="width:100%" onchange="setCsvFieldName(${idx},this.value)"></td>
+      <td style="padding:6px">
+        <select style="width:100%" ${importDisabled?'disabled title="Berechnetes Feld, kann nicht importiert werden"':''} onchange="setCsvFieldImportActive(${idx},this.value==='ja')">
+          <option value="nein" ${!f.importActive?'selected':''}>Nein</option>
+          <option value="ja" ${f.importActive?'selected':''} ${importDisabled?'disabled':''}>Ja</option>
+        </select>
+      </td>
+      <td style="padding:6px">
+        <select style="width:100%" onchange="setCsvFieldExportActive(${idx},this.value==='ja')">
+          <option value="nein" ${!f.exportActive?'selected':''}>Nein</option>
+          <option value="ja" ${f.exportActive?'selected':''}>Ja</option>
+        </select>
+      </td>
+      <td style="padding:6px">
+        <select style="width:100%" ${overwriteDisabled?'disabled title="Nur möglich, wenn das Feld auch importiert wird"':''} onchange="setCsvFieldOverwriteActive(${idx},this.value==='ja')">
+          <option value="nein" ${!f.overwriteActive?'selected':''}>Nein</option>
+          <option value="ja" ${f.overwriteActive?'selected':''} ${overwriteDisabled?'disabled':''}>Ja</option>
+        </select>
+      </td>
+      <td style="padding:6px;text-align:center"><button class="check-item-del" onclick="removeCsvField(${idx})" title="Feld entfernen"><i class="ti ti-trash"></i></button></td>
+    </tr>`;
+  }).join('');
 
   const notifyRulesHtml=(PROJECT.notificationRules||[]).map(r=>`
     <div class="settings-row">
@@ -2241,6 +2282,29 @@ function renderSettings(){
         <div class="section-hdr" style="margin-top:0;color:var(--red)"><i class="ti ti-alert-triangle"></i> Gefahrenzone</div>
         <p style="font-size:12px;color:var(--text2);line-height:1.6">Löscht <strong>alle Leads</strong> unwiderruflich. Die Board-Struktur (Listen/Spalten, Labels, Mitarbeiter, Projekt-Einstellungen) bleibt vollständig erhalten – nur die Kundendaten selbst werden entfernt. Nur für Admins verfügbar.</p>
         <button class="btn btn-sm" style="margin-top:8px;background:var(--red-bg);color:var(--red-dark);border-color:var(--red)" onclick="deleteAllLeads()"><i class="ti ti-trash"></i> Alle Leads löschen</button>
+      </div>`,
+    csv:`
+      <div class="info-section">
+        <div class="section-hdr" style="margin-top:0">CSV-Feldkonfiguration</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.6">Legt pro Datenfeld fest, ob es beim <strong>CSV-Import</strong> und/oder <strong>CSV-Export</strong> verwendet wird, sowie unter welchem Spaltennamen. Berechnete Felder (Marge, Status, Anzahl Aufgaben etc.) lassen sich nur exportieren – "Import" ist dort deaktiviert. Eine Spalte wird beim Import erkannt, wenn ihre Kopfzeile (Groß-/Kleinschreibung egal) mit dem hier hinterlegten Namen übereinstimmt.</p>
+        <p style="font-size:12px;color:var(--text2);line-height:1.6"><strong>Bereits vorhandene Leads werden erkannt</strong> an Kundennummer, Firmenname, Telefonnummer oder E-Mail. Was dann passiert, steuerst du pro Feld über die Spalte <strong>"Datensätze aktualisieren"</strong>: Felder mit "Ja" werden bei einem gefundenen Duplikat mit dem Wert aus der CSV aktualisiert (nur wenn die Zelle nicht leer ist), alle anderen Felder des bestehenden Leads bleiben unangetastet. Steht bei keinem Feld "Ja", wird die Zeile wie bisher komplett übersprungen.</p>
+        <p style="font-size:12px;color:var(--text2);line-height:1.6"><strong>Die Kundennummer bleibt immer eindeutig:</strong> Selbst wenn "Kundennummer" auf "aktualisieren = Ja" steht, wird eine Kundennummer nie übernommen, wenn sie bereits bei einem anderen Lead vergeben ist. In dem Fall bleibt nur dieses eine Feld unverändert, alle übrigen freigegebenen Felder werden trotzdem aktualisiert – im Import-Protokoll siehst du genau, wo das passiert ist.</p>
+        <table style="width:100%;font-size:13px;border-collapse:collapse;margin-top:8px">
+          <tr style="text-align:left;color:var(--text2)">
+            <th style="padding:4px 6px;font-weight:600">Datenfeld</th>
+            <th style="padding:4px 6px;font-weight:600">CSV-Spaltenname</th>
+            <th style="padding:4px 6px;font-weight:600;width:90px">Import</th>
+            <th style="padding:4px 6px;font-weight:600;width:90px">Export</th>
+            <th style="padding:4px 6px;font-weight:600;width:110px">Datensätze aktualisieren</th>
+            <th style="padding:4px 6px;width:40px"></th>
+          </tr>
+          ${csvFieldsHtml}
+        </table>
+        <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+          <button class="btn btn-sm" onclick="addCsvField()"><i class="ti ti-plus"></i> Feld hinzufügen</button>
+          <button class="btn btn-sm" onclick="resetCsvFields()"><i class="ti ti-refresh"></i> Auf Standard zurücksetzen</button>
+          <button class="btn btn-sm btn-primary" onclick="downloadImportTemplate()"><i class="ti ti-download"></i> Import-Vorlage herunterladen (mit Beispieldatensatz)</button>
+        </div>
       </div>`,
     notify:`
       <div class="info-section">
@@ -2581,6 +2645,18 @@ function blocksLeavingFirstColumn(lead,newStatus){
 function warnMissingFirstContact(company){
   alert(`"${company}" kann "${COLUMNS[0].name}" erst verlassen, wenn ein Erstkontakt-Datum eingetragen ist.\n\nDas Fenster öffnet sich jetzt, bitte trage das Datum im Feld "Datum Erstkontakt" ein und speichere erneut.`);
 }
+function warnMissingLossReason(company){
+  alert(`"${company}" kann nicht direkt per Drag & Drop nach "Verloren" verschoben werden.\n\nDas Fenster öffnet sich jetzt – bitte Verlust-Grund und einen kurzen Kommentar eintragen und speichern.`);
+}
+// Öffnet das Lead-Fenster und stellt den Status direkt auf die per Drag&Drop anvisierte
+// "Verloren"-Liste, damit nur noch Verlust-Grund + Kommentar ausgefuellt werden muessen
+function openLeadModalForLostStatus(id,targetStatus){
+  openLeadModal(id);
+  draftLead.status=targetStatus;
+  renderLeadModal();
+  const el=document.getElementById('fLossComment');
+  if(el)el.focus();
+}
 function onCardDrop(e,targetId){
   if(!dragCardId)return;
   e.preventDefault();
@@ -2595,6 +2671,11 @@ function onCardDrop(e,targetId){
   if(blocksLeavingFirstColumn(dragged,target.status)){
     warnMissingFirstContact(dragged.company);
     openLeadModal(dragged.id);
+    return;
+  }
+  if(colById(target.status)&&colById(target.status).outcome==='lost'&&dragged.status!==target.status){
+    warnMissingLossReason(dragged.company);
+    openLeadModalForLostStatus(dragged.id,target.status);
     return;
   }
   if(dragged.status!==target.status){
@@ -2633,6 +2714,12 @@ function onDrop(e,colId){
       dragCardId=null;
       warnMissingFirstContact(l.company);
       openLeadModal(l.id);
+      return;
+    }
+    if(colById(colId)&&colById(colId).outcome==='lost'){
+      dragCardId=null;
+      warnMissingLossReason(l.company);
+      openLeadModalForLostStatus(l.id,colId);
       return;
     }
     const oldName=colById(l.status).name,newName=colById(colId).name;
@@ -3239,7 +3326,7 @@ function renderLeadModal(){
           </div>
           ${(colById(draftLead.status)&&colById(draftLead.status).outcome==='lost')?`
           <div class="field" style="background:var(--red-bg);border-radius:8px;padding:10px 12px;margin-bottom:10px">
-            <label style="color:var(--red-dark)">Verlust-Grund <span style="font-weight:400">(hilft bei der Auswertung im Dashboard)</span></label>
+            <label style="color:var(--red-dark)">Verlust-Grund <span style="font-weight:400">(Pflichtfeld, hilft bei der Auswertung im Dashboard)</span></label>
             <select style="width:100%" onchange="draftLead.lossReason=this.value">
               <option value="">– Bitte auswählen –</option>
               <option value="Preis zu hoch" ${draftLead.lossReason==='Preis zu hoch'?'selected':''}>Preis zu hoch</option>
@@ -3248,6 +3335,8 @@ function renderLeadModal(){
               <option value="Nicht erreichbar" ${draftLead.lossReason==='Nicht erreichbar'?'selected':''}>Nicht erreichbar</option>
               <option value="Sonstiges" ${draftLead.lossReason==='Sonstiges'?'selected':''}>Sonstiges</option>
             </select>
+            <label style="color:var(--red-dark);margin-top:8px">Kommentar zum Verlust <span style="font-weight:400">(Pflichtfeld, erscheint im Verlauf)</span></label>
+            <textarea id="fLossComment" style="width:100%;min-height:60px" placeholder="Kurz beschreiben, was zum Verlust geführt hat…" onchange="draftLead._lossComment=this.value" oninput="draftLead._lossComment=this.value">${esc(draftLead._lossComment||'')}</textarea>
           </div>`:''}
           <div class="field-row-2">
             <div><label>Datum Erstkontakt</label><input type="date" id="firstContactInput" value="${draftLead.firstContact}" onchange="draftLead.firstContact=this.value" style="width:100%"></div>
@@ -3809,10 +3898,26 @@ function saveLead(keepOpen){
       if(el)el.focus();
       return;
     }
+    if(original.status!==draftLead.status&&colById(draftLead.status)&&colById(draftLead.status).outcome==='lost'){
+      if(!draftLead.lossReason){
+        showModalError('Bitte zuerst einen Verlust-Grund auswählen, bevor der Lead als "Verloren" gespeichert werden kann.');
+        return;
+      }
+      if(!(draftLead._lossComment||'').trim()){
+        showModalError('Bitte zuerst einen kurzen Kommentar zum Verlust eintragen, bevor der Lead als "Verloren" gespeichert werden kann.');
+        const el=document.getElementById('fLossComment');
+        if(el)el.focus();
+        return;
+      }
+    }
     if(original.status!==draftLead.status){
       draftLead.activity.unshift({id:Date.now()+1,type:'activity',author:currentUser,text:`Status geändert: ${colById(original.status).name} → ${colById(draftLead.status).name}`,date:nowISO()});
       trackClosedStage(draftLead,original.status,draftLead.status);trackStatusSince(draftLead,original.status,draftLead.status);maybeSendListNotification(draftLead,original.status,draftLead.status);
+      if(colById(draftLead.status)&&colById(draftLead.status).outcome==='lost'&&(draftLead._lossComment||'').trim()){
+        draftLead.activity.unshift({id:Date.now()+3,type:'comment',author:currentUser,text:`Verlust-Grund (${draftLead.lossReason}): ${draftLead._lossComment.trim()}`,date:nowISO()});
+      }
     }
+    delete draftLead._lossComment;
     if(original.followup!==draftLead.followup&&draftLead.followup){
       draftLead.followupHistory=[...(draftLead.followupHistory||[]),{date:draftLead.followup,setAt:nowISO()}];
       draftLead.activity.unshift({id:Date.now()+2,type:'activity',author:currentUser,text:`Follow-up-Datum geändert: "${fmtDate(original.followup)||'–'}" → "${fmtDate(draftLead.followup)}"`,date:nowISO()});
@@ -3966,49 +4071,160 @@ function exportFullBackup(){
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
-function exportCSV(){
-  const headers=['Firmenname','Kundennummer','Art','Adresse','Anzahl Bestellungen','Umsatz (EUR)',
-    'Versand-Drucker','Versand-SKUs (EK/VK)','Investition gesamt EK (EUR)','Marge Versand gesamt (EUR)',
-    'Forecast: Drucker & SKU-Details (Menge, EK, VK, Marge)',
-    'Auftrag: Drucker & SKU-Details (Menge, EK, VK, Marge)',
-    'Ansprechpartner','Telefonnummer','E-Mail','Wettbewerber',
-    'Mitglieder','Status','Seit wann in dieser Liste','Free Toner verschickt','Datum Erstkontakt',
-    'Follow-up-Datum','Forecast (EUR)','Tatsächliches Ergebnis (EUR)','Verlust-Grund','Labels',
-    'Anzahl Kommentare','Offene Aufgaben','Aufgaben gesamt','Anzahl Anhänge','Notizen'];
-  // Baut je Drucker eine Detailzeile mit jeder einzelnen SKU inkl. Menge, EK, VK und Margen-Zeilensumme
-  const formatPrinterDetails=printers=>(printers||[]).map(p=>{
+// ── CSV-FELDKONFIGURATION (Einstellungen → Import/Export) ──
+// Baut je Drucker eine Detailzeile mit jeder einzelnen SKU inkl. Menge, EK, VK und Margen-Zeilensumme
+function formatPrinterDetails(printers){
+  return (printers||[]).map(p=>{
     const skuParts=p.skus.filter(s=>s.sku).map(s=>{
       const qty=parseFloat(s.qty)||0,ek=parseFloat(s.priceEk)||0,vk=parseFloat(s.priceVk)||0;
       return `${s.sku} (${qty} Stk. · EK ${fmtEur(ek)||'0 €'} · VK ${fmtEur(vk)||'0 €'} · Marge ${fmtEur(qty*(vk-ek))||'0 €'})`;
     }).join('; ');
     return `${p.model||'(ohne Modell)'}: ${skuParts||'keine SKUs'}`;
   }).join(' | ');
-  const rows=leads.map(l=>{
-    const shipSkus=l.shipPrinter.skus.filter(s=>s.sku).map(s=>`${s.sku}${(s.priceEk||s.priceVk)?` (EK ${fmtEur(s.priceEk)||'0 €'} / VK ${fmtEur(s.priceVk)||'0 €'})`:''}`).join(', ');
-    const investTotal=l.shipPrinter.skus.reduce((s,x)=>s+(parseFloat(x.priceEk)||0),0);
-    const shipMargin=l.shipPrinter.skus.reduce((s,x)=>s+((parseFloat(x.priceVk)||0)-(parseFloat(x.priceEk)||0)),0);
-    const demandDetails=formatPrinterDetails(l.demandPrinters);
-    const actualDetails=formatPrinterDetails(l.actualPrinters);
-    const commentCount=(l.activity||[]).filter(a=>a.type==='comment').length;
-    const tasksTotal=(l.tasks||[]).length;
-    const tasksOpen=(l.tasks||[]).filter(t=>!t.done).length;
-    return [
-      l.company,l.customerNumber,l.art,l.address,l.orderCount,l.revenue,
-      l.shipPrinter.model,shipSkus,investTotal||'',shipMargin||'',demandDetails,actualDetails,
-      l.contact,l.phone,l.email,l.competitor||'',
-      l.members.map(id=>agentById(id)?.name).filter(Boolean).join('; '),
-      colById(l.status).name,fmtDate(l.statusSince)||'',l.tonerSent,l.firstContact,l.followup,
-      l.forecast,l.actual||'',l.lossReason||'',
-      l.labelIds.map(id=>labelById(id)?.name).filter(Boolean).join('; '),
-      commentCount,tasksOpen,tasksTotal,(l.files||[]).length,
-      l.notes
-    ];
+}
+// Register aller verfuegbaren Lead-Datenfelder. "importable:true" = kann per CSV befuellt werden
+// (einfache, direkt setzbare Werte). Berechnete/aggregierte Felder sind nur exportierbar.
+// aliases = zusaetzliche, alte Spaltennamen die beim Import weiterhin erkannt werden (Abwaertskompatibilitaet).
+const FIELD_REGISTRY={
+  company:{label:'Firmenname',group:'Kundeninformationen',importable:true,aliases:['firmenname','firma','company','unternehmen','name','kundenname'],example:'Musterfirma GmbH',get:l=>l.company,set:(l,v)=>l.company=v},
+  customerNumber:{label:'Kundennummer',group:'Kundeninformationen',importable:true,aliases:['kundennummer','kd-nr','kdnr','kundennr','customer number'],example:'K-10099',get:l=>l.customerNumber,set:(l,v)=>l.customerNumber=v},
+  art:{label:'Art',group:'Kundeninformationen',importable:true,aliases:['art','typ','type','kundentyp'],example:'B2B',get:l=>l.art,set:(l,v)=>{const u=(v||'').toUpperCase();if(u==='B2B'||u==='B2C')l.art=u;}},
+  address:{label:'Adresse',group:'Kundeninformationen',importable:true,aliases:['adresse','address','anschrift'],example:'Musterstraße 1, 12345 Musterstadt',get:l=>l.address,set:(l,v)=>l.address=v},
+  orderCount:{label:'Anzahl Bestellungen',group:'Kundeninformationen',importable:true,aliases:['anzahl bestellungen','bestellungen','anzahl'],example:'3',get:l=>l.orderCount,set:(l,v)=>l.orderCount=v},
+  revenue:{label:'Umsatz (EUR)',group:'Kundeninformationen',importable:true,aliases:['umsatz (eur)','umsatz','revenue'],example:'1500',get:l=>l.revenue,set:(l,v)=>l.revenue=v},
+  contact:{label:'Ansprechpartner',group:'Kundeninformationen',importable:true,aliases:['ansprechpartner','kontakt','contact','ansprechperson'],example:'Max Mustermann',get:l=>l.contact,set:(l,v)=>l.contact=v},
+  phone:{label:'Telefonnummer',group:'Kundeninformationen',importable:true,aliases:['telefonnummer','telefon','phone','tel','rufnummer'],example:'+49 89 1234567',get:l=>l.phone,set:(l,v)=>l.phone=v},
+  email:{label:'E-Mail',group:'Kundeninformationen',importable:true,aliases:['e-mail','email','mail'],example:'max@musterfirma.de',get:l=>l.email,set:(l,v)=>l.email=v},
+  competitor:{label:'Wettbewerber',group:'Kundeninformationen',importable:true,aliases:['wettbewerber','competitor'],example:'Wettbewerber GmbH',get:l=>l.competitor||'',set:(l,v)=>l.competitor=v},
+  notes:{label:'Notizen',group:'Kundeninformationen',importable:true,aliases:['notizen','notiz','notes','bemerkung','kommentar'],example:'Interessiert, ruft nächste Woche zurück',get:l=>l.notes,set:(l,v)=>l.notes=v},
+  shipPrinterModel:{label:'Versand-Drucker',group:'Drucker & Patronen (Versand)',importable:false,get:l=>l.shipPrinter.model},
+  shipSkus:{label:'Versand-SKUs (EK/VK)',group:'Drucker & Patronen (Versand)',importable:false,get:l=>l.shipPrinter.skus.filter(s=>s.sku).map(s=>`${s.sku}${(s.priceEk||s.priceVk)?` (EK ${fmtEur(s.priceEk)||'0 €'} / VK ${fmtEur(s.priceVk)||'0 €'})`:''}`).join(', ')},
+  investTotal:{label:'Investition gesamt EK (EUR)',group:'Drucker & Patronen (Versand)',importable:false,get:l=>l.shipPrinter.skus.reduce((s,x)=>s+(parseFloat(x.priceEk)||0),0)||''},
+  shipMargin:{label:'Marge Versand gesamt (EUR)',group:'Drucker & Patronen (Versand)',importable:false,get:l=>l.shipPrinter.skus.reduce((s,x)=>s+((parseFloat(x.priceVk)||0)-(parseFloat(x.priceEk)||0)),0)||''},
+  tonerSent:{label:'Free Toner verschickt',group:'Drucker & Patronen (Versand)',importable:true,aliases:['free toner verschickt'],example:'Ja',get:l=>l.tonerSent,set:(l,v)=>{if(v)l.tonerSent=v;}},
+  statusName:{label:'Status',group:'Lead-Status',importable:false,get:l=>colById(l.status).name},
+  statusSince:{label:'Seit wann in dieser Liste',group:'Lead-Status',importable:false,get:l=>fmtDate(l.statusSince)||''},
+  firstContact:{label:'Datum Erstkontakt',group:'Lead-Status',importable:true,aliases:['datum erstkontakt','erstkontakt'],example:'2026-07-01',get:l=>l.firstContact,set:(l,v)=>l.firstContact=v},
+  followup:{label:'Follow-up-Datum',group:'Lead-Status',importable:true,aliases:['follow-up-datum','followup','follow-up','wiedervorlage'],example:'2026-07-15',get:l=>l.followup,set:(l,v)=>l.followup=v},
+  membersNames:{label:'Mitglieder',group:'Lead-Status',importable:false,get:l=>l.members.map(id=>agentById(id)?.name).filter(Boolean).join('; ')},
+  labelsNames:{label:'Labels',group:'Lead-Status',importable:false,get:l=>l.labelIds.map(id=>labelById(id)?.name).filter(Boolean).join('; ')},
+  checklistItems:{label:'Checkliste',group:'Lead-Status',importable:false,get:l=>(l.checklist||[]).map(c=>`${c.done?'[x]':'[ ]'} ${c.text}`).join('; ')},
+  commentCount:{label:'Anzahl Kommentare',group:'Lead-Status',importable:false,get:l=>(l.activity||[]).filter(a=>a.type==='comment').length},
+  tasksOpen:{label:'Offene Aufgaben',group:'Lead-Status',importable:false,get:l=>(l.tasks||[]).filter(t=>!t.done).length},
+  tasksTotal:{label:'Aufgaben gesamt',group:'Lead-Status',importable:false,get:l=>(l.tasks||[]).length},
+  filesCount:{label:'Anzahl Anhänge',group:'Lead-Status',importable:false,get:l=>(l.files||[]).length},
+  lossReason:{label:'Verlust-Grund',group:'Lead-Status',importable:true,aliases:['verlust-grund'],example:'Preis zu hoch',get:l=>l.lossReason||'',set:(l,v)=>l.lossReason=v},
+  topSkuOem1:{label:'SKU OEM 1',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku oem 1','top artikel 1 sku oem','artikel 1 sku oem'],example:'OEM-1234',get:l=>l.topArticles[0]?.skuOem||'',set:(l,v)=>l.topArticles[0].skuOem=v},
+  topSkuKompa1:{label:'SKU Kompa 1',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku kompa 1','top artikel 1 sku kompa','artikel 1 sku kompa'],example:'KOMPA-1234',get:l=>l.topArticles[0]?.skuKompa||'',set:(l,v)=>l.topArticles[0].skuKompa=v},
+  topTitle1:{label:'Titel 1',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['titel 1','top artikel 1 titel','artikel 1 titel'],example:'HP LaserJet Toner Schwarz',get:l=>l.topArticles[0]?.title||'',set:(l,v)=>l.topArticles[0].title=v},
+  topSkuOem2:{label:'SKU OEM 2',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku oem 2','top artikel 2 sku oem','artikel 2 sku oem'],example:'',get:l=>l.topArticles[1]?.skuOem||'',set:(l,v)=>l.topArticles[1].skuOem=v},
+  topSkuKompa2:{label:'SKU Kompa 2',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku kompa 2','top artikel 2 sku kompa','artikel 2 sku kompa'],example:'',get:l=>l.topArticles[1]?.skuKompa||'',set:(l,v)=>l.topArticles[1].skuKompa=v},
+  topTitle2:{label:'Titel 2',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['titel 2','top artikel 2 titel','artikel 2 titel'],example:'',get:l=>l.topArticles[1]?.title||'',set:(l,v)=>l.topArticles[1].title=v},
+  topSkuOem3:{label:'SKU OEM 3',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku oem 3','top artikel 3 sku oem','artikel 3 sku oem'],example:'',get:l=>l.topArticles[2]?.skuOem||'',set:(l,v)=>l.topArticles[2].skuOem=v},
+  topSkuKompa3:{label:'SKU Kompa 3',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['sku kompa 3','top artikel 3 sku kompa','artikel 3 sku kompa'],example:'',get:l=>l.topArticles[2]?.skuKompa||'',set:(l,v)=>l.topArticles[2].skuKompa=v},
+  topTitle3:{label:'Titel 3',group:'Top 3 Gekaufte Artikel',importable:true,aliases:['titel 3','top artikel 3 titel','artikel 3 titel'],example:'',get:l=>l.topArticles[2]?.title||'',set:(l,v)=>l.topArticles[2].title=v},
+  forecast:{label:'Forecast (EUR)',group:'Forecast',importable:true,aliases:['forecast (eur)','forecast'],example:'2000',get:l=>l.forecast,set:(l,v)=>l.forecast=v},
+  demandDetails:{label:'Drucker & SKU-Details (Menge, EK, VK, Marge)',group:'Forecast',importable:false,get:l=>formatPrinterDetails(l.demandPrinters)},
+  actual:{label:'Tatsächliches Ergebnis (EUR)',group:'Auftrag',importable:true,aliases:['tatsächliches ergebnis (eur)'],example:'1800',get:l=>l.actual||'',set:(l,v)=>l.actual=v},
+  actualDetails:{label:'Drucker & SKU-Details (Menge, EK, VK, Marge)',group:'Auftrag',importable:false,get:l=>formatPrinterDetails(l.actualPrinters)},
+};
+const GROUP_ORDER=['Kundeninformationen','Drucker & Patronen (Versand)','Lead-Status','Top 3 Gekaufte Artikel','Forecast','Auftrag'];
+// Eine gemeinsame Feldliste, pro Feld getrennt steuerbar ob es beim Import bzw. Export
+// verwendet wird (statt eines einzelnen "Aktiv"-Schalters oder zweier getrennter Listen).
+// Feldreihenfolge wird automatisch aus der Gruppenreihenfolge (GROUP_ORDER) abgeleitet:
+// innerhalb jeder Gruppe bleibt die Deklarationsreihenfolge im FIELD_REGISTRY erhalten.
+const FIELD_ORDER=GROUP_ORDER.flatMap(group=>Object.keys(FIELD_REGISTRY).filter(k=>FIELD_REGISTRY[k].group===group));
+function defaultCsvFields(){
+  return FIELD_ORDER.map(key=>{
+    const r=FIELD_REGISTRY[key];
+    return{key,csvName:`${r.group} – ${r.label}`,importActive:!!r.importable,exportActive:true,overwriteActive:false};
   });
+}
+// Migriert Konfigurationen aus Vorversionen (getrennte Export-/Import-Listen, oder eine
+// einzelne Liste mit nur einem "Aktiv"-Flag) in das aktuelle Format.
+function migrateLegacyCsvFields(){
+  if((PROJECT.csvExportFields&&PROJECT.csvExportFields.length)||(PROJECT.csvImportFields&&PROJECT.csvImportFields.length)){
+    const expList=PROJECT.csvExportFields||[],impList=PROJECT.csvImportFields||[];
+    const keys=[...new Set([...expList.map(f=>f.key),...impList.map(f=>f.key)])];
+    PROJECT.csvFields=keys.map(key=>{
+      const e=expList.find(f=>f.key===key),i=impList.find(f=>f.key===key);
+      return{key,csvName:(e&&e.csvName)||(i&&i.csvName)||FIELD_REGISTRY[key]?.label||key,importActive:!!(i&&i.active),exportActive:!!(e&&e.active),overwriteActive:false};
+    });
+    delete PROJECT.csvExportFields;delete PROJECT.csvImportFields;
+  }
+  if(PROJECT.csvFields&&PROJECT.csvFields.length&&PROJECT.csvFields[0].importActive===undefined){
+    PROJECT.csvFields=PROJECT.csvFields.map(f=>({key:f.key,csvName:f.csvName,importActive:!!(f.active&&FIELD_REGISTRY[f.key]?.importable),exportActive:!!f.active,overwriteActive:false}));
+  }
+  // Bestandslisten (vor Einfuehrung der Ueberschreiben-Option) um das neue Flag ergaenzen,
+  // Standard bewusst "Nein" damit sich das bisherige Verhalten (nie ueberschreiben) nicht aendert
+  if(PROJECT.csvFields&&PROJECT.csvFields.length&&PROJECT.csvFields[0].overwriteActive===undefined){
+    PROJECT.csvFields=PROJECT.csvFields.map(f=>({...f,overwriteActive:false}));
+  }
+}
+function getCsvFields(){
+  migrateLegacyCsvFields();
+  if(!PROJECT.csvFields||!PROJECT.csvFields.length)PROJECT.csvFields=defaultCsvFields();
+  return PROJECT.csvFields;
+}
+function unusedFieldKeys(){
+  const used=new Set(getCsvFields().map(f=>f.key));
+  return Object.keys(FIELD_REGISTRY).filter(k=>!used.has(k));
+}
+function csvNameFor(key){const r=FIELD_REGISTRY[key];return `${r.group} – ${r.label}`;}
+function addCsvField(){
+  const free=unusedFieldKeys();
+  if(!free.length){alert('Alle verfügbaren Felder sind bereits in der Liste.');return;}
+  getCsvFields().push({key:free[0],csvName:csvNameFor(free[0]),importActive:!!FIELD_REGISTRY[free[0]].importable,exportActive:true,overwriteActive:false});
+  saveState();renderSettings();
+}
+function removeCsvField(idx){getCsvFields().splice(idx,1);saveState();renderSettings();}
+function setCsvFieldKey(idx,key){
+  const f=getCsvFields()[idx];f.key=key;f.csvName=csvNameFor(key);
+  if(!FIELD_REGISTRY[key].importable){f.importActive=false;f.overwriteActive=false;}
+  saveState();renderSettings();
+}
+function setCsvFieldName(idx,val){getCsvFields()[idx].csvName=val;saveState();}
+function setCsvFieldImportActive(idx,val){
+  const f=getCsvFields()[idx];
+  if(val&&!FIELD_REGISTRY[f.key]?.importable)return; // berechnete Felder koennen nicht importiert werden
+  f.importActive=val;
+  if(!val)f.overwriteActive=false; // ohne Import macht "ueberschreiben" keinen Sinn
+  saveState();renderSettings();
+}
+function setCsvFieldExportActive(idx,val){getCsvFields()[idx].exportActive=val;saveState();renderSettings();}
+function setCsvFieldOverwriteActive(idx,val){
+  const f=getCsvFields()[idx];
+  if(val&&(!FIELD_REGISTRY[f.key]?.importable||!f.importActive))return; // nur moeglich wenn Feld auch importiert wird
+  f.overwriteActive=val;saveState();renderSettings();
+}
+function resetCsvFields(){
+  if(!confirm('Feldkonfiguration wirklich auf den Standard zurücksetzen?'))return;
+  PROJECT.csvFields=defaultCsvFields();
+  saveState();renderSettings();
+}
+function exportCSV(){
+  const fields=getCsvFields().filter(f=>f.exportActive&&FIELD_REGISTRY[f.key]);
+  const headers=fields.map(f=>f.csvName);
+  const rows=leads.map(l=>fields.map(f=>FIELD_REGISTRY[f.key].get(l)));
   const csv=[headers,...rows].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
   const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;a.download=`toner_kampagne_leads_${TODAY}.csv`;a.click();
+  URL.revokeObjectURL(url);
+}
+// Lädt eine Vorlage zum Ausfüllen herunter: Kopfzeile nach aktueller Import-Konfiguration
+// plus eine Beispielzeile mit plausiblen Musterwerten je Feld
+function downloadImportTemplate(){
+  const fields=getCsvFields().filter(f=>f.importActive&&FIELD_REGISTRY[f.key]?.importable);
+  if(!fields.length){alert('Keine aktiven Import-Felder konfiguriert.');return;}
+  const headers=fields.map(f=>f.csvName);
+  const exampleRow=fields.map(f=>FIELD_REGISTRY[f.key].example??'');
+  const csv=[headers,exampleRow].map(r=>r.map(v=>`"${(v||'').toString().replace(/"/g,'""')}"`).join(',')).join('\n');
+  const blob=new Blob(['\ufeff'+csv],{type:'text/csv;charset=utf-8;'});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement('a');
+  a.href=url;a.download='toner_kampagne_import_vorlage.csv';a.click();
   URL.revokeObjectURL(url);
 }
 
@@ -4042,29 +4258,6 @@ function parseCSV(text){
   return rows;
 }
 // Flexible Header-Erkennung: verschiedene gaengige Spaltennamen werden akzeptiert
-const CSV_FIELD_ALIASES={
-  company:['firmenname','firma','company','unternehmen','name','kundenname'],
-  customerNumber:['kundennummer','kd-nr','kdnr','kundennr','customer number'],
-  contact:['ansprechpartner','kontakt','contact','ansprechperson'],
-  phone:['telefonnummer','telefon','phone','tel','rufnummer'],
-  email:['e-mail','email','mail'],
-  address:['adresse','address','anschrift'],
-  art:['art','typ','type','kundentyp'],
-  orderCount:['anzahl bestellungen','bestellungen','anzahl'],
-  revenue:['umsatz (eur)','umsatz','revenue'],
-  notes:['notizen','notiz','notes','bemerkung','kommentar'],
-  firstContact:['datum erstkontakt','erstkontakt'],
-  followup:['follow-up-datum','followup','follow-up','wiedervorlage'],
-  topSkuOem1:['sku oem 1','top artikel 1 sku oem','artikel 1 sku oem'],
-  topSkuKompa1:['sku kompa 1','top artikel 1 sku kompa','artikel 1 sku kompa'],
-  topTitle1:['titel 1','top artikel 1 titel','artikel 1 titel'],
-  topSkuOem2:['sku oem 2','top artikel 2 sku oem','artikel 2 sku oem'],
-  topSkuKompa2:['sku kompa 2','top artikel 2 sku kompa','artikel 2 sku kompa'],
-  topTitle2:['titel 2','top artikel 2 titel','artikel 2 titel'],
-  topSkuOem3:['sku oem 3','top artikel 3 sku oem','artikel 3 sku oem'],
-  topSkuKompa3:['sku kompa 3','top artikel 3 sku kompa','artikel 3 sku kompa'],
-  topTitle3:['titel 3','top artikel 3 titel','artikel 3 titel'],
-};
 function importCSVFile(file){
   const reader=new FileReader();
   reader.onload=e=>{
@@ -4074,19 +4267,25 @@ function importCSVFile(file){
       const rows=parseCSV(text);
       if(rows.length<2){alert('Die Datei enthält keine Datenzeilen (nur Kopfzeile oder leer).');return;}
       const headers=rows[0].map(h=>h.replace(/\uFEFF/g,'').replace(/^["']|["']$/g,'').trim().toLowerCase());
-      // Spalten-Zuordnung aufbauen
+      // Spalten-Zuordnung aufbauen: fuer jedes importierbare Feld aus der konfigurierten Liste in den
+      // Einstellungen pruefen, ob eine Spalte mit dem konfigurierten Namen ODER einem der bekannten
+      // Alias-Namen (Abwaertskompatibilitaet zu bisherigen CSV-Vorlagen) in der Kopfzeile existiert.
       const colMap={};
-      Object.entries(CSV_FIELD_ALIASES).forEach(([field,aliases])=>{
-        const idx=headers.findIndex(h=>aliases.includes(h));
-        if(idx>-1)colMap[field]=idx;
+      getCsvFields().filter(f=>f.importActive&&FIELD_REGISTRY[f.key]?.importable).forEach(f=>{
+        const reg=FIELD_REGISTRY[f.key];
+        const candidates=[f.csvName.trim().toLowerCase(),...(reg.aliases||[])];
+        const idx=headers.findIndex(h=>candidates.includes(h));
+        if(idx>-1)colMap[f.key]=idx;
       });
       if(colMap.company===undefined){
         alert('Keine Spalte "Firmenname" (oder "Firma") in der Kopfzeile gefunden. Bitte prüfe die CSV-Datei.\n\nGefundene Spalten: '+rows[0].join(', '));
         return;
       }
       const norm=v=>(v||'').trim().toLowerCase();
-      let added=0,skippedDup=0,skippedEmpty=0;
+      let added=0,updated=0,skippedDup=0,skippedEmpty=0;
       const dupDetails=[];
+      const overwriteKeys=getCsvFields().filter(f=>f.importActive&&f.overwriteActive&&FIELD_REGISTRY[f.key]?.set).map(f=>f.key);
+      const collisionBlocked=[];
       const seenInFile=new Set(); // erkennt Duplikate auch INNERHALB der hochgeladenen Datei
       const firstColId=COLUMNS[0].id;
       rows.slice(1).forEach((r,rowIdx)=>{
@@ -4102,6 +4301,31 @@ function importCSVFile(file){
         );
         const fileKey=custNo?'kdnr:'+norm(custNo):'firma:'+norm(company);
         if(existingMatch||seenInFile.has(fileKey)){
+          if(existingMatch&&overwriteKeys.length){
+            // Nur die dafuer freigegebenen Felder aktualisieren, alles andere am bestehenden Lead bleibt unangetastet.
+            // Sonderfall Kundennummer: sie ist die eindeutige Referenz-ID und darf durch das Ueberschreiben
+            // NIE mit der Kundennummer eines ANDEREN Leads kollidieren - in dem Fall wird nur dieses eine
+            // Feld uebersprungen (alle anderen freigegebenen Felder werden trotzdem aktualisiert).
+            const changedFields=[];
+            overwriteKeys.forEach(key=>{
+              const val=get(key);
+              if(val==='')return;
+              if(key==='customerNumber'){
+                const collision=leads.find(l=>l!==existingMatch&&norm(l.customerNumber)===norm(val));
+                if(collision){
+                  collisionBlocked.push(`Zeile ${rowIdx+2}: Kundennummer "${val}" ist bereits bei "${collision.company}" vergeben – Kundennummer von "${existingMatch.company}" wurde NICHT geändert.`);
+                  return;
+                }
+              }
+              FIELD_REGISTRY[key].set(existingMatch,val);changedFields.push(FIELD_REGISTRY[key].label);
+            });
+            if(changedFields.length){
+              existingMatch.activity=existingMatch.activity||[];
+              existingMatch.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Per CSV-Import aktualisiert: ${changedFields.join(', ')}`,date:nowISO()});
+              updated++;
+              return;
+            }
+          }
           skippedDup++;
           const reason=existingMatch
             ?(custNo&&norm(existingMatch.customerNumber)===norm(custNo)?'Kundennummer existiert bereits':
@@ -4116,22 +4340,14 @@ function importCSVFile(file){
         nl.id=genId();
         nl.company=company;
         nl.customerNumber=custNo;
-        nl.contact=get('contact');
         nl.phone=phone;
         nl.email=email;
-        nl.address=get('address');
-        nl.orderCount=get('orderCount');
-        nl.revenue=get('revenue');
-        nl.notes=get('notes');
-        nl.firstContact=get('firstContact');
-        nl.followup=get('followup');
-        nl.topArticles=[1,2,3].map(n=>({
-          skuOem:get('topSkuOem'+n),
-          skuKompa:get('topSkuKompa'+n),
-          title:get('topTitle'+n)
-        }));
-        const art=get('art').toUpperCase();
-        if(art==='B2B'||art==='B2C')nl.art=art;
+        // Alle uebrigen konfigurierten, importierbaren Felder generisch uebernehmen
+        Object.keys(colMap).forEach(key=>{
+          if(['company','customerNumber','phone','email'].includes(key))return;
+          const val=get(key);
+          if(val!==''&&FIELD_REGISTRY[key]?.set)FIELD_REGISTRY[key].set(nl,val);
+        });
         nl.status=firstColId;
         nl.statusSince=TODAY;
         nl.activity=[{id:Date.now()+Math.random(),type:'activity',author:currentUser,text:'Lead per CSV-Import angelegt',date:nowISO()}];
@@ -4141,10 +4357,17 @@ function importCSVFile(file){
       });
       saveState();
       renderBoard();
-      let msg=`CSV-Import abgeschlossen:\n\n✓ ${added} neue Leads angelegt (in "${COLUMNS[0].name}")\n↷ ${skippedDup} übersprungen (bereits vorhanden oder doppelt in der Datei)\n∅ ${skippedEmpty} übersprungen (kein Firmenname)`;
+      let msg=`CSV-Import abgeschlossen:\n\n✓ ${added} neue Leads angelegt (in "${COLUMNS[0].name}")`;
+      if(overwriteKeys.length)msg+=`\n✎ ${updated} bestehende Leads aktualisiert (freigegebene Felder)`;
+      msg+=`\n↷ ${skippedDup} übersprungen (bereits vorhanden, keine Änderung, oder doppelt in der Datei)\n∅ ${skippedEmpty} übersprungen (kein Firmenname)`;
+      if(collisionBlocked.length)msg+=`\n⚠ ${collisionBlocked.length} Kundennummer(n) NICHT übernommen, da sie bereits bei einem anderen Lead vergeben sind`;
       if(dupDetails.length){
         msg+='\n\nÜbersprungene Zeilen im Detail:\n'+dupDetails.slice(0,25).join('\n');
         if(dupDetails.length>25)msg+=`\n… und ${dupDetails.length-25} weitere`;
+      }
+      if(collisionBlocked.length){
+        msg+='\n\nKundennummer-Konflikte im Detail:\n'+collisionBlocked.slice(0,25).join('\n');
+        if(collisionBlocked.length>25)msg+=`\n… und ${collisionBlocked.length-25} weitere`;
       }
       alert(msg);
     }catch(err){

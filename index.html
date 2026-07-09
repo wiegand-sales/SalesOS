@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-09T13:22:26.347Z';
+const BUILD_VERSION='2026-07-09T19:39:04.014Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -880,6 +880,22 @@ function mergeArraysById(baselineArr,localArr,remoteArr){
   const r=new Map((remoteArr||[]).map(x=>[x.id,x]));
   const allIds=new Set([...b.keys(),...l.keys(),...r.keys()]);
   const result=[];
+  // SICHERHEITSSPERRE (der eigentliche, heute gefundene Fehler): Fehlt ein Eintrag lokal,
+  // obwohl er in Baseline UND Remote unveraendert vorhanden ist, wurde das bisher IMMER
+  // als "vom Nutzer absichtlich geloescht" gewertet. Das ist gefaehrlich, wenn der lokale
+  // Speicher aus einem ANDEREN Grund unvollstaendig ist (z.B. ein Ladefehler, ein
+  // veralteter Zwischenspeicher) - dann wuerden echte, unveraenderte Datensaetze
+  // faelschlich geloescht. Betrifft das verdaechtig VIELE Eintraege auf einmal, wird die
+  // Loeschung NICHT ausgefuehrt, sondern der bekannte Stand beibehalten. Eine einzelne,
+  // echte Loeschung durch den Nutzer ist davon nicht betroffen und funktioniert weiterhin.
+  let suspiciousDeletionCount=0;
+  b.forEach((bv,id)=>{
+    if(!l.has(id)&&r.has(id)&&deepEqual(r.get(id),bv))suspiciousDeletionCount++;
+  });
+  const massDeletionSuspected=b.size>5&&suspiciousDeletionCount>5&&suspiciousDeletionCount>b.size*0.3;
+  if(massDeletionSuspected){
+    console.warn(`SICHERHEITSSPERRE: ${suspiciousDeletionCount} von ${b.size} Eintraegen wuerden als geloescht behandelt - das ist verdaechtig viel und wird NICHT ausgefuehrt. Bekannter Stand wird beibehalten.`);
+  }
   allIds.forEach(id=>{
     const inB=b.has(id),inL=l.has(id),inR=r.has(id);
     const bv=b.get(id),lv=l.get(id),rv=r.get(id);
@@ -893,7 +909,11 @@ function mergeArraysById(baselineArr,localArr,remoteArr){
     const localChanged=!inL||!deepEqual(lv,bv);
     const remoteChanged=!inR||!deepEqual(rv,bv);
     if(!localChanged&&!remoteChanged){if(inL)result.push(lv);return;} // unveraendert
-    if(localChanged&&!remoteChanged){if(inL)result.push(lv);return;} // nur lokal geaendert/geloescht
+    if(localChanged&&!remoteChanged){
+      if(inL){result.push(lv);return;} // nur lokal geaendert
+      if(massDeletionSuspected){result.push(bv);return;} // verdaechtige Massenloeschung -> NICHT loeschen
+      return; // einzelne, echte lokale Loeschung -> wird ausgefuehrt
+    }
     if(!localChanged&&remoteChanged){if(inR)result.push(rv);return;} // nur remote geaendert/geloescht
     // Beide Seiten haben seit der Baseline etwas an DIESEM Element geaendert:
     if(!inL&&inR){result.push(rv);return;} // lokal geloescht, remote aber zwischenzeitlich bearbeitet -> nicht verlieren

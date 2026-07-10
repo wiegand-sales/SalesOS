@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T17:48:17.702Z';
+const BUILD_VERSION='2026-07-10T18:06:24.891Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -3262,6 +3262,11 @@ function renderSettings(){
           ${labelsHtml}
           <p style="font-size:11px;color:var(--text3);margin-top:10px">Neue Labels legst du direkt in einer Lead-Karte an (Bereich "Labels").</p>
         </div>
+      </div>
+      <div class="info-section">
+        <div class="section-hdr" style="margin-top:0">"Nicht erreicht"-Verhalten</div>
+        <div class="field"><label>Follow-up automatisch verschieben um (Tage)</label><input type="number" min="1" max="90" step="1" value="${PROJECT.notReachedFollowupDays!==undefined?PROJECT.notReachedFollowupDays:6}" onchange="setProjectField('notReachedFollowupDays',Math.max(1,parseInt(this.value)||6))" style="width:100%;max-width:200px"></div>
+        <p style="font-size:11px;color:var(--text3);margin-top:6px">Klickt jemand im Lead auf "Nicht erreicht", wird das Follow-up-Datum automatisch um diese Anzahl Tage ab heute gesetzt.</p>
       </div>`,
     project:`
       <div class="dash-row-1-1">
@@ -3275,24 +3280,6 @@ function renderSettings(){
           <p style="font-size:11px;color:var(--text3);margin-top:6px">Budget-Auslastung (Toner-Investition gesamt) siehst du im Dashboard.</p>
         </div>
         <div class="info-section">
-          <div class="section-hdr" style="margin-top:0">"Nicht erreicht"-Verhalten</div>
-          <div class="field"><label>Follow-up automatisch verschieben um (Tage)</label><input type="number" min="1" max="90" step="1" value="${PROJECT.notReachedFollowupDays!==undefined?PROJECT.notReachedFollowupDays:6}" onchange="setProjectField('notReachedFollowupDays',Math.max(1,parseInt(this.value)||6))" style="width:100%"></div>
-          <p style="font-size:11px;color:var(--text3);margin-top:6px">Klickt jemand im Lead auf "Nicht erreicht", wird das Follow-up-Datum automatisch um diese Anzahl Tage ab heute gesetzt.</p>
-        </div>
-        <div class="info-section">
-          <div class="section-hdr" style="margin-top:0">Automatische lokale Sicherung</div>
-          <div class="field"><label>Backup-Datei automatisch herunterladen alle (Minuten)</label>
-            <select onchange="setProjectField('autoBackupIntervalMinutes',parseInt(this.value)||0)" style="width:100%">
-              <option value="0" ${!PROJECT.autoBackupIntervalMinutes?'selected':''}>Aus</option>
-              <option value="15" ${PROJECT.autoBackupIntervalMinutes===15?'selected':''}>Alle 15 Minuten</option>
-              <option value="30" ${PROJECT.autoBackupIntervalMinutes===30?'selected':''}>Alle 30 Minuten</option>
-              <option value="60" ${PROJECT.autoBackupIntervalMinutes===60?'selected':''}>Jede Stunde</option>
-              <option value="120" ${PROJECT.autoBackupIntervalMinutes===120?'selected':''}>Alle 2 Stunden</option>
-            </select>
-          </div>
-          <p style="font-size:11px;color:var(--text3);margin-top:6px">Lädt zusätzlich zur stündlichen Cloud-Sicherung eine Backup-Datei direkt auf deinen Rechner herunter, solange dieser Tab geöffnet ist – als zusätzliche, lokale Kopie. Der Speicherort selbst wird von deinem Browser bestimmt (i.d.R. dein Downloads-Ordner) und lässt sich hier aus Sicherheitsgründen nicht einstellen.</p>
-        </div>
-        <div class="info-section">
           <div class="section-hdr" style="margin-top:0">Meilensteine</div>
           ${milestonesHtml}
           <div class="add-check-row" style="margin-top:10px;flex-wrap:wrap;gap:6px">
@@ -3301,10 +3288,6 @@ function renderSettings(){
             <button class="btn btn-sm btn-primary" onclick="createMilestone()"><i class="ti ti-plus"></i></button>
           </div>
         </div>
-      </div>
-      <div class="info-section">
-        <div class="section-hdr" style="margin-top:0">Änderungsprotokoll <span style="font-weight:400;color:var(--text3);font-size:11px">(jede Live-Änderung mit Vorher/Nachher-Zahlenvergleich und Datenschnappschuss von direkt davor – ein doppeltes Sicherheitsnetz)</span></div>
-        ${deployLogHtml()}
       </div>
       <div class="info-section">
         <div class="section-hdr" style="margin-top:0">Projekt-Risiken <span style="font-weight:400;color:var(--text3);font-size:11px">(allgemein, nicht an einen einzelnen Lead gebunden)</span></div>
@@ -3327,6 +3310,26 @@ function renderSettings(){
         <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="runDataIntegrityCheck()"><i class="ti ti-stethoscope"></i> Datenintegrität jetzt prüfen</button>
         <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="listAvailableBackups()"><i class="ti ti-history"></i> Backups anzeigen / wiederherstellen</button>
         <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="migrateLegacyAttachmentsToStorage()"><i class="ti ti-file-upload"></i> Alte Anhänge in den Dateispeicher übertragen</button>
+      </div>
+      <div class="info-section">
+        <div class="section-hdr" style="margin-top:0">Automatische lokale Sicherung</div>
+        <div class="field"><label>Backup-Datei automatisch herunterladen alle (Minuten)</label>
+          <select onchange="setProjectField('autoBackupIntervalMinutes',parseInt(this.value)||0)" style="width:100%;max-width:250px">
+            <option value="0" ${!PROJECT.autoBackupIntervalMinutes?'selected':''}>Aus</option>
+            <option value="15" ${PROJECT.autoBackupIntervalMinutes===15?'selected':''}>Alle 15 Minuten</option>
+            <option value="30" ${PROJECT.autoBackupIntervalMinutes===30?'selected':''}>Alle 30 Minuten</option>
+            <option value="60" ${PROJECT.autoBackupIntervalMinutes===60?'selected':''}>Jede Stunde</option>
+            <option value="120" ${PROJECT.autoBackupIntervalMinutes===120?'selected':''}>Alle 2 Stunden</option>
+          </select>
+        </div>
+        <p style="font-size:11px;color:var(--text3);margin-top:6px">Lädt zusätzlich zur stündlichen Cloud-Sicherung eine Backup-Datei direkt auf deinen Rechner herunter, solange dieser Tab geöffnet ist – als zusätzliche, lokale Kopie. Der Speicherort selbst wird von deinem Browser bestimmt (i.d.R. dein Downloads-Ordner) und lässt sich hier aus Sicherheitsgründen nicht einstellen.</p>
+      </div>
+      <div class="info-section">
+        <div class="section-hdr" style="margin-top:0">Änderungsprotokoll</div>
+        <p style="font-size:12px;color:var(--text3);margin:-6px 0 12px 0;max-width:820px">
+          Jede Code-Änderung, die Claude an SalesOS Live vornimmt, wird hier festgehalten – mit einer kurzen Beschreibung, was geändert wurde, und einem Zahlenvergleich (Anzahl Leads und Aktivitäten/Kommentare insgesamt, jeweils direkt vor und direkt nach der Änderung). Stimmen die Zahlen überein (✓), ist nichts verlorengegangen. Weichen sie ab (✗), ist das ein sofortiges Warnsignal. Zusätzlich wird vor jeder Änderung automatisch ein vollständiger Datenschnappschuss gesichert ("Stand davor") – ein doppeltes Sicherheitsnetz: Du musst weder Claudes Angaben vertrauen noch dich auf ein einzelnes stündliches Backup verlassen, sondern kannst jederzeit selbst nachprüfen und im Zweifel sofort den exakten Stand von davor herunterladen.
+        </p>
+        ${deployLogHtml()}
       </div>
       <div class="info-section" style="border-color:var(--red)">
         <div class="section-hdr" style="margin-top:0;color:var(--red)"><i class="ti ti-alert-triangle"></i> Gefahrenzone</div>

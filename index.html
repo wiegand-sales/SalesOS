@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T11:33:49.967Z';
+const BUILD_VERSION='2026-07-10T13:56:21.173Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -1052,6 +1052,16 @@ let leadsSyncQueued=false;
 // vorsichtshalber der komplette, aktuelle Stand von der Cloud geholt, statt sich auf den
 // (potenziell leicht veralteten) lokalen Vergleich zu verlassen.
 let isFirstLeadsSyncSinceLoad=true;
+// Fuehrt zwei Verlaufslisten (Kommentare/Aktivitaeten) verlustfrei zusammen, dedupliziert
+// nach eindeutiger ID. Wird immer dann genutzt, wenn eine eingehende Fassung eines Leads
+// WENIGER Eintraege haette als die bereits bekannte - so kann eine veraltete Fassung nie
+// mehr echte, bereits gespeicherte Eintraege loeschen, egal woher sie kommt.
+function mergeActivityArrays(arrA,arrB){
+  const byId={};
+  (arrA||[]).forEach(a=>{byId[a.id]=a;});
+  (arrB||[]).forEach(a=>{if(!(a.id in byId))byId[a.id]=a;});
+  return Object.values(byId).sort((a,b)=>new Date(a.date)-new Date(b.date));
+}
 async function syncLeadsLayer(){
   if(!sbSession||!sbSession.access_token)return;
   // Genau wie beim Einstellungs-Abgleich: ist eine neuere Version erkannt worden, wird
@@ -1095,7 +1105,19 @@ async function syncLeadsLayer(){
       const newBaseline={};
       const newLeads=rows.map(r=>{
         newBaseline[r.id]={data:r.data,updatedAt:r.updated_at};
-        return localChangedMap[r.id]!==undefined?localChangedMap[r.id]:r.data;
+        if(localChangedMap[r.id]!==undefined)return localChangedMap[r.id];
+        // Dieselbe Absicherung wie beim regulaeren Abgleich: hat der Lead lokal (aus dem
+        // Zwischenspeicher) bereits MEHR Verlaufseintraege als die frisch geholte
+        // Cloud-Fassung, wird zusammengefuehrt statt blind ersetzt.
+        const existingLocal=leads.find(l=>String(l.id)===String(r.id));
+        if(existingLocal){
+          const localActivity=existingLocal.activity||[];
+          const remoteActivity=r.data.activity||[];
+          if(remoteActivity.length<localActivity.length){
+            return {...r.data,activity:mergeActivityArrays(localActivity,remoteActivity)};
+          }
+        }
+        return r.data;
       });
       // Ganz neue, noch nie synchronisierte eigene Leads (z.B. gerade erst angelegt, kurz
       // bevor dieser erste Abgleich abgeschlossen war) zusaetzlich mit aufnehmen.
@@ -1170,7 +1192,22 @@ async function syncLeadsLayer(){
       const fetchedRows=await pullLeadRowsByIds(idsToFetch);
       fetchedRows.forEach(r=>{
         const idx=leads.findIndex(l=>String(l.id)===String(r.id));
-        if(idx>=0)leads[idx]=r.data;else leads.push(r.data);
+        if(idx>=0){
+          const localActivity=leads[idx].activity||[];
+          const remoteActivity=r.data.activity||[];
+          // SICHERHEITSCHECK: haette die eingehende Fassung WENIGER Verlaufseintraege
+          // als das, was hier bereits bekannt ist, wird NICHT einfach ersetzt, sondern
+          // zusammengefuehrt - so kann ein veralteter Stand von woanders nie mehr echte,
+          // bereits gespeicherte Kommentare/Aktivitaeten verschwinden lassen.
+          if(remoteActivity.length<localActivity.length){
+            console.warn(`Lead ${r.id}: eingehende Fassung hatte weniger Verlaufseintraege (${remoteActivity.length} statt ${localActivity.length}) - wird zusammengefuehrt statt ersetzt.`);
+            leads[idx]={...r.data,activity:mergeActivityArrays(localActivity,remoteActivity)};
+          }else{
+            leads[idx]=r.data;
+          }
+        }else{
+          leads.push(r.data);
+        }
         leadsBaseline[r.id]={data:JSON.parse(JSON.stringify(r.data)),updatedAt:r.updated_at};
       });
       normalizeLeads();
@@ -1195,8 +1232,22 @@ async function syncLeadsLayer(){
         let confirmedAt=await pushLeadRow(lead,expected);
         if(confirmedAt===false){
           // Konflikt: ein anderes Geraet hat GENAU diesen Lead zwischenzeitlich auch
-          // geaendert. Etablierte, bereits dokumentierte Regel: lokale Version gewinnt
-          // fuer diesen einen Lead (kein Effekt auf alle anderen Leads).
+          // geaendert. Bevor die eigene Version einfach druebergeschrieben wird, wird
+          // jetzt zuerst der AKTUELLE Cloud-Stand dieses einen Leads geholt und die
+          // Verlaufseintraege verlustfrei zusammengefuehrt - keine Seite verliert dabei etwas.
+          try{
+            const currentRemoteRows=await pullLeadRowsByIds([lead.id]);
+            if(currentRemoteRows.length){
+              const remoteActivity=currentRemoteRows[0].data.activity||[];
+              const localActivity=lead.activity||[];
+              if(remoteActivity.length>localActivity.length){
+                lead.activity=mergeActivityArrays(localActivity,remoteActivity);
+              }
+            }
+          }catch(mergeErr){
+            // Falls das Nachladen selbst fehlschlaegt, wird trotzdem mit der bisherigen
+            // lokalen Fassung fortgefahren (besser als den ganzen Sync abzubrechen).
+          }
           confirmedAt=await pushLeadRow(lead,null);
         }
         leadsBaseline[lead.id]={data:JSON.parse(JSON.stringify(lead)),updatedAt:confirmedAt};

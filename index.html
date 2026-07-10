@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T14:01:50.082Z';
+const BUILD_VERSION='2026-07-10T14:16:59.871Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -3285,6 +3285,11 @@ function renderSettings(){
           <p style="font-size:11px;color:var(--text3);margin-top:6px">Lädt zusätzlich zur stündlichen Cloud-Sicherung eine Backup-Datei direkt auf deinen Rechner herunter, solange dieser Tab geöffnet ist – als zusätzliche, lokale Kopie. Der Speicherort selbst wird von deinem Browser bestimmt (i.d.R. dein Downloads-Ordner) und lässt sich hier aus Sicherheitsgründen nicht einstellen.</p>
         </div>
         <div class="info-section">
+          <div class="section-hdr" style="margin-top:0">Änderungsprotokoll</div>
+          <p style="font-size:11px;color:var(--text3);margin-bottom:8px">Jede von Claude vorgenommene Code-Änderung an Live wird hier mit einer kurzen Beschreibung und einem Zahlenvergleich (Leads/Aktivitäten vor und nach der Änderung) festgehalten.</p>
+          ${deployLogHtml()}
+        </div>
+        <div class="info-section">
           <div class="section-hdr" style="margin-top:0">Meilensteine</div>
           ${milestonesHtml}
           <div class="add-check-row" style="margin-top:10px;flex-wrap:wrap;gap:6px">
@@ -5389,6 +5394,50 @@ function maybeRunClientAutoBackup(){
   exportFullBackup(true);
   PROJECT.lastAutoBackupAt=now.toISOString();
   saveState();
+}
+// ===== Aenderungsprotokoll (Einstellungen) =====
+let deployLogEntries=null;
+let deployLogLoading=false;
+async function loadDeployLog(){
+  if(deployLogLoading)return;
+  deployLogLoading=true;
+  try{
+    const res=await fetch(`${SUPABASE_URL}/rest/v1/deploy_log?select=*&order=deployed_at.desc&limit=30`,{headers:getSbHeaders()});
+    if(res.ok){
+      deployLogEntries=await res.json();
+      if(currentView==='settings')renderSettings();
+    }
+  }catch(e){
+    console.warn('Aenderungsprotokoll konnte nicht geladen werden:',e);
+  }finally{
+    deployLogLoading=false;
+  }
+}
+function deployLogHtml(){
+  if(deployLogEntries===null){
+    loadDeployLog();
+    return `<div class="activity-item" style="padding-left:0">Lade Protokoll…</div>`;
+  }
+  if(!deployLogEntries.length){
+    return `<div class="activity-item" style="padding-left:0">Noch keine Einträge vorhanden.</div>`;
+  }
+  return deployLogEntries.map(e=>{
+    const match=e.counts_match;
+    const badge=match
+      ?`<span style="color:var(--green,#1a7f37);font-weight:600">✓ Zahlen stimmen überein</span>`
+      :`<span style="color:var(--red);font-weight:600">✗ Abweichung!</span>`;
+    return `<div class="comment-item">
+      <div class="comment-bubble" style="width:100%">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:2px">${fmtDateTime(e.deployed_at)}</div>
+        <div style="font-weight:600;margin-bottom:4px">${esc(e.description)}</div>
+        <div style="font-size:12px;color:var(--text2)">
+          Leads: ${e.leads_count_before} → ${e.leads_count_after} &nbsp;|&nbsp;
+          Aktivitäten: ${e.activities_count_before} → ${e.activities_count_after} &nbsp;|&nbsp;
+          ${badge}
+        </div>
+      </div>
+    </div>`;
+  }).join('');
 }
 // ── CSV-FELDKONFIGURATION (Einstellungen → Import/Export) ──
 // Baut je Drucker eine Detailzeile mit jeder einzelnen SKU inkl. Menge, EK, VK und Margen-Zeilensumme

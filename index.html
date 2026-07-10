@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T13:56:21.173Z';
+const BUILD_VERSION='2026-07-10T14:01:50.082Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -3272,6 +3272,19 @@ function renderSettings(){
           <p style="font-size:11px;color:var(--text3);margin-top:6px">Klickt jemand im Lead auf "Nicht erreicht", wird das Follow-up-Datum automatisch um diese Anzahl Tage ab heute gesetzt.</p>
         </div>
         <div class="info-section">
+          <div class="section-hdr" style="margin-top:0">Automatische lokale Sicherung</div>
+          <div class="field"><label>Backup-Datei automatisch herunterladen alle (Minuten)</label>
+            <select onchange="setProjectField('autoBackupIntervalMinutes',parseInt(this.value)||0)" style="width:100%">
+              <option value="0" ${!PROJECT.autoBackupIntervalMinutes?'selected':''}>Aus</option>
+              <option value="15" ${PROJECT.autoBackupIntervalMinutes===15?'selected':''}>Alle 15 Minuten</option>
+              <option value="30" ${PROJECT.autoBackupIntervalMinutes===30?'selected':''}>Alle 30 Minuten</option>
+              <option value="60" ${PROJECT.autoBackupIntervalMinutes===60?'selected':''}>Jede Stunde</option>
+              <option value="120" ${PROJECT.autoBackupIntervalMinutes===120?'selected':''}>Alle 2 Stunden</option>
+            </select>
+          </div>
+          <p style="font-size:11px;color:var(--text3);margin-top:6px">Lädt zusätzlich zur stündlichen Cloud-Sicherung eine Backup-Datei direkt auf deinen Rechner herunter, solange dieser Tab geöffnet ist – als zusätzliche, lokale Kopie. Der Speicherort selbst wird von deinem Browser bestimmt (i.d.R. dein Downloads-Ordner) und lässt sich hier aus Sicherheitsgründen nicht einstellen.</p>
+        </div>
+        <div class="info-section">
           <div class="section-hdr" style="margin-top:0">Meilensteine</div>
           ${milestonesHtml}
           <div class="add-check-row" style="margin-top:10px;flex-wrap:wrap;gap:6px">
@@ -5350,7 +5363,7 @@ function deleteAllLeads(){
   renderSettings();
   alert('Alle Leads wurden gelöscht. Ein Backup der vorherigen Daten wurde als JSON-Datei heruntergeladen.');
 }
-function exportFullBackup(){
+function exportFullBackup(isAutomatic){
   const backup={
     exportedAt:nowISO(),
     leads,COLUMNS,LABELS,AGENTS,ARTICLES,PROJECT,
@@ -5360,11 +5373,22 @@ function exportFullBackup(){
   const url=URL.createObjectURL(blob);
   const a=document.createElement('a');
   a.href=url;
-  a.download=`salesos_backup_${TODAY}.json`;
+  const timeSuffix=isAutomatic?'_'+new Date().toTimeString().slice(0,5).replace(':','-'):'';
+  a.download=`salesos_backup_${TODAY}${timeSuffix}.json`;
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
+}
+function maybeRunClientAutoBackup(){
+  const intervalMinutes=PROJECT.autoBackupIntervalMinutes;
+  if(!intervalMinutes||intervalMinutes<=0)return;
+  const last=PROJECT.lastAutoBackupAt?new Date(PROJECT.lastAutoBackupAt):null;
+  const now=new Date();
+  if(last&&(now-last)<intervalMinutes*60*1000)return;
+  exportFullBackup(true);
+  PROJECT.lastAutoBackupAt=now.toISOString();
+  saveState();
 }
 // ── CSV-FELDKONFIGURATION (Einstellungen → Import/Export) ──
 // Baut je Drucker eine Detailzeile mit jeder einzelnen SKU inkl. Menge, EK, VK und Margen-Zeilensumme
@@ -5938,6 +5962,7 @@ async function bootstrapApp(){
   await sbInitialSync();
   setTimeout(()=>{sbPoll();setInterval(sbPoll,5000);},Math.random()*5000);
   setInterval(checkForNewVersion,60000);
+  setInterval(maybeRunClientAutoBackup,60000);
   // Ein Tab, der lange im Hintergrund lag (z.B. eine Nacht offen), soll beim Zurueckkehren
   // sofort geprueft werden - genau die Situation, in der veralteter Code am ehesten
   // unbemerkt weiterlaeuft und Daten anderer, aktuellerer Sitzungen ueberschreiben koennte.

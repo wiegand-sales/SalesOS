@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T10:13:58.879Z';
+const BUILD_VERSION='2026-07-10T10:16:06.819Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -864,6 +864,10 @@ let leadsBaseline=null; // {[id]: {data, updatedAt}} oder null = noch nie synchr
 // Stand direkt aus der Cloud.
 function loadLeadsBaseline(){
   leadsBaseline=null;
+  // Einmaliges Aufraeumen: der ALTE Eintrag (von vor diesem Fix) liegt bei Leuten, die
+  // ihn schon mal gefuellt hatten, noch als "Leiche" im Speicher und wird nie mehr
+  // beschrieben - aktiv entfernen, damit der dadurch belegte Platz sofort wieder frei ist.
+  try{localStorage.removeItem(LEADS_BASELINE_KEY);}catch(e){}
 }
 function saveLeadsBaseline(newBaseline){
   leadsBaseline=newBaseline;

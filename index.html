@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T10:07:24.087Z';
+const BUILD_VERSION='2026-07-10T10:13:58.879Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -854,15 +854,19 @@ let sbBaselineUpdatedAt=null;
 // einzelne Speicherstelle im Code das selbst melden muesste.
 const LEADS_BASELINE_KEY='toner_kanban_leads_baseline_v1';
 let leadsBaseline=null; // {[id]: {data, updatedAt}} oder null = noch nie synchronisiert
+// WICHTIG: leadsBaseline wird bewusst NICHT mehr zusaetzlich im Browser-Speicher
+// dupliziert (das war im Kern eine komplette Zweitkopie aller Lead-Daten und damit der
+// groesste Speicherfresser - fuehrte bei ausreichend vielen/grossen Leads zu
+// "QuotaExceededError", wonach ueberhaupt nichts mehr lokal gespeichert werden konnte).
+// leadsBaseline lebt jetzt nur noch im Arbeitsspeicher fuer die Dauer der Sitzung. Das
+// ist sicher: der "erster Abgleich nach dem Laden"-Mechanismus (siehe syncLeadsLayer)
+// holt bei leerer Baseline ohnehin immer verlaesslich den aktuellen, vollstaendigen
+// Stand direkt aus der Cloud.
 function loadLeadsBaseline(){
-  try{
-    const raw=localStorage.getItem(LEADS_BASELINE_KEY);
-    leadsBaseline=raw?JSON.parse(raw):null;
-  }catch(e){leadsBaseline=null;}
+  leadsBaseline=null;
 }
 function saveLeadsBaseline(newBaseline){
   leadsBaseline=newBaseline;
-  try{localStorage.setItem(LEADS_BASELINE_KEY,JSON.stringify(newBaseline));}catch(e){}
 }
 function loadSyncBaseline(){
   try{

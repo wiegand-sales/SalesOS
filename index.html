@@ -40,6 +40,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .sidebar-user-row label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 .sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:background .15s,color .15s;}
 .sidebar-nav-item i{font-size:17px;flex-shrink:0;}
+.nav-icon-badge{width:26px;height:26px;border-radius:7px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-icon-badge i{color:#fff;font-size:14px;}
 .sidebar-nav-item:hover{background:var(--bg2);color:var(--text);}
 .sidebar-nav-item.active{background:linear-gradient(180deg,#eaf2f3,#e3eef0);color:var(--purple-dark);box-shadow:inset 0 0 0 1px rgba(32,106,114,.14),0 1px 3px rgba(32,106,114,.08);font-weight:600;}
 .sidebar-footer{margin-top:auto;padding:10px 8px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);}
@@ -466,11 +468,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 <div class="app-shell hidden">
   <div class="sidebar">
     <div class="sidebar-project">
-      <svg width="28" height="28" viewBox="0 0 32 32" style="flex-shrink:0">
-        <rect width="32" height="32" rx="8" fill="#206A72"/>
-        <circle cx="16" cy="16" r="10" fill="none" stroke="#E9F0F1" stroke-width="4" stroke-dasharray="5 5.9" stroke-linecap="round"/>
-        <circle cx="16" cy="16" r="10" fill="none" stroke="#D94109" stroke-width="4" stroke-dasharray="5 57.8" stroke-dashoffset="-18" stroke-linecap="round"/>
-      </svg>
+      <span class="nav-icon-badge" style="width:28px;height:28px;border-radius:8px"><i class="ti ti-target-arrow" style="font-size:15px"></i></span>
       <div>
         <div class="sidebar-project-name">SalesOS</div>
         <div class="sidebar-project-sub">FlowBoard</div>
@@ -493,12 +491,12 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
         <select id="currentUserSelect" class="me-select" onchange="currentUser=this.value;updateNavForRole()" style="width:100%"></select>
       </div>
     </div>
-    <div class="sidebar-nav-item" id="navDashboard" onclick="switchView('dashboard')"><i class="ti ti-layout-dashboard"></i> SFP: Toner</div>
-    <div class="sidebar-nav-item" id="navBoard" onclick="switchView('board')"><i class="ti ti-layout-kanban"></i> Board</div>
-    <div class="sidebar-nav-item" id="navCrrma" onclick="switchView('crrma')"><i class="ti ti-report-money"></i> CR RMA</div>
-    <div class="sidebar-nav-item" id="navTasks" onclick="switchView('tasks')"><i class="ti ti-list-check"></i> Aufgaben</div>
-    <div class="sidebar-nav-item" id="navActivities" onclick="switchView('activities')"><i class="ti ti-history"></i> Aktivitäten</div>
-    <div class="sidebar-nav-item" id="navSettings" onclick="switchView('settings')"><i class="ti ti-settings"></i> Einstellungen</div>
+    <div class="sidebar-nav-item" id="navDashboard" onclick="switchView('dashboard')"><span class="nav-icon-badge"><i class="ti ti-layout-dashboard"></i></span> SFP: Toner</div>
+    <div class="sidebar-nav-item" id="navBoard" onclick="switchView('board')"><span class="nav-icon-badge"><i class="ti ti-layout-kanban"></i></span> Board</div>
+    <div class="sidebar-nav-item" id="navCrrma" onclick="switchView('crrma')"><span class="nav-icon-badge"><i class="ti ti-report-money"></i></span> CR RMA</div>
+    <div class="sidebar-nav-item" id="navTasks" onclick="switchView('tasks')"><span class="nav-icon-badge"><i class="ti ti-list-check"></i></span> Aufgaben</div>
+    <div class="sidebar-nav-item" id="navActivities" onclick="switchView('activities')"><span class="nav-icon-badge"><i class="ti ti-history"></i></span> Aktivitäten</div>
+    <div class="sidebar-nav-item" id="navSettings" onclick="switchView('settings')"><span class="nav-icon-badge"><i class="ti ti-settings"></i></span> Einstellungen</div>
     <div class="sidebar-footer">Weitere Projekte folgen hier bald.<div id="buildVersionDisplay" style="margin-top:8px;font-size:10px;color:var(--text3);opacity:.7;user-select:all"></div></div>
   </div>
   <div class="main-area">
@@ -734,7 +732,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T18:50:25.171Z';
+const BUILD_VERSION='2026-07-10T19:06:22.496Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -4940,6 +4938,7 @@ function addTask(){
   }
   clearTaskFormError();
   draftLead.tasks.push({id:genId(),text,dueDate:dueEl.value,done:false,createdBy:currentUser,createdAt:nowISO(),assigneeId:pendingTaskAssigneeId||null});
+  draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Aufgabe hinzugefügt: ${text}`,date:nowISO()});
   textEl.value='';
   dueEl.value='';
   pendingTaskAssigneeId=null;
@@ -4950,19 +4949,26 @@ function addTask(){
 }
 function toggleTask(id){
   const t=draftLead.tasks.find(x=>x.id===id);
-  if(t)t.done=!t.done;
+  if(t){
+    t.done=!t.done;
+    draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Aufgabe ${t.done?'erledigt':'wieder geöffnet'}: ${t.text}`,date:nowISO()});
+  }
   autoPersistIfEditing();
   renderLeadModal();
 }
 function deleteTask(id){
+  const t=draftLead.tasks.find(x=>x.id===id);
   draftLead.tasks=draftLead.tasks.filter(x=>x.id!==id);
+  if(t)draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Aufgabe entfernt: ${t.text}`,date:nowISO()});
   autoPersistIfEditing();
   renderLeadModal();
 }
 
 // Checkliste
 function deleteChecklist(){
+  const count=(draftLead.checklist||[]).length;
   draftLead.checklist=[];
+  if(count>0)draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Checkliste komplett gelöscht (${count} Punkte)`,date:nowISO()});
   autoPersistIfEditing();
   renderLeadModal();
 }
@@ -5046,17 +5052,23 @@ function addChecklistItem(){
   const text=inp.value.trim();
   if(!text)return;
   draftLead.checklist.push({id:Date.now(),text,done:false});
+  draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Checklisten-Punkt hinzugefügt: ${text}`,date:nowISO()});
   autoPersistIfEditing();
   renderLeadModal();
 }
 function toggleCheckItem(id){
   const item=draftLead.checklist.find(c=>c.id===id);
-  if(item)item.done=!item.done;
+  if(item){
+    item.done=!item.done;
+    draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Checklisten-Punkt ${item.done?'erledigt':'wieder geöffnet'}: ${item.text}`,date:nowISO()});
+  }
   autoPersistIfEditing();
   renderLeadModal();
 }
 function deleteCheckItem(id){
+  const item=draftLead.checklist.find(c=>c.id===id);
   draftLead.checklist=draftLead.checklist.filter(c=>c.id!==id);
+  if(item)draftLead.activity.unshift({id:Date.now()+Math.random(),type:'activity',author:currentUser,text:`Checklisten-Punkt entfernt: ${item.text}`,date:nowISO()});
   autoPersistIfEditing();
   renderLeadModal();
 }
@@ -5188,6 +5200,15 @@ function logFieldChanges(original,draft){
   }
   if(JSON.stringify(original.actualPrinters||[])!==JSON.stringify(draft.actualPrinters||[])){
     entries.push('Tatsächlicher Bedarf aktualisiert');
+  }
+  if(JSON.stringify(original.tasks||[])!==JSON.stringify(draft.tasks||[])){
+    const oldCount=(original.tasks||[]).length,newCount=(draft.tasks||[]).length;
+    if(newCount>oldCount)entries.push(`Aufgabe hinzugefügt (jetzt ${newCount})`);
+    else if(newCount<oldCount)entries.push(`Aufgabe entfernt (jetzt ${newCount})`);
+    else entries.push('Aufgaben aktualisiert');
+  }
+  if(JSON.stringify(original.checklist||[])!==JSON.stringify(draft.checklist||[])){
+    entries.push('Checkliste aktualisiert');
   }
   return entries;
 }

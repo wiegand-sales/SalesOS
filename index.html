@@ -227,6 +227,8 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 .btn-primary:hover{background:linear-gradient(180deg,#1f6d76 0%,#174C52 100%);}
 .btn-danger{background:var(--red-bg);color:var(--red);border-color:transparent;}
 .btn-sm{padding:5px 10px;font-size:12px;}
+.info-callout{background:var(--purple-bg);border-left:3px solid var(--purple);border-radius:var(--r-md);padding:12px 16px;font-size:12px;color:var(--purple-dark);line-height:1.6;width:100%;box-sizing:border-box;}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
 .me-select{font-size:12px;padding:6px 9px;}
 
 /* FILTER BAR */
@@ -730,7 +732,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T18:06:24.891Z';
+const BUILD_VERSION='2026-07-10T18:27:40.984Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -3306,10 +3308,12 @@ function renderSettings(){
       <div class="info-section">
         <div class="section-hdr" style="margin-top:0">Datenspeicherung</div>
         <p style="font-size:12px;color:var(--text2);line-height:1.6">Alle Daten liegen in einer gemeinsamen Cloud-Datenbank (Supabase) – alle Mitarbeiter sehen denselben Stand, egal an welchem Gerät. Der Status oben links in der Seitenleiste zeigt, ob die Verbindung gerade aktiv ist. Bei fehlender Internetverbindung wird lokal weitergearbeitet und automatisch synchronisiert, sobald die Verbindung zurück ist.</p>
-        <button class="btn btn-sm" style="margin-top:8px" onclick="exportFullBackup()"><i class="ti ti-database-export"></i> Alle Daten als Backup exportieren (JSON)</button>
-        <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="runDataIntegrityCheck()"><i class="ti ti-stethoscope"></i> Datenintegrität jetzt prüfen</button>
-        <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="listAvailableBackups()"><i class="ti ti-history"></i> Backups anzeigen / wiederherstellen</button>
-        <button class="btn btn-sm" style="margin-top:8px;margin-left:8px" onclick="migrateLegacyAttachmentsToStorage()"><i class="ti ti-file-upload"></i> Alte Anhänge in den Dateispeicher übertragen</button>
+        <div class="btn-row">
+          <button class="btn" onclick="exportFullBackup()"><i class="ti ti-database-export"></i> Alle Daten als Backup exportieren (JSON)</button>
+          <button class="btn" onclick="runDataIntegrityCheck()"><i class="ti ti-stethoscope"></i> Datenintegrität jetzt prüfen</button>
+          <button class="btn" onclick="listAvailableBackups()"><i class="ti ti-history"></i> Backups anzeigen / wiederherstellen</button>
+          <button class="btn" onclick="migrateLegacyAttachmentsToStorage()"><i class="ti ti-file-upload"></i> Alte Anhänge in den Dateispeicher übertragen</button>
+        </div>
       </div>
       <div class="info-section">
         <div class="section-hdr" style="margin-top:0">Automatische lokale Sicherung</div>
@@ -3326,15 +3330,15 @@ function renderSettings(){
       </div>
       <div class="info-section">
         <div class="section-hdr" style="margin-top:0">Änderungsprotokoll</div>
-        <p style="font-size:12px;color:var(--text3);margin:-6px 0 12px 0;max-width:820px">
+        <div class="info-callout" style="margin-bottom:14px">
           Jede Code-Änderung, die Claude an SalesOS Live vornimmt, wird hier festgehalten – mit einer kurzen Beschreibung, was geändert wurde, und einem Zahlenvergleich (Anzahl Leads und Aktivitäten/Kommentare insgesamt, jeweils direkt vor und direkt nach der Änderung). Stimmen die Zahlen überein (✓), ist nichts verlorengegangen. Weichen sie ab (✗), ist das ein sofortiges Warnsignal. Zusätzlich wird vor jeder Änderung automatisch ein vollständiger Datenschnappschuss gesichert ("Stand davor") – ein doppeltes Sicherheitsnetz: Du musst weder Claudes Angaben vertrauen noch dich auf ein einzelnes stündliches Backup verlassen, sondern kannst jederzeit selbst nachprüfen und im Zweifel sofort den exakten Stand von davor herunterladen.
-        </p>
+        </div>
         ${deployLogHtml()}
       </div>
       <div class="info-section" style="border-color:var(--red)">
         <div class="section-hdr" style="margin-top:0;color:var(--red)"><i class="ti ti-alert-triangle"></i> Gefahrenzone</div>
         <p style="font-size:12px;color:var(--text2);line-height:1.6">Löscht <strong>alle Leads</strong> unwiderruflich. Die Board-Struktur (Listen/Spalten, Labels, Mitarbeiter, Projekt-Einstellungen) bleibt vollständig erhalten – nur die Kundendaten selbst werden entfernt. Nur für Admins verfügbar.</p>
-        <button class="btn btn-sm" style="margin-top:8px;background:var(--red-bg);color:var(--red-dark);border-color:var(--red)" onclick="deleteAllLeads()"><i class="ti ti-trash"></i> Alle Leads löschen</button>
+        <button class="btn" style="margin-top:8px;background:var(--red-bg);color:var(--red-dark);border-color:var(--red)" onclick="deleteAllLeads()"><i class="ti ti-trash"></i> Alle Leads löschen</button>
       </div>`,
     csv:`
       <div class="info-section">
@@ -3354,9 +3358,9 @@ function renderSettings(){
           ${csvFieldsHtml}
         </table>
         <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
-          <button class="btn btn-sm" onclick="addCsvField()"><i class="ti ti-plus"></i> Feld hinzufügen</button>
-          <button class="btn btn-sm" onclick="resetCsvFields()"><i class="ti ti-refresh"></i> Auf Standard zurücksetzen</button>
-          <button class="btn btn-sm btn-primary" onclick="downloadImportTemplate()"><i class="ti ti-download"></i> Import-Vorlage herunterladen (mit Beispieldatensatz)</button>
+          <button class="btn" onclick="addCsvField()"><i class="ti ti-plus"></i> Feld hinzufügen</button>
+          <button class="btn" onclick="resetCsvFields()"><i class="ti ti-refresh"></i> Auf Standard zurücksetzen</button>
+          <button class="btn btn-primary" onclick="downloadImportTemplate()"><i class="ti ti-download"></i> Import-Vorlage herunterladen (mit Beispieldatensatz)</button>
         </div>
       </div>`,
     notify:`
@@ -3376,7 +3380,7 @@ function renderSettings(){
             ${COLUMNS.map(c=>`<option value="${esc(c.name)}">${esc(c.name)}</option>`).join('')}
           </select>
           <input type="email" id="newNotifyEmail" placeholder="empfaenger@wiegand-gmbh.de" style="flex:1;min-width:200px">
-          <button class="btn btn-sm btn-primary" onclick="createNotifyRule()"><i class="ti ti-plus"></i> Regel hinzufügen</button>
+          <button class="btn btn-primary" onclick="createNotifyRule()"><i class="ti ti-plus"></i> Regel hinzufügen</button>
         </div>
       </div>`,
   };

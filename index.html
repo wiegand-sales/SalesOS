@@ -40,8 +40,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .sidebar-user-row label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 .sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:background .15s,color .15s;}
 .sidebar-nav-item i{font-size:17px;flex-shrink:0;}
-.nav-icon-badge{width:26px;height:26px;border-radius:7px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
-.nav-icon-badge i{color:#fff;font-size:14px;}
+.nav-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-icon-badge i{color:#fff;font-size:19px;}
 .sidebar-nav-item:hover{background:var(--bg2);color:var(--text);}
 .sidebar-nav-item.active{background:linear-gradient(180deg,#eaf2f3,#e3eef0);color:var(--purple-dark);box-shadow:inset 0 0 0 1px rgba(32,106,114,.14),0 1px 3px rgba(32,106,114,.08);font-weight:600;}
 .sidebar-footer{margin-top:auto;padding:10px 8px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);}
@@ -468,7 +468,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 <div class="app-shell hidden">
   <div class="sidebar">
     <div class="sidebar-project">
-      <span class="nav-icon-badge" style="width:28px;height:28px;border-radius:8px"><i class="ti ti-target-arrow" style="font-size:15px"></i></span>
+      <span class="nav-icon-badge"><i class="ti ti-target-arrow"></i></span>
       <div>
         <div class="sidebar-project-name">SalesOS</div>
         <div class="sidebar-project-sub">FlowBoard</div>
@@ -732,7 +732,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T19:06:22.496Z';
+const BUILD_VERSION='2026-07-10T19:16:24.323Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';

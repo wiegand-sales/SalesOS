@@ -56,7 +56,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .page-tab-btn:hover{color:var(--text2);}
 .page-tab-btn.active{color:var(--purple);border-bottom-color:var(--purple);}
 .page-hdr-left{display:flex;align-items:center;gap:12px;}
-.page-icon-badge{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;color:#fff;font-size:15px;flex-shrink:0;}
+.page-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;flex-shrink:0;}
 .page-hdr-title{font-size:18px;font-weight:700;}
 .page-hdr-sub{font-size:12px;color:var(--text2);margin-top:2px;}
 .dash-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
@@ -504,7 +504,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewDashboard">
       <div class="page-hdr">
         <div class="page-hdr-left">
-          <div class="page-icon-badge" style="background:var(--purple)"><i class="ti ti-layout-dashboard"></i></div>
+          <div class="page-icon-badge"><i class="ti ti-layout-dashboard"></i></div>
           <div>
             <div class="page-hdr-title">SFP: Toner</div>
             <div class="page-hdr-sub">Überblick über Projekt: Toner</div>
@@ -560,7 +560,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewCrrma">
       <div class="page-hdr">
         <div class="page-hdr-left">
-          <div class="page-icon-badge" style="background:var(--green)"><i class="ti ti-report-money"></i></div>
+          <div class="page-icon-badge"><i class="ti ti-report-money"></i></div>
           <div>
             <div class="page-hdr-title">CR RMA</div>
             <div class="page-hdr-sub">Artikel-Stammdaten mit Reklamationsquoten (RMA/RGA) je SKU</div>
@@ -579,7 +579,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewTasks">
       <div class="page-hdr">
         <div class="page-hdr-left">
-          <div class="page-icon-badge" style="background:var(--amber)"><i class="ti ti-list-check"></i></div>
+          <div class="page-icon-badge"><i class="ti ti-list-check"></i></div>
           <div>
             <div class="page-hdr-title">Aufgaben</div>
             <div class="page-hdr-sub">Leads mit Follow-up-Datum, gruppiert nach Fälligkeit</div>
@@ -596,7 +596,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewActivities">
       <div class="page-hdr">
         <div class="page-hdr-left">
-          <div class="page-icon-badge" style="background:var(--teal)"><i class="ti ti-history"></i></div>
+          <div class="page-icon-badge"><i class="ti ti-history"></i></div>
           <div>
             <div class="page-hdr-title">Aktivitäten</div>
             <div class="page-hdr-sub">Vollständiges Protokoll aller Änderungen, durchsuchbar nach Kunde</div>
@@ -617,7 +617,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewSettings">
       <div class="page-hdr">
         <div class="page-hdr-left">
-          <div class="page-icon-badge" style="background:var(--gray)"><i class="ti ti-settings"></i></div>
+          <div class="page-icon-badge"><i class="ti ti-settings"></i></div>
           <div>
             <div class="page-hdr-title">Einstellungen</div>
             <div class="page-hdr-sub">Mitarbeiter, Labels und Listen für dieses Projekt verwalten</div>
@@ -732,7 +732,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T19:16:24.323Z';
+const BUILD_VERSION='2026-07-10T19:24:19.785Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';

@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T08:23:26.223Z';
+const BUILD_VERSION='2026-07-10T09:37:33.892Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -1300,10 +1300,14 @@ let syncQueued=false;
 // heutige Tag (Feierabend-Stand), davor gilt noch der VORHERIGE Tag - falls dessen
 // 19-Uhr-Backup nie gelaufen ist (weil um 19 Uhr niemand mehr online war), wird es beim
 // naechsten Öffnen der Seite automatisch nachgeholt, sobald jemand die App wieder oeffnet.
+// Liefert die aktuell faellige Sicherungs-Kennung im Format "YYYY-MM-DD_HH" (Berliner
+// Zeit) - eine eigene pro Stunde, damit mehrere Sicherungen desselben Tages sich nicht
+// mehr gegenseitig ueberschreiben wie zuvor bei der reinen Datums-Kennung.
 function getDueBackupDate(){
-  const hour=parseInt(new Date().toLocaleString('en-US',{timeZone:'Europe/Berlin',hour:'2-digit',hour12:false}),10);
-  if(hour>=19)return TODAY;
-  return new Date(Date.now()-24*60*60*1000).toLocaleDateString('en-CA',{timeZone:'Europe/Berlin'});
+  const now=new Date();
+  const parts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false}).formatToParts(now);
+  const get=t=>parts.find(p=>p.type===t).value;
+  return `${get('year')}-${get('month')}-${get('day')}_${get('hour')}`;
 }
 async function maybeRunDailyBackup(){
   try{
@@ -1317,13 +1321,19 @@ async function maybeRunDailyBackup(){
     if(!res.ok)return;
     PROJECT.lastBackupDate=dueDate;
     saveState();
-    const cutoffDate='backup_'+new Date(Date.now()-30*24*60*60*1000).toISOString().slice(0,10);
-    fetch(`${SUPABASE_URL}/rest/v1/app_state?id=lt.${cutoffDate}&id=like.backup_*`,{
+    // Rollierendes 48-Stunden-Fenster: aeltere stuendliche Sicherungen werden automatisch
+    // entfernt, damit sich nicht unbegrenzt Daten ansammeln - die letzten 2 Tage bleiben
+    // aber immer stundengenau verfuegbar.
+    const cutoff=new Date(Date.now()-48*60*60*1000);
+    const cutoffParts=new Intl.DateTimeFormat('en-CA',{timeZone:'Europe/Berlin',year:'numeric',month:'2-digit',day:'2-digit',hour:'2-digit',hour12:false}).formatToParts(cutoff);
+    const cget=t=>cutoffParts.find(p=>p.type===t).value;
+    const cutoffId='backup_'+`${cget('year')}-${cget('month')}-${cget('day')}_${cget('hour')}`;
+    fetch(`${SUPABASE_URL}/rest/v1/app_state?id=lt.${cutoffId}&id=like.backup_*`,{
       method:'DELETE',
       headers:getSbHeaders()
     }).catch(()=>{});
   }catch(e){
-    console.warn('Taegliches Backup fehlgeschlagen (unkritisch, normale Arbeit ist nicht betroffen):',e);
+    console.warn('Stuendliches Backup fehlgeschlagen (unkritisch, normale Arbeit ist nicht betroffen):',e);
   }
 }
 async function syncMerge(retryCount){
@@ -1733,13 +1743,20 @@ async function previewAndRestoreBackup(dateStr){
     const res=await fetch(`${SUPABASE_URL}/rest/v1/app_state?id=eq.backup_${dateStr}&select=data,updated_at`,{headers:getSbHeaders()});
     if(!res.ok){alert('Backup konnte nicht geladen werden.');return;}
     const rows=await res.json();
-    if(!rows.length){alert(`Kein Backup für "${dateStr}" gefunden. Bitte exaktes Format JJJJ-MM-TT verwenden (z.B. 2026-07-09).`);return;}
+    if(!rows.length){alert(`Kein Backup für "${dateStr}" gefunden. Bitte exaktes Format aus der Liste oben verwenden (z.B. 2026-07-09_14).`);return;}
     const backupData=rows[0].data;
     const leadCount=(backupData.leads||[]).length;
     if(!confirm(`Backup vom ${dateStr} enthält ${leadCount} Lead(s).\nAktuell im System: ${leads.length} Lead(s).\n\nWirklich diesen Stand wiederherstellen?\n\nACHTUNG: Das überschreibt den aktuellen Stand für ALLE im Team. Alles, was seit diesem Backup neu eingetragen wurde, geht dabei verloren. Nicht rückgängig zu machen (außer über ein anderes Backup).`))return;
     applyStateData(JSON.parse(JSON.stringify(backupData)));
+    // WICHTIG: applyStateData() kuemmert sich seit dem Umbau bewusst NICHT mehr um
+    // Leads (die leben jetzt in eigenen Datenbank-Zeilen). Die Leads aus dem Backup
+    // muessen daher hier explizit gesetzt werden - der anschliessende Lead-Abgleich
+    // erkennt den Unterschied zur bisherigen Baseline und schreibt sie einzeln zurueck.
+    leads=JSON.parse(JSON.stringify(backupData.leads||[]));
+    normalizeLeads();
     saveState();
     await syncMerge();
+    await syncLeadsLayer();
     renderBoard();
     alert(`Backup vom ${dateStr} wurde wiederherstellt und in die Cloud hochgeladen (${leads.length} Leads).`);
   }catch(e){

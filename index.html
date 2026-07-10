@@ -730,7 +730,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T14:51:09.320Z';
+const BUILD_VERSION='2026-07-10T17:48:17.702Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -1056,6 +1056,15 @@ let isFirstLeadsSyncSinceLoad=true;
 // nach eindeutiger ID. Wird immer dann genutzt, wenn eine eingehende Fassung eines Leads
 // WENIGER Eintraege haette als die bereits bekannte - so kann eine veraltete Fassung nie
 // mehr echte, bereits gespeicherte Eintraege loeschen, egal woher sie kommt.
+function getLatestActivityDate(lead){
+  const acts=(lead&&lead.activity)||[];
+  let max=0;
+  acts.forEach(a=>{
+    const t=new Date(a.date).getTime();
+    if(!isNaN(t)&&t>max)max=t;
+  });
+  return max;
+}
 function mergeActivityArrays(arrA,arrB){
   const byId={};
   (arrA||[]).forEach(a=>{byId[a.id]=a;});
@@ -1106,18 +1115,17 @@ async function syncLeadsLayer(){
       const newLeads=rows.map(r=>{
         newBaseline[r.id]={data:r.data,updatedAt:r.updated_at};
         if(localChangedMap[r.id]!==undefined)return localChangedMap[r.id];
-        // Dieselbe Absicherung wie beim regulaeren Abgleich: hat der Lead lokal (aus dem
-        // Zwischenspeicher) bereits MEHR Verlaufseintraege als die frisch geholte
-        // Cloud-Fassung, wird zusammengefuehrt statt blind ersetzt.
         const existingLocal=leads.find(l=>String(l.id)===String(r.id));
-        if(existingLocal){
-          const localActivity=existingLocal.activity||[];
-          const remoteActivity=r.data.activity||[];
-          if(remoteActivity.length<localActivity.length){
-            return {...r.data,activity:mergeActivityArrays(localActivity,remoteActivity)};
-          }
+        if(!existingLocal)return r.data;
+        const mergedActivity=mergeActivityArrays(existingLocal.activity||[],r.data.activity||[]);
+        if(deepEqual(existingLocal,r.data))return r.data;
+        const localLatest=getLatestActivityDate(existingLocal);
+        const remoteLatest=getLatestActivityDate(r.data);
+        if(localLatest>remoteLatest){
+          console.warn(`Lead ${r.id}: lokale Fassung ist anhand der Aktivitaet zeitlich juenger (${new Date(localLatest).toISOString()} > ${new Date(remoteLatest).toISOString()}) - wird bevorzugt und beim naechsten Abgleich hochgeladen.`);
+          return {...existingLocal,activity:mergedActivity};
         }
-        return r.data;
+        return {...r.data,activity:mergedActivity};
       });
       // Ganz neue, noch nie synchronisierte eigene Leads (z.B. gerade erst angelegt, kurz
       // bevor dieser erste Abgleich abgeschlossen war) zusaetzlich mit aufnehmen.

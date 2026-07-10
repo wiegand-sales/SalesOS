@@ -205,7 +205,11 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .tb-dot{width:9px;height:9px;border-radius:50%;background:var(--purple);display:inline-block;vertical-align:middle;}
 .tb-title{font-size:18px;font-weight:700;}
 .tb-sub{font-size:12px;color:var(--text2);margin-top:2px;}
-.tb-stats{display:flex;gap:18px;margin-left:14px;}
+.tb-stats{display:flex;gap:8px;margin-left:14px;flex-wrap:wrap;}
+.tb-stat-pill{display:flex;align-items:center;gap:6px;border-radius:20px;padding:6px 12px;white-space:nowrap;}
+.tb-stat-pill i{font-size:14px;}
+.tb-stat-pill b{font-size:13px;font-weight:700;}
+.tb-stat-pill span{font-size:11px;}
 .tb-stat{text-align:center;}
 .tb-stat-val{font-size:16px;font-weight:700;}
 .tb-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;}
@@ -520,14 +524,12 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="view" id="viewBoard">
       <div class="topbar">
         <div class="tb-left">
-          <svg width="28" height="28" viewBox="0 0 32 32" style="flex-shrink:0">
-            <rect width="32" height="32" rx="8" fill="#D94109"/>
-            <circle cx="16" cy="16" r="9" fill="none" stroke="#FBECE6" stroke-width="3"/>
-            <path d="M11,16 L14,19.5 L21,12.5" fill="none" stroke="#FBECE6" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
-          </svg>
+          <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
+            <i class="ti ti-layout-kanban" style="color:#fff;font-size:19px"></i>
+          </div>
           <div>
             <div class="tb-title">Projekt: Toner</div>
-            <div class="tb-sub">Kostenloser Toner → Follow-up → Angebot</div>
+            <div class="tb-sub">Kanban Board</div>
           </div>
           <div class="tb-stats" id="statsBar"></div>
         </div>
@@ -732,7 +734,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-10T18:27:40.984Z';
+const BUILD_VERSION='2026-07-10T18:50:25.171Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -2150,15 +2152,19 @@ function getFilteredLeads(){
 function renderStats(){
   const fl=getFilteredLeads();
   const total=fl.length;
+  const totalActivities=fl.reduce((s,l)=>s+((l.activity||[]).length),0);
   const won=fl.filter(l=>isWon(l)).length;
   const overdue=fl.filter(l=>l.followup&&daysUntil(l.followup)<0).length;
   const rate=total?Math.round(won/total*100):0;
   const forecastSum=fl.reduce((s,l)=>s+(parseFloat(l.forecast)||0),0);
+  const overdueBg=overdue>0?'var(--red-bg)':'var(--purple-bg)';
+  const overdueColor=overdue>0?'var(--red-dark)':'var(--purple-dark)';
   document.getElementById('statsBar').innerHTML=`
-    <div class="tb-stat"><div class="tb-stat-val">${total}</div><div class="tb-stat-label">Leads</div></div>
-    <div class="tb-stat"><div class="tb-stat-val" style="color:${overdue>0?'var(--red)':'var(--text)'}">${overdue}</div><div class="tb-stat-label">Follow-up überfällig</div></div>
-    <div class="tb-stat"><div class="tb-stat-val" style="color:var(--green)">${rate}%</div><div class="tb-stat-label">Gewonnen</div></div>
-    <div class="tb-stat"><div class="tb-stat-val" style="color:var(--purple)">${fmtEur(forecastSum)}</div><div class="tb-stat-label">Forecast gesamt</div></div>`;
+    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-users" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${total}</b><span style="color:var(--purple-dark)">Leads</span></div>
+    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-message-2" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${totalActivities}</b><span style="color:var(--purple-dark)">Aktivitäten</span></div>
+    <div class="tb-stat-pill" style="background:${overdueBg}"><i class="ti ti-alert-triangle" style="color:${overdueColor}"></i><b style="color:${overdueColor}">${overdue}</b><span style="color:${overdueColor}">überfällig</span></div>
+    <div class="tb-stat-pill" style="background:var(--green-bg)"><i class="ti ti-trophy" style="color:var(--green-dark)"></i><b style="color:var(--green-dark)">${rate}%</b><span style="color:var(--green-dark)">gewonnen</span></div>
+    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-chart-line" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${fmtEur(forecastSum)}</b><span style="color:var(--purple-dark)">Forecast</span></div>`;
 }
 
 // ── RENDER: AGENT FILTER + USER SELECT ──

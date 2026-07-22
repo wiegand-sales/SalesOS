@@ -11,23 +11,24 @@
 :root{
   --bg:#fff;--bg2:#f7f7f5;--bg3:#f0efec;
   --text:#1a1a18;--text2:#6b6b67;--text3:#9a9a96;
-  --border:rgba(0,0,0,0.1);--border2:rgba(0,0,0,0.18);
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.18);
+  --glass:rgba(255,255,255,0.55);--glass-edge:rgba(255,255,255,0.5);
   --purple:#206A72;--purple-bg:#E9F0F1;--purple-dark:#174C52;
   --teal:#32A8B4;--teal-bg:#EBF6F8;--teal-dark:#247982;
   --amber:#D94109;--amber-bg:#FBECE6;--amber-dark:#9C2F06;
   --gray:#676660;--gray-bg:#E5E3D6;--gray-dark:#393936;
   --green:#7ED2DB;--green-bg:#F2FBFB;--green-dark:#5B979E;
   --red:#BD2D29;--red-bg:#F8EAEA;--red-dark:#88201E;
-  --r-sm:6px;--r-md:8px;--r-lg:12px;
+  --r-sm:6px;--r-md:8px;--r-lg:14px;
 }
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;}
-body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%,#eef1ef 45%,#eaeeec 100%) fixed;color:var(--text);font-size:14px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden;}
+body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%,#eef1ef 45%,#eaeeec 100%) fixed;color:var(--text);font-size:13.5px;line-height:1.5;display:flex;flex-direction:column;overflow:hidden;}
 
 .app-shell{flex:1;display:flex;overflow:hidden;min-height:0;}
 
 /* SIDEBAR */
-.sidebar{width:212px;flex-shrink:0;background:var(--bg);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:16px 12px;}
+.sidebar{width:212px;flex-shrink:0;background:rgba(255,255,255,0.55);backdrop-filter:blur(18px);-webkit-backdrop-filter:blur(18px);border-right:1px solid rgba(255,255,255,0.5);display:flex;flex-direction:column;padding:16px 12px;}
 .sidebar-project{display:flex;align-items:center;gap:9px;padding:6px 8px 16px;border-bottom:1px solid var(--border);margin-bottom:14px;}
 .sb-status-indicator{display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);padding:0 8px 14px;margin-top:-6px;}
 .sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;vertical-align:middle;}
@@ -40,10 +41,16 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .sidebar-user-row label{font-size:10px;font-weight:600;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;margin-bottom:4px;}
 .sidebar-nav-item{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:var(--r-md);font-size:13px;font-weight:500;color:var(--text2);cursor:pointer;margin-bottom:2px;transition:background .15s,color .15s;}
 .sidebar-nav-item i{font-size:17px;flex-shrink:0;}
-.nav-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.nav-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);box-shadow:0 6px 16px rgba(32,106,114,.3);display:flex;align-items:center;justify-content:center;flex-shrink:0;}
 .nav-icon-badge i{color:#fff;font-size:19px;}
 .sidebar-nav-item:hover{background:var(--bg2);color:var(--text);}
 .sidebar-nav-item.active{background:linear-gradient(180deg,#eaf2f3,#e3eef0);color:var(--purple-dark);box-shadow:inset 0 0 0 1px rgba(32,106,114,.14),0 1px 3px rgba(32,106,114,.08);font-weight:600;}
+.settings-subnav{margin:2px 0 4px 14px;padding-left:22px;border-left:1px solid var(--border);display:flex;flex-direction:column;gap:1px;}
+.settings-subnav-item{display:flex;align-items:center;gap:8px;padding:7px 10px;border-radius:var(--r-sm);font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;transition:background .15s,color .15s;}
+.settings-subnav-item i{font-size:14px;flex-shrink:0;color:var(--text3);}
+.settings-subnav-item:hover{background:var(--bg2);color:var(--text);}
+.settings-subnav-item.active{background:var(--purple-bg);color:var(--purple-dark);font-weight:600;}
+.settings-subnav-item.active i{color:var(--purple-dark);}
 .sidebar-footer{margin-top:auto;padding:10px 8px;font-size:11px;color:var(--text3);border-top:1px solid var(--border);}
 
 .main-area{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0;}
@@ -51,28 +58,45 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .view.active{display:flex;}
 .view-scroll{flex:1;overflow-y:auto;padding:22px;}
 .page-hdr{padding:18px 22px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:26px;}
-.page-tabs{display:flex;gap:4px;padding:0 22px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;height:44px;align-items:stretch;}
+.page-tabs{display:flex;gap:4px;padding:0 22px;border-bottom:1px solid var(--border);background:var(--bg);flex-shrink:0;height:34px;align-items:stretch;}
 .page-tab-btn{background:transparent;border:none;border-bottom:2px solid transparent;font-size:13px;font-weight:600;color:var(--text3);padding:0 14px;cursor:pointer;font-family:inherit;display:flex;align-items:center;gap:6px;transition:color .12s,border-color .12s;height:100%;}
 .page-tab-btn:hover{color:var(--text2);}
 .page-tab-btn.active{color:var(--purple);border-bottom-color:var(--purple);}
 .page-hdr-left{display:flex;align-items:center;gap:12px;}
-.page-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;flex-shrink:0;}
+.page-icon-badge{width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);box-shadow:0 6px 16px rgba(32,106,114,.3);display:flex;align-items:center;justify-content:center;color:#fff;font-size:19px;flex-shrink:0;}
 .page-hdr-title{font-size:18px;font-weight:700;}
 .page-hdr-sub{font-size:12px;color:var(--text2);margin-top:2px;}
-.dash-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:20px;}
-.dash-kpi{background:var(--bg);border:1px solid var(--border);border-radius:12px;padding:14px 16px;position:relative;box-shadow:0 1px 2px rgba(15,61,66,.04),0 3px 10px rgba(15,61,66,.04);transition:box-shadow .18s,transform .18s;}
+.dash-kpi-row{display:grid;grid-template-columns:repeat(6,1fr);gap:12px;margin-bottom:22px;}
+.dash-kpi{background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-edge);border-radius:var(--r-lg);padding:14px 16px;position:relative;box-shadow:0 12px 30px rgba(15,61,66,0.08);transition:box-shadow .18s,transform .18s;}
+.info-section:hover,.dash-kpi:hover{box-shadow:0 16px 40px rgba(15,61,66,0.16);transform:translateY(-2px);}
 .dash-kpi:hover{transform:translateY(-2px);box-shadow:0 6px 18px rgba(15,61,66,.09);}
 .dash-kpi-icon{position:absolute;top:12px;right:12px;font-size:16px;width:34px;height:34px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:var(--purple-bg);color:var(--purple-dark);opacity:1;}
 .dash-kpi-label{font-size:11px;color:var(--text2);text-transform:uppercase;letter-spacing:.03em;margin-bottom:6px;}
 .dash-kpi-val{font-size:25px;font-weight:700;letter-spacing:-0.02em;}
-.dash-row-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:16px;}
-.dash-row-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:16px;}
-.dash-row-1-1{display:flex;gap:16px;margin-bottom:16px;align-items:stretch;}
-.dash-row-1-1>.info-section{flex:1;min-width:0;display:flex;flex-direction:column;}
+.dash-kpi-tall{padding:18px 18px 16px;min-height:104px;border-left:none;}
+.dash-kpi-tall.followup-kpi-overdue,.dash-kpi-tall.followup-kpi-today,.dash-kpi-tall.followup-kpi-week,.dash-kpi-tall.followup-kpi-nextweek,.dash-kpi-tall.followup-kpi-total{border-left:none;}
+.dash-kpi-compare{font-size:11px;color:var(--text2);margin-top:8px;}
+.dash-row-2-1{display:grid;grid-template-columns:2fr 1fr;gap:16px;margin-bottom:22px;}
+.dash-row-1-2{display:grid;grid-template-columns:1fr 2fr;gap:16px;margin-bottom:22px;}
+.dash-row-1-1{display:flex;gap:16px;margin-bottom:22px;align-items:stretch;}
+.dash-row-1-1>.info-section{flex:1;min-width:0;display:flex;flex-direction:column;margin-bottom:0;}
 .funnel-wrap{display:flex;flex-direction:column;gap:5px;padding-top:2px;}
 .funnel-row{cursor:pointer;display:flex;align-items:center;gap:10px;}
 .funnel-label{font-size:11px;font-weight:500;display:flex;align-items:center;gap:6px;width:172px;flex-shrink:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .funnel-track{background:var(--bg3);border-radius:5px;height:20px;overflow:hidden;flex:1;}
+.hfunnel-wrap{display:flex;height:150px;align-items:stretch;margin-bottom:52px;}
+.hfunnel-seg{position:relative;flex:1;cursor:pointer;transition:filter .15s;}
+.hfunnel-seg:hover{filter:brightness(1.08);}
+.hfunnel-seg svg{width:100%;height:100%;display:block;}
+.hfunnel-seg-label{position:absolute;bottom:-48px;left:0;right:0;text-align:center;font-size:11px;color:var(--text2);font-weight:600;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;padding:0 4px;pointer-events:none;}
+.hfunnel-seg-label strong{display:block;font-size:13px;font-weight:800;color:var(--text);margin-top:2px;}
+.donut-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}
+.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:180px;}
+.donut-legend-item{display:flex;align-items:center;gap:9px;font-size:12.5px;}
+.donut-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}
+.donut-legend-name{flex:1;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.donut-legend-val{font-weight:700;color:var(--text);}
+.donut-legend-pct{font-size:11px;color:var(--text3);width:34px;text-align:right;}
 .funnel-bar{height:100%;border-radius:5px;display:flex;align-items:center;justify-content:flex-end;padding-right:8px;color:#fff;font-size:11px;font-weight:700;transition:width .2s;min-width:22px;}
 .funnel-conv{font-size:10px;color:var(--text3);display:flex;align-items:center;gap:2px;width:46px;flex-shrink:0;justify-content:flex-end;}
 .movements-strip{display:flex;flex-wrap:wrap;gap:18px;margin-top:14px;padding-top:12px;border-top:1px solid var(--border);}
@@ -82,6 +106,10 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .project-status-item span:first-child{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;}
 .project-status-item strong{font-size:14px;margin-top:1px;}
 .project-status-sub{font-size:10px;color:var(--text3);margin-top:3px;}
+.project-status-glass .project-status-item span:first-child{color:rgba(255,255,255,.65);}
+.project-status-glass .project-status-item strong{color:#fff;}
+.project-status-glass .project-status-sub{color:rgba(255,255,255,.6);}
+.project-status-glass .funnel-track{background:rgba(255,255,255,.18);}
 .no-date-warning{background:var(--amber-bg);color:var(--amber-dark);border-radius:8px;padding:9px 14px;font-size:12px;display:flex;align-items:center;gap:8px;margin-bottom:16px;}
 .no-date-warning a{color:var(--amber-dark);font-weight:600;text-decoration:underline;cursor:pointer;margin-left:auto;flex-shrink:0;white-space:nowrap;}
 .movements-item{font-size:12px;color:var(--text2);display:flex;align-items:center;gap:6px;}
@@ -97,7 +125,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .winrate-val{font-size:28px;font-weight:700;color:var(--green-dark);}
 .winrate-label{font-size:11px;color:var(--text2);margin-top:2px;line-height:1.5;}
 .impact-row{display:flex;align-items:center;justify-content:space-between;padding:9px 0;border-bottom:1px solid var(--border);font-size:13px;}
-.compare-strip{display:flex;justify-content:space-between;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:10px 14px;margin-bottom:12px;}
+.compare-strip{display:flex;justify-content:space-between;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border:1px solid var(--glass-edge);border-radius:8px;padding:10px 14px;margin-bottom:22px;box-shadow:0 12px 30px rgba(15,61,66,0.08);transition:box-shadow .18s,transform .18s;}
+.compare-strip:hover{box-shadow:0 16px 40px rgba(15,61,66,0.16);transform:translateY(-2px);}
 .compare-item{display:flex;flex-direction:column;align-items:center;gap:2px;}
 .compare-col{display:flex;flex-direction:column;align-items:flex-start;gap:1px;}
 .compare-col-title{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.03em;margin-bottom:2px;}
@@ -117,10 +146,12 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .followup-kpi-today{border-left:3px solid var(--amber);}
 .followup-kpi-week{border-left:3px solid var(--teal);}
 .followup-kpi-nextweek{border-left:3px solid var(--purple);}
-.followup-group{border-left-width:4px;box-shadow:0 1px 4px rgba(0,0,0,.07);margin-bottom:16px;}
+.followup-group{border-left-width:0;box-shadow:0 12px 30px rgba(15,61,66,0.08);margin-bottom:22px;}
+.followup-group.followup-kpi-overdue,.followup-group.followup-kpi-today,.followup-group.followup-kpi-week,.followup-group.followup-kpi-nextweek{border-left:none;}
+.info-section.followup-group{box-shadow:0 12px 30px rgba(15,61,66,0.08);}
 .dash-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;}
 .dash-row-eq{display:flex;gap:16px;align-items:stretch;}
-.dash-row-eq>.info-section{flex:1;min-width:0;display:flex;flex-direction:column;}
+.dash-row-eq>.info-section{flex:1;min-width:0;display:flex;flex-direction:column;margin-bottom:0;}
 .dash-bar-row{display:flex;align-items:center;gap:10px;margin-bottom:10px;}
 .dash-bar-label{width:130px;flex-shrink:0;font-size:12px;display:flex;align-items:center;gap:6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .dash-bar-track{flex:1;height:8px;background:var(--bg3);border-radius:4px;overflow:hidden;}
@@ -129,6 +160,19 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .dash-agent-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
 .dash-agent-row:last-child{border-bottom:none;}
 .dash-lead-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);cursor:pointer;}
+.activity-row{display:flex;align-items:center;gap:12px;padding:10px 14px;margin-bottom:6px;border-radius:8px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.12);cursor:pointer;transition:background .12s;}
+.activity-row:hover{background:rgba(0,0,0,0.06);}
+.activity-row:last-child{margin-bottom:0;}
+.activity-row-date{width:64px;flex-shrink:0;text-align:left;font-size:11px;color:var(--text3);line-height:1.4;}
+.activity-row-date span{display:block;}
+.activity-row-avatar{width:22px;height:22px;border-radius:50%;font-size:9px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;}
+.activity-row-body{flex:1;min-width:0;}
+.activity-row-head{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;line-height:1.4;}
+.activity-row-author{font-weight:600;font-size:13px;color:var(--text);flex-shrink:0;}
+.activity-type-badge{font-size:10px;font-weight:600;padding:2px 8px;border-radius:20px;text-transform:uppercase;letter-spacing:.03em;background:var(--green-bg);color:var(--green-dark);flex-shrink:0;}
+.activity-type-badge.activity-type-comment{background:var(--purple-bg);color:var(--purple-dark);}
+.activity-row-text{font-size:13px;color:var(--text2);}
+.activity-row-sub{font-size:11px;color:var(--text3);margin-top:2px;}
 .dash-lead-row:last-child{border-bottom:none;}
 .dash-lead-row:hover{background:var(--bg2);margin:0 -8px;padding:8px 8px;border-radius:6px;}
 .settings-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);}
@@ -142,7 +186,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .role-badge.role-admin{background:var(--purple-bg);color:var(--purple-dark);}
 .role-badge.role-sales{background:var(--teal-bg);color:var(--teal-dark);}
 .role-badge.role-am{background:var(--amber-bg);color:var(--amber-dark);}
-.icon-btn{width:26px;height:26px;border:none;background:transparent;color:var(--text3);border-radius:6px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;}
+.icon-btn{width:34px;height:34px;border:none;background:transparent;color:var(--text3);border-radius:var(--r-md);cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:13px;flex-shrink:0;}
 .icon-btn:hover{background:var(--bg3);color:var(--text);}
 .icon-btn-danger:hover{background:var(--red-bg);color:var(--red);}
 .status-badge{font-size:10px;font-weight:700;padding:3px 9px;border-radius:12px;white-space:nowrap;}
@@ -168,8 +212,11 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .task-group-hdr{display:flex;align-items:center;gap:8px;font-size:13px;font-weight:600;margin-bottom:8px;}
 .task-group-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;display:inline-block;vertical-align:middle;}
 .task-group-count{font-size:11px;font-weight:500;color:var(--text3);}
-.task-row{display:flex;align-items:center;gap:10px;background:var(--bg2);border:1px solid var(--border);border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;transition:box-shadow .12s,border-color .12s;}
+.task-row{display:flex;align-items:center;gap:10px;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.12);border-radius:8px;padding:9px 12px;margin-bottom:6px;cursor:pointer;transition:background .12s,border-color .12s;}
+.task-row:hover{background:rgba(0,0,0,0.06);}
 .task-row:hover{border-color:var(--border2);box-shadow:0 1px 4px rgba(0,0,0,.06);}
+.task-row-placeholder{min-height:44px;background:rgba(0,0,0,0.015);border-style:dashed;cursor:default;pointer-events:none;}
+.task-row-placeholder:hover{background:rgba(0,0,0,0.015);}
 .task-row input[type=checkbox]{width:16px;height:16px;accent-color:var(--teal);cursor:pointer;flex-shrink:0;}
 .task-row-text{flex:1;font-size:13px;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 .task-row-text.done{text-decoration:line-through;color:var(--text3);}
@@ -184,7 +231,8 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .crrma-dot{width:9px;height:9px;border-radius:50%;display:inline-block;}
 .crrma-table{display:flex;flex-direction:column;}
 .crrma-row{display:grid;grid-template-columns:1.2fr 1.8fr 0.8fr 0.8fr 0.8fr 0.9fr 0.9fr 34px;gap:8px;align-items:center;padding:4px 0;}
-.crrma-margin-input{font-size:13px;font-weight:600;width:100%;background:var(--bg3);border:1px solid var(--border);border-radius:6px;padding:6px 8px;font-family:inherit;}
+.crrma-margin-input{font-size:13px;font-weight:600;width:100%;background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.12);border-radius:6px;padding:6px 8px;font-family:inherit;}
+.crrma-num-input{background:rgba(0,0,0,0.03);border:1px solid rgba(0,0,0,0.12);}
 .crrma-sortable{cursor:pointer;user-select:none;}
 .crrma-sortable:hover{color:var(--purple);}
 .crrma-row.crrma-hdr{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.03em;padding-bottom:8px;border-bottom:1px solid var(--border);margin-bottom:4px;}
@@ -202,7 +250,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .staging-bottombar a{color:#fff;text-decoration:underline;font-weight:700;}
 
 /* TOPBAR */
-.topbar{background:var(--bg);border-bottom:1px solid var(--border);padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:10px;}
+.topbar{background:transparent;padding:18px 22px;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;flex-wrap:wrap;gap:10px;}
 .tb-left{display:flex;align-items:center;gap:10px;}
 .tb-dot{width:9px;height:9px;border-radius:50%;background:var(--purple);display:inline-block;vertical-align:middle;}
 .tb-title{font-size:18px;font-weight:700;}
@@ -212,6 +260,48 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .tb-stat-pill i{font-size:14px;}
 .tb-stat-pill b{font-size:13px;font-weight:700;}
 .tb-stat-pill span{font-size:11px;}
+.infobtn{width:37px;height:37px;border-radius:50%;border:1px solid var(--border2);background:var(--bg);display:flex;align-items:center;justify-content:center;cursor:pointer;color:var(--text2);flex-shrink:0;}
+.infobtn:hover{background:var(--bg2);}
+.infobtn-wrap{position:relative;}
+.infopop{position:absolute;top:44px;right:0;background:var(--bg);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.16);border:1px solid var(--border);padding:12px 16px;width:210px;z-index:20;display:none;font-size:12px;}
+.infopop.show{display:block;}
+.infopop-row{display:flex;justify-content:space-between;align-items:center;padding:4px 0;color:var(--text2);}
+.infopop-row b{color:var(--text);font-weight:700;}
+.infopop-row.warn b{color:var(--red-dark);}
+.infopop-row.good b{color:var(--green-dark, #2E7D32);}
+.omnibar-row{padding:0 22px 14px;}
+.omnibar{background:var(--bg);border:1px solid var(--border2);border-radius:24px;min-height:44px;display:flex;align-items:center;padding:4px 8px 4px 16px;gap:8px;flex-wrap:wrap;}
+.omnibar .search-box{border:none;padding:0;}
+.omnibar i.omni-search-icon{color:var(--text3);font-size:15px;flex-shrink:0;}
+.omni-input{border:none;outline:none;font-family:inherit;font-size:13px;flex:1 1 120px;min-width:120px;background:transparent;height:34px;}
+.omni-token{background:var(--bg2);border-radius:var(--r-md);padding:0 6px 0 10px;height:28px;display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:500;color:var(--text2);white-space:nowrap;}
+.omni-token i{cursor:pointer;font-size:13px;color:var(--text3);}
+.omni-token i:hover{color:var(--red-dark);}
+.omni-addfilter-wrap{position:relative;flex-shrink:0;}
+.omni-addfilter{height:28px;padding:0 10px;border-radius:16px;border:1px dashed var(--border2);color:var(--text3);font-size:12px;display:inline-flex;align-items:center;gap:4px;cursor:pointer;white-space:nowrap;background:transparent;font-family:inherit;}
+.omni-addfilter:hover{border-color:var(--purple);color:var(--purple-dark);}
+.filtermenu{position:absolute;top:34px;left:0;background:var(--bg);border-radius:10px;box-shadow:0 8px 28px rgba(0,0,0,.16);border:1px solid var(--border);padding:12px;width:230px;z-index:20;display:none;}
+.filtermenu.show{display:block;}
+.filtermenu h4{font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--text3);margin:0 0 6px;}
+.filtermenu-item{display:flex;align-items:center;justify-content:space-between;gap:8px;font-size:13px;padding:6px 6px;border-radius:6px;cursor:pointer;color:var(--text);}
+.filtermenu-item i.ti-check{color:var(--purple);flex-shrink:0;}
+.filtermenu-item:hover{background:var(--bg2);}
+.filtermenu-item.active{color:var(--purple-dark);font-weight:600;}
+.filtermenu hr{border:none;border-top:1px solid var(--border);margin:8px 0;}
+.omni-spacer{flex:1 1 auto;min-width:8px;}
+.topbar-unified{padding:14px 22px;display:flex;align-items:center;gap:16px;flex-wrap:wrap;}
+.tbu-left{display:flex;align-items:center;gap:12px;flex-shrink:0;}
+.tbu-left .tb-title{margin:0;line-height:1;}
+.omnibar-flex{flex:1 1 260px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--border2);border-radius:var(--r-md);padding:5px 6px 5px 16px;min-width:200px;}
+.omnibar-flex .omni-input{background:transparent;height:34px;border:none;box-shadow:none;padding-left:4px;flex:0 0 190px;min-width:0;}
+.omnibar-btn{height:34px;padding:0 14px;border-radius:var(--r-md);font-size:13px;font-weight:500;cursor:pointer;
+  border:1px solid var(--border2);background:#fff;color:var(--text);display:inline-flex;align-items:center;gap:6px;
+  font-family:inherit;white-space:nowrap;flex-shrink:0;}
+.omnibar-btn:hover{background:var(--bg2);}
+.omnibar-btn.primary{background:linear-gradient(180deg,#27808a 0%,#206A72 100%);color:#fff;border-color:var(--purple);box-shadow:0 6px 16px rgba(32,106,114,.3);}
+.omnibar-btn.primary:hover{background:linear-gradient(180deg,#256d76 0%,#174C52 100%);box-shadow:0 3px 10px rgba(15,61,66,.35),inset 0 1px 0 rgba(255,255,255,.12);}
+.omnibar-btn.icon{width:34px;padding:0;justify-content:center;border-radius:var(--r-md);}
+.tbu-right{display:flex;align-items:center;gap:8px;flex-shrink:0;}
 .tb-stat{text-align:center;}
 .tb-stat-val{font-size:16px;font-weight:700;}
 .tb-stat-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.04em;}
@@ -225,25 +315,25 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 .search-box{position:relative;}
 .search-box i{position:absolute;left:10px;top:50%;transform:translateY(-50%);color:var(--text3);font-size:14px;}
 .search-box input{padding-left:30px;width:190px;}
-.btn{padding:8px 14px;font-size:13px;font-weight:500;border-radius:var(--r-md);cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s ease;font-family:inherit;white-space:nowrap;}
+.btn{height:34px;padding:0 14px;font-size:13px;font-weight:500;border-radius:var(--r-md);cursor:pointer;border:1px solid var(--border2);background:var(--bg);color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s ease;font-family:inherit;white-space:nowrap;box-sizing:border-box;}
 .btn:hover{box-shadow:0 2px 8px rgba(15,61,66,.1);}
 .btn:hover{background:var(--bg2);}
-.btn-primary{background:linear-gradient(180deg,#27808a 0%,#206A72 100%);color:#fff;border-color:var(--purple);box-shadow:0 2px 8px rgba(32,106,114,.28);}
-.btn-primary:hover{box-shadow:0 4px 14px rgba(32,106,114,.38);transform:translateY(-1px);}
-.btn-primary:hover{background:linear-gradient(180deg,#1f6d76 0%,#174C52 100%);}
+.btn-primary{background:linear-gradient(180deg,#27808a 0%,#206A72 100%);color:#fff;border-color:var(--purple);box-shadow:0 6px 16px rgba(32,106,114,.3);}
+.btn-primary:hover{box-shadow:0 3px 10px rgba(15,61,66,.35),inset 0 1px 0 rgba(255,255,255,.12);}
+.btn-primary:hover{background:linear-gradient(180deg,#256d76 0%,#174C52 100%);}
 .btn-danger{background:var(--red-bg);color:var(--red);border-color:transparent;}
-.btn-sm{padding:5px 10px;font-size:12px;}
+.btn-sm{font-size:12px;}
 .info-callout{background:var(--purple-bg);border-left:3px solid var(--purple);border-radius:var(--r-md);padding:12px 16px;font-size:12px;color:var(--purple-dark);line-height:1.6;width:100%;box-sizing:border-box;}
 .btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;}
 .me-select{font-size:12px;padding:6px 9px;}
 
 /* FILTER BAR */
-.filterbar{background:var(--bg);border-bottom:1px solid var(--border);padding:6px 22px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;flex-shrink:0;min-height:44px;box-sizing:border-box;}
+.filterbar{background:transparent;padding:6px 22px;display:flex;gap:20px;align-items:center;flex-wrap:wrap;flex-shrink:0;min-height:44px;box-sizing:border-box;}
 .filterbar>div:not(.filter-group){display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .filter-group{display:flex;gap:8px;align-items:center;flex-wrap:wrap;}
 .filter-group>div{display:flex;gap:8px;flex-wrap:wrap;align-items:center;}
 .filter-divider{width:1px;height:18px;background:var(--border2);flex-shrink:0;}
-.chip{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:var(--bg);transition:all .15s ease;}
+.chip{height:34px;padding:0 14px;border-radius:var(--r-md);font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border2);color:var(--text2);background:var(--bg);transition:all .15s ease;display:inline-flex;align-items:center;box-sizing:border-box;}
 .chip:hover{transform:translateY(-1px);box-shadow:0 2px 6px rgba(15,61,66,.1);}
 .chip:hover{border-color:var(--purple);color:var(--text);}
 .chip.active{background:var(--purple);color:#fff;border-color:var(--purple);}
@@ -331,15 +421,31 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 @media (prefers-reduced-motion:reduce){.modal-overlay,.modal-lg,.card,.btn,.chip{animation:none!important;transition:none!important}}
 .modal-overlay.hidden{display:none;}
 .hidden{display:none !important;}
-.login-screen{position:fixed;inset:0;background:var(--bg2);display:flex;align-items:center;justify-content:center;z-index:500;}
-.login-box{background:var(--bg);border:1px solid var(--border);border-radius:var(--r-lg);padding:32px 30px;width:340px;box-shadow:0 8px 32px rgba(0,0,0,.08);display:flex;flex-direction:column;align-items:center;text-align:center;}
-.login-box .field{width:100%;text-align:left;}
-.login-title{font-size:17px;font-weight:700;color:var(--text);}
-.login-sub{font-size:12px;color:var(--text3);margin-top:2px;margin-bottom:4px;}
-.login-message{width:100%;font-size:12px;border-radius:8px;padding:8px 10px;margin-top:12px;}
-.login-message-error{background:var(--red-bg);color:var(--red-dark);}
-.login-message-info{background:var(--amber-bg);color:var(--amber-dark);}
-.login-footer{font-size:11px;color:var(--text3);margin-top:16px;line-height:1.5;}
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0c3b40 0%,#164e54 45%,#1d6169 100%);overflow-y:auto;z-index:500;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.login-hero{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;width:300px;font-family:'Inter',sans-serif;}
+.login-hero-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(180deg,#3fa3ab 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 6px 20px rgba(0,0,0,.3);flex-shrink:0;}
+.login-hero-title{font-size:40px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;color:#fff;}
+.login-hero-tag{font-size:14px;color:rgba(255,255,255,.75);font-weight:500;margin-bottom:32px;transition:opacity .2s ease;}
+.login-hero-btn{width:100%;background:#fff;color:var(--purple-dark);border:none;border-radius:10px;height:56px;font-size:16px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(0,0,0,.2);font-family:inherit;}
+.login-hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.28);}
+.login-intro{width:100%;}
+.login-screen.panel-open .login-intro{display:none;}
+.login-fields{display:none;flex-direction:column;align-items:stretch;width:100%;}
+.login-screen.panel-open .login-fields{display:flex;}
+.login-sub{font-size:12px;color:rgba(255,255,255,.65);margin-bottom:18px;}
+.login-box .field{width:100%;text-align:left;margin-bottom:12px;}
+.login-box label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px;font-family:inherit;}
+.login-box input{width:100%;height:44px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;padding:0 12px;font-family:inherit;font-size:14px;outline:none;}
+.login-box input::placeholder{color:rgba(255,255,255,.45);}
+.login-box input:focus{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18);}
+.login-submit-btn{width:100%;height:44px;box-sizing:border-box;border-radius:8px;border:none;background:#fff;color:var(--purple-dark);font-weight:600;font-size:14px;cursor:pointer;margin-top:6px;font-family:inherit;}
+.login-offline-btn{width:100%;height:38px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,.3);background:transparent;color:rgba(255,255,255,.85);font-size:12px;font-weight:500;cursor:pointer;margin-top:10px;font-family:inherit;}
+.login-offline-btn:hover{background:rgba(255,255,255,.08);}
+.login-back-link{font-size:12px;color:rgba(255,255,255,.55);margin-top:16px;cursor:pointer;text-decoration:underline;font-family:inherit;}
+.login-message{width:100%;font-size:12px;border-radius:8px;padding:9px 11px;margin-bottom:14px;font-family:inherit;}
+.login-message-error{background:rgba(189,45,41,.85);color:#fff;}
+.login-message-info{background:rgba(217,65,9,.85);color:#fff;}
+.login-footer{font-size:11px;color:rgba(255,255,255,.5);margin-top:16px;line-height:1.5;font-family:inherit;}
 .logout-btn{margin-left:auto;background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 4px;border-radius:6px;}
 .logout-btn:hover{color:var(--red);background:var(--red-bg);}
 .modal-lg{background:var(--bg);border-radius:14px;width:100%;max-width:1360px;max-height:90vh;overflow:hidden;display:flex;flex-direction:column;box-shadow:0 24px 70px rgba(15,61,66,.25);animation:modalIn .22s cubic-bezier(.16,1,.3,1);}
@@ -357,7 +463,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 .field-row-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px;}
 .field{margin-bottom:10px;}
 .section-block{margin-top:18px;}
-.info-section{border:1px solid var(--border2);border-radius:10px;padding:15px 16px;margin-bottom:14px;background:var(--bg);box-shadow:0 1px 2px rgba(0,0,0,.03);}
+.info-section{border:1px solid var(--glass-edge);border-radius:var(--r-lg);padding:15px 16px;margin-bottom:22px;background:var(--glass);backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);box-shadow:0 12px 30px rgba(15,61,66,0.08);transition:box-shadow .18s,transform .18s;}
 .info-section:last-child{margin-bottom:0;}
 .info-section .section-hdr{margin-top:0;}
 .info-section input[type=text],.info-section input[type=date],.info-section input[type=datetime-local],.info-section input[type=tel],.info-section input[type=email],.info-section input[type=number],.info-section select,.info-section textarea{background:var(--bg3);}
@@ -412,7 +518,7 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 .modal-actions{display:flex;justify-content:space-between;gap:8px;padding:14px 20px;border-top:1px solid var(--border);flex-shrink:0;}
 .right-hdr{font-size:12px;font-weight:600;color:var(--text2);flex-shrink:0;display:flex;align-items:center;gap:6px;}
 .tab-bar{display:flex;gap:3px;background:var(--bg3);border-radius:9px;padding:4px;flex-shrink:0;margin-bottom:14px;}
-.tab-btn{flex:1;background:transparent;border:none;border-radius:6px;font-size:12px;font-weight:600;color:var(--text2);padding:9px 8px;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;}
+.tab-btn{flex:1;height:34px;box-sizing:border-box;background:transparent;border:none;border-radius:6px;font-size:12px;font-weight:600;color:var(--text2);padding:0 8px;display:flex;align-items:center;justify-content:center;cursor:pointer;font-family:inherit;white-space:nowrap;transition:all .15s;}
 .tab-btn:hover:not(.active){color:var(--text);}
 .tab-btn.active{background:var(--bg);color:var(--purple);box-shadow:0 1px 3px rgba(0,0,0,.1);}
 .printer-card{border:1px solid var(--border);border-radius:8px;padding:10px;margin-bottom:8px;background:var(--bg2);}
@@ -432,27 +538,34 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
 </head>
 <body>
 
+
 <div id="loginScreen" class="login-screen hidden">
-  <div class="login-box">
-    <svg width="40" height="40" viewBox="0 0 32 32" style="margin-bottom:10px">
-      <rect width="32" height="32" rx="8" fill="#206A72"/>
-      <circle cx="16" cy="16" r="10" fill="none" stroke="#E9F0F1" stroke-width="4" stroke-dasharray="5 5.9" stroke-linecap="round"/>
-      <circle cx="16" cy="16" r="10" fill="none" stroke="#D94109" stroke-width="4" stroke-dasharray="5 57.8" stroke-dashoffset="-18" stroke-linecap="round"/>
-    </svg>
-    <div class="login-title">SalesOS – Anmeldung</div>
-    <div class="login-sub">Nur für Wiegand &amp; Partner Team-Mitglieder</div>
-    <div id="loginMessage" class="login-message hidden"></div>
-    <div class="field" style="margin-top:14px">
-      <label>E-Mail</label>
-      <input type="email" id="loginEmail" placeholder="name@wiegand-gmbh.de" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+  <div class="login-hero">
+    <div class="login-hero-logo">
+      <svg width="26" height="26" viewBox="0 0 32 32">
+        <circle cx="16" cy="16" r="10" fill="none" stroke="#E9F0F1" stroke-width="4" stroke-dasharray="5 5.9" stroke-linecap="round"/>
+        <circle cx="16" cy="16" r="10" fill="none" stroke="#D94109" stroke-width="4" stroke-dasharray="5 57.8" stroke-dashoffset="-18" stroke-linecap="round"/>
+      </svg>
     </div>
-    <div class="field" style="margin-top:10px">
-      <label>Passwort</label>
-      <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')attemptLogin()">
+    <div class="login-hero-title">SalesOS</div>
+    <div class="login-hero-tag" id="loginHeroTag">Jede Pipeline. Jedes Investment.<br><strong>Ein FlowBoard.</strong></div>
+    <div class="login-intro">
+      <button class="login-hero-btn" onclick="openLoginPanel()">Anmelden</button>
     </div>
-    <button class="btn btn-primary" style="width:100%;justify-content:center;margin-top:16px" onclick="attemptLogin()" id="loginBtn"><i class="ti ti-login"></i> Anmelden</button>
-    <button class="btn btn-sm" style="width:100%;justify-content:center;margin-top:8px" onclick="continueOffline()"><i class="ti ti-plug-connected-x"></i> Ohne Anmeldung mit lokalen Daten weiterarbeiten</button>
-    <div class="login-footer">Noch keinen Zugang? Wende dich an deine Admin-Kollegin/deinen Admin-Kollegen, damit sie/er dir in Supabase einen Zugang anlegt.<br>Falls die Anmeldung wegen einer Störung bei Supabase nicht klappt: Mit "Ohne Anmeldung" kannst du trotzdem mit dem zuletzt gespeicherten lokalen Stand weiterarbeiten. Die Cloud-Synchronisation läuft dann automatisch wieder an, sobald du dich später normal anmeldest.</div>
+    <div class="login-fields login-box">
+      <div id="loginMessage" class="login-message hidden"></div>
+      <div class="field">
+        <label>E-Mail</label>
+        <input type="email" id="loginEmail" placeholder="name@wiegand-gmbh.de" onkeydown="if(event.key==='Enter')document.getElementById('loginPassword').focus()">
+      </div>
+      <div class="field">
+        <label>Passwort</label>
+        <input type="password" id="loginPassword" placeholder="••••••••" onkeydown="if(event.key==='Enter')attemptLogin()">
+      </div>
+      <button class="login-submit-btn" onclick="attemptLogin()" id="loginBtn">Anmelden</button>
+      <button class="login-offline-btn" onclick="continueOffline()">Lokal anmelden</button>
+      <div class="login-back-link" onclick="closeLoginPanel()">← zurück</div>
+    </div>
   </div>
 </div>
 
@@ -499,54 +612,89 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     <div class="sidebar-nav-item" id="navCrrma" onclick="switchView('crrma')"><span class="nav-icon-badge"><i class="ti ti-report-money"></i></span> CR RMA</div>
     <div class="sidebar-nav-item" id="navTasks" onclick="switchView('tasks')"><span class="nav-icon-badge"><i class="ti ti-list-check"></i></span> Aufgaben</div>
     <div class="sidebar-nav-item" id="navActivities" onclick="switchView('activities')"><span class="nav-icon-badge"><i class="ti ti-history"></i></span> Aktivitäten</div>
-    <div class="sidebar-nav-item" id="navSettings" onclick="switchView('settings')"><span class="nav-icon-badge"><i class="ti ti-settings"></i></span> Einstellungen</div>
+    <div class="sidebar-nav-item" id="navSettings" onclick="toggleSettingsNav()"><span class="nav-icon-badge"><i class="ti ti-settings"></i></span> Einstellungen <i class="ti ti-chevron-down" id="settingsNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
+    <div id="settingsSubNav" class="settings-subnav hidden">
+      <div class="settings-subnav-item" id="settingsTabBtn_team" onclick="goSettingsTab('team')"><i class="ti ti-users"></i> Team</div>
+      <div class="settings-subnav-item" id="settingsTabBtn_board" onclick="goSettingsTab('board')"><i class="ti ti-layout-kanban"></i> Board</div>
+      <div class="settings-subnav-item" id="settingsTabBtn_project" onclick="goSettingsTab('project')"><i class="ti ti-target-arrow"></i> Projekt</div>
+      <div class="settings-subnav-item" id="settingsTabBtn_system" onclick="goSettingsTab('system')"><i class="ti ti-database"></i> System</div>
+      <div class="settings-subnav-item" id="settingsTabBtn_csv" onclick="goSettingsTab('csv')"><i class="ti ti-table"></i> Import/Export</div>
+      <div class="settings-subnav-item" id="settingsTabBtn_notify" onclick="goSettingsTab('notify')"><i class="ti ti-mail"></i> Auto. Benachrichtigungen</div>
+    </div>
     <div class="sidebar-footer">Weitere Projekte folgen hier bald.<div id="buildVersionDisplay" style="margin-top:8px;font-size:10px;color:var(--text3);opacity:.7;user-select:all"></div></div>
   </div>
   <div class="main-area">
 
     <div class="view" id="viewDashboard">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="page-icon-badge"><i class="ti ti-layout-dashboard"></i></div>
-          <div>
-            <div class="page-hdr-title">SFP: Toner</div>
-            <div class="page-hdr-sub">Überblick über Projekt: Toner</div>
+      <div class="topbar-unified">
+        <div class="omnibar-flex">
+          <div class="omni-addfilter-wrap">
+            <button class="omnibar-btn" onclick="toggleDashboardDateMenu(event)"><i class="ti ti-calendar" style="font-size:13px"></i> Datum</button>
+            <div class="filtermenu" id="dashboardDateMenu" style="width:230px">
+              <h4>Zeitraum (individuell)</h4>
+              <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
+                <div>
+                  <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:3px">Start</label>
+                  <input type="date" id="dashboardDateStartInput" style="width:100%">
+                </div>
+                <div>
+                  <label style="font-size:11px;color:var(--text2);display:block;margin-bottom:3px">Ende</label>
+                  <input type="date" id="dashboardDateEndInput" style="width:100%">
+                </div>
+              </div>
+              <div style="display:flex;gap:8px">
+                <button class="btn btn-sm" style="flex:1;justify-content:center" onclick="clearDashboardDateRange()">Zurücksetzen</button>
+                <button class="btn btn-sm btn-primary" style="flex:1;justify-content:center" onclick="applyDashboardDateRange()">Übernehmen</button>
+              </div>
+            </div>
           </div>
+          <div class="omni-addfilter-wrap">
+            <button class="omnibar-btn" onclick="toggleDashboardFilterMenu(event)"><i class="ti ti-plus" style="font-size:12px"></i> Filter</button>
+            <div class="filtermenu" id="dashboardFilterMenu">
+              <h4>Mitarbeiter</h4>
+              <div id="dashboardFilterMenuAgents"></div>
+              <hr>
+              <h4>Zeitraum</h4>
+              <div id="dashboardFilterMenuPeriod"></div>
+            </div>
+          </div>
+          <div id="dashboardOmniTokens" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:320px;flex-shrink:1;"></div>
+          <div class="omni-spacer"></div>
         </div>
-      </div>
-      <div class="filterbar">
-        <div class="filter-group"><span class="filterbar-label">Mitarbeiter</span><div id="dashAgentChips"></div></div>
-        <div class="filter-divider"></div>
-        <div class="filter-group"><span class="filterbar-label">Zeitraum</span><div id="dashPeriodChips"></div></div>
       </div>
       <div class="view-scroll" id="dashboardContent"></div>
     </div>
 
     <div class="view" id="viewBoard">
-      <div class="topbar">
-        <div class="tb-left">
-          <div style="width:36px;height:36px;border-radius:9px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0">
-            <i class="ti ti-layout-kanban" style="color:#fff;font-size:19px"></i>
+      <div class="topbar-unified">
+        <div class="omnibar-flex">
+          <i class="ti ti-search omni-search-icon"></i>
+          <input type="text" class="omni-input" id="searchInput" placeholder="Firma, Kontakt, Kd-Nr." oninput="renderBoard()">
+          <div class="omni-addfilter-wrap">
+            <button class="omnibar-btn" onclick="toggleFilterMenu(event)"><i class="ti ti-plus" style="font-size:12px"></i> Filter</button>
+            <div class="filtermenu" id="filterMenu">
+              <h4>Mitarbeiter</h4>
+              <div id="filterMenuAgents"></div>
+              <hr>
+              <h4>Label</h4>
+              <div id="filterMenuLabels"></div>
+            </div>
           </div>
-          <div>
-            <div class="tb-title">Projekt: Toner</div>
-            <div class="tb-sub">Kanban Board</div>
-          </div>
-          <div class="tb-stats" id="statsBar"></div>
-        </div>
-        <div class="tb-right">
-          <div class="search-box"><i class="ti ti-search"></i><input type="text" id="searchInput" placeholder="Firma, Kontakt, Kd-Nr." oninput="renderBoard()"></div>
-          <button class="btn" onclick="triggerCSVImport()" title="Leads aus CSV-Datei importieren (Spalte 'Firmenname' erforderlich)"><i class="ti ti-upload"></i> Import CSV</button>
+          <div id="omniTokens" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:320px;flex-shrink:1;"></div>
+          <div class="omni-spacer"></div>
+          <button class="omnibar-btn" id="bulkModeBtn" onclick="toggleBulkMode()"><i class="ti ti-checkbox"></i> Mehrfachauswahl</button>
+          <button class="omnibar-btn primary" onclick="openLeadModal(null)"><i class="ti ti-plus"></i> Neuer Lead</button>
           <input type="file" id="csvImportInput" accept=".csv,text/csv" style="display:none" onchange="if(this.files[0]){importCSVFile(this.files[0]);this.value='';}">
-          <button class="btn" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</button>
-          <button class="btn btn-primary" onclick="openLeadModal(null)"><i class="ti ti-plus"></i> Neuer Lead</button>
+          <div class="infobtn-wrap">
+            <button class="omnibar-btn icon" id="overflowBtn" onclick="toggleOverflowMenu(event)" title="Weitere Optionen"><i class="ti ti-dots-vertical"></i></button>
+            <div class="infopop" id="overflowMenu">
+              <div class="filtermenu-item" onclick="triggerCSVImport()"><i class="ti ti-upload"></i> Import CSV</div>
+              <div class="filtermenu-item" onclick="exportCSV()"><i class="ti ti-download"></i> Export CSV</div>
+              <hr>
+              <div id="statsPopover"></div>
+            </div>
+          </div>
         </div>
-      </div>
-      <div class="filterbar">
-        <div class="filter-group"><span class="filterbar-label">Mitarbeiter</span><div id="agentChips"></div></div>
-        <div class="filter-divider"></div>
-        <div class="filter-group"><span class="filterbar-label">Label</span><div id="labelChipsFilter"></div></div>
-        <button class="btn btn-sm" id="bulkModeBtn" onclick="toggleBulkMode()" style="margin-left:auto"><i class="ti ti-checkbox"></i> Mehrfachauswahl</button>
       </div>
       <div id="bulkActionBar" class="bulk-action-bar" style="display:none">
         <span id="bulkCountLabel">0 ausgewählt</span>
@@ -561,81 +709,72 @@ label{font-size:12px;font-weight:500;color:var(--text2);display:block;margin-bot
     </div>
 
     <div class="view" id="viewCrrma">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="page-icon-badge"><i class="ti ti-report-money"></i></div>
-          <div>
-            <div class="page-hdr-title">CR RMA</div>
-            <div class="page-hdr-sub">Artikel-Stammdaten mit Reklamationsquoten (RMA/RGA) je SKU</div>
-          </div>
-        </div>
-        <div style="display:flex;gap:8px;align-items:center">
-          <div class="search-box"><i class="ti ti-search"></i><input type="text" id="crrmaSearch" placeholder="SKU oder Titel suchen…" oninput="renderCrRma()"></div>
-          <button class="btn btn-sm" onclick="triggerArticleCSVImport()" title="Artikel aus CSV-Datei importieren (Spalte 'SKU' erforderlich)"><i class="ti ti-upload"></i> Import CSV</button>
+      <div class="topbar-unified">
+        <div class="omnibar-flex">
+          <i class="ti ti-search omni-search-icon"></i>
+          <input type="text" class="omni-input" id="crrmaSearch" placeholder="SKU oder Titel suchen…" oninput="renderCrRma()">
+          <div class="omni-spacer"></div>
           <input type="file" id="articleCsvImportInput" accept=".csv,text/csv" style="display:none" onchange="if(this.files[0]){importArticleCSVFile(this.files[0]);this.value='';}">
-          <button class="btn btn-sm" onclick="exportArticleCSV()"><i class="ti ti-download"></i> Export CSV</button>
+          <button class="omnibar-btn" style="color:var(--red);border-color:var(--red)" onclick="deleteAllArticles()"><i class="ti ti-trash"></i> Alle löschen</button>
+          <button class="omnibar-btn primary" onclick="addArticle()"><i class="ti ti-plus"></i> Artikel hinzufügen</button>
+          <div class="infobtn-wrap crrma-menu-wrap">
+            <button class="omnibar-btn icon" onclick="toggleCrrmaMenu(event)" title="Import / Export"><i class="ti ti-dots-vertical"></i></button>
+            <div class="infopop" id="crrmaOverflowMenu">
+              <div class="filtermenu-item" onclick="triggerArticleCSVImport()"><i class="ti ti-upload"></i> Import CSV</div>
+              <div class="filtermenu-item" onclick="exportArticleCSV()"><i class="ti ti-download"></i> Export CSV</div>
+            </div>
+          </div>
         </div>
       </div>
       <div class="view-scroll" id="crrmaContent"></div>
     </div>
 
     <div class="view" id="viewTasks">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="page-icon-badge"><i class="ti ti-list-check"></i></div>
-          <div>
-            <div class="page-hdr-title">Aufgaben</div>
-            <div class="page-hdr-sub">Leads mit Follow-up-Datum, gruppiert nach Fälligkeit</div>
+      <div class="topbar-unified">
+        <div class="omnibar-flex">
+          <i class="ti ti-search omni-search-icon"></i>
+          <input type="text" class="omni-input" id="tasksSearch" placeholder="Firma, Kd-Nr. suchen…" oninput="renderTasksView()">
+          <div class="omni-addfilter-wrap">
+            <button class="omnibar-btn" onclick="toggleTasksFilterMenu(event)"><i class="ti ti-plus" style="font-size:12px"></i> Filter</button>
+            <div class="filtermenu" id="tasksFilterMenu">
+              <h4>Mitarbeiter</h4>
+              <div id="tasksFilterMenuAgents"></div>
+            </div>
           </div>
+          <div id="tasksOmniTokens" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:320px;flex-shrink:1;"></div>
+          <div class="omni-spacer"></div>
         </div>
-      </div>
-      <div class="filterbar">
-        <span class="filterbar-label">Mitarbeiter</span>
-        <div id="tasksAgentChips"></div>
       </div>
       <div class="view-scroll" id="tasksViewContent"></div>
     </div>
 
     <div class="view" id="viewActivities">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="page-icon-badge"><i class="ti ti-history"></i></div>
-          <div>
-            <div class="page-hdr-title">Aktivitäten</div>
-            <div class="page-hdr-sub">Vollständiges Protokoll aller Änderungen, durchsuchbar nach Kunde</div>
+      <div class="topbar-unified">
+        <div class="omnibar-flex">
+          <i class="ti ti-search omni-search-icon"></i>
+          <input type="text" class="omni-input" id="activitySearch" placeholder="Firma oder Kundennummer suchen…" oninput="renderActivities()">
+          <div class="omni-addfilter-wrap">
+            <button class="omnibar-btn" onclick="toggleActivityFilterMenu(event)"><i class="ti ti-plus" style="font-size:12px"></i> Filter</button>
+            <div class="filtermenu" id="activityFilterMenu">
+              <h4>Mitarbeiter</h4>
+              <div id="activityFilterMenuAgents"></div>
+              <hr>
+              <h4>Typ</h4>
+              <div id="activityFilterMenuTypes"></div>
+              <hr>
+              <h4>Status</h4>
+              <div id="activityFilterMenuStatus"></div>
+            </div>
           </div>
+          <div id="activityOmniTokens" style="display:flex;gap:8px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:320px;flex-shrink:1;"></div>
+          <div class="omni-spacer"></div>
         </div>
-        <div class="search-box"><i class="ti ti-search"></i><input type="text" id="activitySearch" placeholder="Firma oder Kundennummer suchen…" oninput="renderActivities()"></div>
-      </div>
-      <div class="filterbar">
-        <div class="filter-group"><span class="filterbar-label">Mitarbeiter</span><div id="activityAgentChips"></div></div>
-        <div class="filter-divider"></div>
-        <div class="filter-group"><span class="filterbar-label">Typ</span><div id="activityTypeChips"></div></div>
-        <div class="filter-divider"></div>
-        <div class="filter-group"><span class="filterbar-label">Status</span><div id="activityStatusChips"></div></div>
       </div>
       <div class="view-scroll" id="activitiesContent"></div>
     </div>
 
     <div class="view" id="viewSettings">
-      <div class="page-hdr">
-        <div class="page-hdr-left">
-          <div class="page-icon-badge"><i class="ti ti-settings"></i></div>
-          <div>
-            <div class="page-hdr-title">Einstellungen</div>
-            <div class="page-hdr-sub">Mitarbeiter, Labels und Listen für dieses Projekt verwalten</div>
-          </div>
-        </div>
-      </div>
-      <div class="page-tabs">
-        <button class="page-tab-btn" id="settingsTabBtn_team" onclick="setSettingsTab('team')"><i class="ti ti-users"></i> Team</button>
-        <button class="page-tab-btn" id="settingsTabBtn_board" onclick="setSettingsTab('board')"><i class="ti ti-layout-kanban"></i> Board</button>
-        <button class="page-tab-btn" id="settingsTabBtn_project" onclick="setSettingsTab('project')"><i class="ti ti-target-arrow"></i> Projekt</button>
-        <button class="page-tab-btn" id="settingsTabBtn_system" onclick="setSettingsTab('system')"><i class="ti ti-database"></i> System</button>
-        <button class="page-tab-btn" id="settingsTabBtn_csv" onclick="setSettingsTab('csv')"><i class="ti ti-table"></i> Import/Export</button>
-        <button class="page-tab-btn" id="settingsTabBtn_notify" onclick="setSettingsTab('notify')"><i class="ti ti-mail"></i> Auto. Benachrichtigungen</button>
-      </div>
-      <div class="view-scroll" id="settingsContent"></div>
+      <div class="view-scroll" id="settingsContent" style="padding-top:94px"></div>
     </div>
 
   </div>
@@ -690,14 +829,14 @@ let currentView='board';
 
 // ── ARTIKEL-STAMMDATEN (CR RMA) ──
 let ARTICLES=[
-  {id:1,sku:'TN-1001-BK',title:'HP LaserJet Toner Schwarz',ek:12.50,vk:29.90,crRma:2.1,crRga:0.8},
-  {id:2,sku:'TN-1002-BK',title:'Brother Toner Schwarz',ek:9.80,vk:24.90,crRma:3.4,crRga:1.2},
-  {id:3,sku:'TN-1003-BK',title:'Canon Toner Schwarz',ek:14.20,vk:32.90,crRma:1.5,crRga:0.5},
-  {id:4,sku:'TN-1005-CMYK',title:'Xerox Toner Farbset (CMYK)',ek:38.00,vk:79.90,crRma:4.9,crRga:2.0},
-  {id:5,sku:'TN-1006-BK',title:'HP Enterprise Toner Schwarz',ek:22.00,vk:49.90,crRma:1.2,crRga:0.4},
-  {id:6,sku:'TN-1007-CMYK',title:'Epson Tinte Farbset (CMYK)',ek:16.50,vk:34.90,crRma:6.7,crRga:3.1},
-  {id:7,sku:'TN-1008-CMYK',title:'Konica Minolta Toner Farbset',ek:45.00,vk:94.90,crRma:2.8,crRga:1.0},
-  {id:8,sku:'TN-1011-CMYK',title:'HP Color Toner Farbset',ek:19.90,vk:42.90,crRma:3.9,crRga:1.6},
+  {id:1,sku:'TN-1001-BK',title:'HP LaserJet Toner Schwarz',ek:12.50,vk:29.90,crRma:2.1,verkaufteStk:0},
+  {id:2,sku:'TN-1002-BK',title:'Brother Toner Schwarz',ek:9.80,vk:24.90,crRma:3.4,verkaufteStk:0},
+  {id:3,sku:'TN-1003-BK',title:'Canon Toner Schwarz',ek:14.20,vk:32.90,crRma:1.5,verkaufteStk:0},
+  {id:4,sku:'TN-1005-CMYK',title:'Xerox Toner Farbset (CMYK)',ek:38.00,vk:79.90,crRma:4.9,verkaufteStk:0},
+  {id:5,sku:'TN-1006-BK',title:'HP Enterprise Toner Schwarz',ek:22.00,vk:49.90,crRma:1.2,verkaufteStk:0},
+  {id:6,sku:'TN-1007-CMYK',title:'Epson Tinte Farbset (CMYK)',ek:16.50,vk:34.90,crRma:6.7,verkaufteStk:0},
+  {id:7,sku:'TN-1008-CMYK',title:'Konica Minolta Toner Farbset',ek:45.00,vk:94.90,crRma:2.8,verkaufteStk:0},
+  {id:8,sku:'TN-1011-CMYK',title:'HP Color Toner Farbset',ek:19.90,vk:42.90,crRma:3.9,verkaufteStk:0},
 ];
 
 // ── PROJEKT-RAHMEN: Zeitrahmen, Budget, Meilensteine, Risiken ──
@@ -735,7 +874,7 @@ const STORAGE_KEY='toner_kanban_state_v1';
 // dass ein laenger offener Tab automatisch erkennt, wenn eine neuere Version online ist
 // (siehe checkForNewVersion) - damit alte Tabs nicht unbemerkt mit veraltetem Code
 // weiterlaufen und neuere Aenderungen ueberschreiben koennen.
-const BUILD_VERSION='2026-07-12T13:49:41.000Z';
+const BUILD_VERSION='2026-07-22T14:03:20.000Z';
 const SUPABASE_URL='https://emsxbpcufhqjcuzdobcu.supabase.co';
 const SUPABASE_KEY='sb_publishable_P_QdWfpxyk8pvJDPd1-h6w_-CWSOg7e';
 const SB_SESSION_KEY='sb_session_v1';
@@ -838,7 +977,7 @@ function applyStateData(data){
   if(data.ARTICLES)ARTICLES=data.ARTICLES;
   if(data.LEADLOCKS)LEADLOCKS=data.LEADLOCKS;
   pruneExpiredLocks();
-  if(data.PROJECT)PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:''},data.PROJECT);
+  if(data.PROJECT)PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:'',dashboardKpiHistory:[]},data.PROJECT);
   if(data.nextId)nextId=data.nextId;
   if(data.nextLabelId)nextLabelId=data.nextLabelId;
   if(data.nextPrinterId)nextPrinterId=data.nextPrinterId;
@@ -1539,13 +1678,13 @@ async function syncMerge(retryCount){
     if(baselineForCompare.leads)normalizeLeads(baselineForCompare.leads);
     if(baselineForCompare.COLUMNS)normalizeColumns(baselineForCompare.COLUMNS);
     if(baselineForCompare.AGENTS)normalizeAgents(baselineForCompare.AGENTS);
-    if(baselineForCompare.PROJECT)baselineForCompare.PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:''},baselineForCompare.PROJECT);
+    if(baselineForCompare.PROJECT)baselineForCompare.PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:'',dashboardKpiHistory:[]},baselineForCompare.PROJECT);
     if(!baselineForCompare.LEADLOCKS)baselineForCompare.LEADLOCKS=[];
     const remoteForCompare=JSON.parse(JSON.stringify(remoteData));
     if(remoteForCompare.leads)normalizeLeads(remoteForCompare.leads);
     if(remoteForCompare.COLUMNS)normalizeColumns(remoteForCompare.COLUMNS);
     if(remoteForCompare.AGENTS)normalizeAgents(remoteForCompare.AGENTS);
-    if(remoteForCompare.PROJECT)remoteForCompare.PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:''},remoteForCompare.PROJECT);
+    if(remoteForCompare.PROJECT)remoteForCompare.PROJECT=Object.assign({milestones:[],risks:[],notificationsEnabled:true,notificationRules:[],csvFields:[],lastBackupDate:'',dashboardKpiHistory:[]},remoteForCompare.PROJECT);
     if(!remoteForCompare.LEADLOCKS)remoteForCompare.LEADLOCKS=[];
     const baseline=baselineForCompare;
     // KRITISCH: Gibt es noch KEINE bekannte Baseline (z.B. eine ganz frische Sitzung, ein
@@ -1953,8 +2092,8 @@ function runDataIntegrityCheck(){
   else if(fixedIds>0||fixedSwaps>0)msg+='\n\nDie automatischen Korrekturen wurden bereits gespeichert und in die Cloud hochgeladen.';
   alert(msg);
 }
-let activeAgentFilter='all';
-let activeLabelFilter='all';
+let activeAgentFilters=[];
+let activeLabelFilters=[];
 let activeTasksAgentFilter='all';
 let dragCardId=null;
 let dragColId=null;
@@ -2016,6 +2155,8 @@ function requireAdmin(actionLabel){
 function roleLabel(r){return r==='admin'?'Admin':r==='am'?'Account Manager':'Sales Agent';}
 function labelById(id){return LABELS.find(l=>l.id===id);}
 function fmtDate(d){if(!d)return'';const p=d.split('T')[0].split('-');return`${p[2]}.${p[1]}.${p[0]}`;}
+const WEEKDAYS_DE=['So','Mo','Di','Mi','Do','Fr','Sa'];
+function fmtWeekday(d){if(!d)return'';return WEEKDAYS_DE[new Date(d).getDay()];}
 // Formatiert Datum + Uhrzeit gemeinsam, aber nur wenn tatsaechlich eine Uhrzeit gesetzt ist
 // (nicht die Standard-Mitternacht, die entsteht, wenn beim datetime-local-Feld nur das
 // Datum, aber keine Uhrzeit ausgewaehlt wurde) - sonst wie gewohnt nur das Datum.
@@ -2242,9 +2383,14 @@ function formatBytes(b){if(b<1024)return b+' B';if(b<1024*1024)return(b/1024).to
 function getFilteredLeads(){
   const q=(document.getElementById('searchInput').value||'').toLowerCase().trim();
   return leads.filter(l=>{
-    if(activeAgentFilter==='unassigned'&&l.members.length>0)return false;
-    else if(activeAgentFilter!=='all'&&activeAgentFilter!=='unassigned'&&!l.members.includes(activeAgentFilter))return false;
-    if(activeLabelFilter!=='all'&&!(l.labelIds||[]).includes(activeLabelFilter))return false;
+    if(activeAgentFilters.length){
+      const okAgent=activeAgentFilters.some(f=>f==='unassigned'?l.members.length===0:l.members.includes(f));
+      if(!okAgent)return false;
+    }
+    if(activeLabelFilters.length){
+      const okLabel=(l.labelIds||[]).some(id=>activeLabelFilters.includes(id));
+      if(!okLabel)return false;
+    }
     if(q&&!(l.company.toLowerCase().includes(q)||l.contact.toLowerCase().includes(q)||(l.customerNumber||'').toLowerCase().includes(q)))return false;
     return true;
   });
@@ -2261,36 +2407,97 @@ function renderStats(){
   const forecastSum=fl.reduce((s,l)=>s+(parseFloat(l.forecast)||0),0);
   const overdueBg=overdue>0?'var(--red-bg)':'var(--purple-bg)';
   const overdueColor=overdue>0?'var(--red-dark)':'var(--purple-dark)';
-  document.getElementById('statsBar').innerHTML=`
-    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-users" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${total}</b><span style="color:var(--purple-dark)">Leads</span></div>
-    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-message-2" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${totalActivities}</b><span style="color:var(--purple-dark)">Aktivitäten</span></div>
-    <div class="tb-stat-pill" style="background:${overdueBg}"><i class="ti ti-alert-triangle" style="color:${overdueColor}"></i><b style="color:${overdueColor}">${overdue}</b><span style="color:${overdueColor}">überfällig</span></div>
-    <div class="tb-stat-pill" style="background:var(--green-bg)"><i class="ti ti-trophy" style="color:var(--green-dark)"></i><b style="color:var(--green-dark)">${rate}%</b><span style="color:var(--green-dark)">gewonnen</span></div>
-    <div class="tb-stat-pill" style="background:var(--purple-bg)"><i class="ti ti-chart-line" style="color:var(--purple-dark)"></i><b style="color:var(--purple-dark)">${fmtEur(forecastSum)}</b><span style="color:var(--purple-dark)">Forecast</span></div>`;
+  document.getElementById('statsPopover').innerHTML=`
+    <div class="infopop-row"><span>Leads</span><b>${total}</b></div>
+    <div class="infopop-row"><span>Aktivitäten</span><b>${totalActivities}</b></div>
+    <div class="infopop-row${overdue>0?' warn':''}"><span>Überfällig</span><b>${overdue}</b></div>
+    <div class="infopop-row good"><span>Gewonnen</span><b>${rate}%</b></div>
+    <div class="infopop-row"><span>Forecast</span><b>${fmtEur(forecastSum)}</b></div>`;
+}
+let overflowMenuOpen=false;
+function toggleOverflowMenu(e){
+  if(e)e.stopPropagation();
+  overflowMenuOpen=!overflowMenuOpen;
+  if(overflowMenuOpen)filterMenuOpen=false;
+  document.getElementById('overflowMenu').classList.toggle('show',overflowMenuOpen);
+  document.getElementById('filterMenu').classList.remove('show');
+}
+let crrmaMenuOpen=false;
+function toggleCrrmaMenu(e){
+  if(e)e.stopPropagation();
+  crrmaMenuOpen=!crrmaMenuOpen;
+  document.getElementById('crrmaOverflowMenu').classList.toggle('show',crrmaMenuOpen);
 }
 
 // ── RENDER: AGENT FILTER + USER SELECT ──
 function activeAgents(){return AGENTS.filter(a=>a.active!==false);}
 function renderAgentChips(){
-  const el=document.getElementById('agentChips');
-  let html=`<span class="chip ${activeAgentFilter==='all'?'active':''}" onclick="setAgentFilter('all')">Alle</span>`;
-  html+=`<span class="chip ${activeAgentFilter==='unassigned'?'active':''}" onclick="setAgentFilter('unassigned')" style="color:var(--text3)"><i class="ti ti-user-question" style="margin-right:3px"></i>Nicht zugeordnet</span>`;
+  const el=document.getElementById('filterMenuAgents');
+  if(!el)return;
+  const noneSel=activeAgentFilters.length===0;
+  let html=`<div class="filtermenu-item ${noneSel?'active':''}" onclick="toggleAgentFilter('all')"><span>Alle</span>${noneSel?'<i class="ti ti-check"></i>':''}</div>`;
+  const unassignedActive=activeAgentFilters.includes('unassigned');
+  html+=`<div class="filtermenu-item ${unassignedActive?'active':''}" onclick="toggleAgentFilter('unassigned')"><span>Nicht zugeordnet</span>${unassignedActive?'<i class="ti ti-check"></i>':''}</div>`;
   AGENTS.forEach(a=>{
-    html+=`<span class="chip ${activeAgentFilter===a.id?'active':''}" onclick="setAgentFilter('${a.id}')">${esc(a.name)}${a.active===false?' <span style="opacity:.6">(inaktiv)</span>':''}</span>`;
+    const active=activeAgentFilters.includes(a.id);
+    html+=`<div class="filtermenu-item ${active?'active':''}" onclick="toggleAgentFilter('${a.id}')"><span>${esc(a.name)}${a.active===false?' <span style="opacity:.6">(inaktiv)</span>':''}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
   });
   el.innerHTML=html;
+  renderOmniTokens();
+}
+function agentFilterLabels(){
+  return activeAgentFilters.map(f=>{
+    if(f==='unassigned')return{id:f,label:'Nicht zugeordnet'};
+    const a=AGENTS.find(a=>a.id===f);
+    return a?{id:f,label:a.name}:null;
+  }).filter(Boolean);
+}
+function labelFilterLabels(){
+  return activeLabelFilters.map(f=>{
+    const lb=LABELS.find(l=>l.id===f);
+    return lb?{id:f,label:lb.name}:null;
+  }).filter(Boolean);
+}
+function renderOmniTokens(){
+  const el=document.getElementById('omniTokens');
+  if(!el)return;
+  let html='';
+  agentFilterLabels().forEach(t=>{
+    html+=`<div class="omni-token"><i class="ti ti-user" style="font-size:12px"></i>${esc(t.label)}<i class="ti ti-x" onclick="toggleAgentFilter('${t.id}')"></i></div>`;
+  });
+  labelFilterLabels().forEach(t=>{
+    html+=`<div class="omni-token"><i class="ti ti-tag" style="font-size:12px"></i>${esc(t.label)}<i class="ti ti-x" onclick="toggleLabelFilter('${t.id}')"></i></div>`;
+  });
+  el.innerHTML=html;
+}
+let filterMenuOpen=false;
+function toggleFilterMenu(e){
+  if(e)e.stopPropagation();
+  filterMenuOpen=!filterMenuOpen;
+  if(filterMenuOpen)overflowMenuOpen=false;
+  document.getElementById('filterMenu').classList.toggle('show',filterMenuOpen);
+  document.getElementById('overflowMenu').classList.remove('show');
 }
 function renderLabelChips(){
-  const el=document.getElementById('labelChipsFilter');
+  const el=document.getElementById('filterMenuLabels');
   if(!el)return;
-  let html=`<span class="chip ${activeLabelFilter==='all'?'active':''}" onclick="setLabelFilter('all')">Alle</span>`;
+  const noneSel=activeLabelFilters.length===0;
+  let html=`<div class="filtermenu-item ${noneSel?'active':''}" onclick="toggleLabelFilter('all')"><span>Alle</span>${noneSel?'<i class="ti ti-check"></i>':''}</div>`;
   LABELS.forEach(lb=>{
-    const active=activeLabelFilter===lb.id;
-    html+=`<span class="chip ${active?'active':''}" style="${active?`background:${lb.color};border-color:${lb.color}`:`border-color:${lb.color};color:${lb.color}`}" onclick="setLabelFilter('${lb.id}')">${esc(lb.name)}</span>`;
+    const active=activeLabelFilters.includes(lb.id);
+    html+=`<div class="filtermenu-item ${active?'active':''}" onclick="toggleLabelFilter('${lb.id}')"><span style="display:flex;align-items:center;gap:8px;"><span style="width:8px;height:8px;border-radius:50%;background:${lb.color};display:inline-block;flex-shrink:0"></span>${esc(lb.name)}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
   });
   el.innerHTML=html;
+  renderOmniTokens();
 }
-function setLabelFilter(id){activeLabelFilter=id;renderLabelChips();renderBoard();}
+function toggleLabelFilter(id){
+  if(id==='all'){activeLabelFilters=[];}
+  else{
+    const idx=activeLabelFilters.indexOf(id);
+    if(idx>-1)activeLabelFilters.splice(idx,1);else activeLabelFilters.push(id);
+  }
+  renderLabelChips();renderBoard();
+}
 function renderUserSelect(){
   const avail=activeAgents();
   // Automatische Erkennung: passt die angemeldete E-Mail zu einem Mitarbeiter,
@@ -2321,9 +2528,18 @@ function renderUserSelect(){
 function updateNavForRole(){
   const el=document.getElementById('navSettings');
   if(el)el.style.display=isAdmin()?'':'none';
+  const sub=document.getElementById('settingsSubNav');
+  if(sub&&!isAdmin())sub.classList.add('hidden');
   if(currentView==='settings'&&!isAdmin())switchView('board');
 }
-function setAgentFilter(id){activeAgentFilter=id;renderAgentChips();renderBoard();}
+function toggleAgentFilter(id){
+  if(id==='all'){activeAgentFilters=[];}
+  else{
+    const idx=activeAgentFilters.indexOf(id);
+    if(idx>-1)activeAgentFilters.splice(idx,1);else activeAgentFilters.push(id);
+  }
+  renderAgentChips();renderBoard();
+}
 
 // ── RENDER: BOARD ──
 // ── NAVIGATION ──
@@ -2403,7 +2619,7 @@ function renderBoard(){
 }
 
 // ── DASHBOARD ──
-let activeDashboardAgentFilter='all';
+let activeDashboardAgentFilters=[];
 // Erfasst echte Bewegungen (Statuswechsel) aus dem Aktivitaets-Protokoll der letzten X Tage
 function getRecentMovements(dl,days){
   const cutoff=new Date(TODAY);
@@ -2429,28 +2645,91 @@ function getRecentMovements(dl,days){
   return {total,toWon,toLost,forward:total-toWon-toLost,rows};
 }
 
+let dashboardDateStart='';
+let dashboardDateEnd='';
+let dashboardDateMenuOpen=false;
+function toggleDashboardDateMenu(e){
+  if(e)e.stopPropagation();
+  dashboardDateMenuOpen=!dashboardDateMenuOpen;
+  if(dashboardDateMenuOpen)dashboardFilterMenuOpen=false;
+  document.getElementById('dashboardDateMenu').classList.toggle('show',dashboardDateMenuOpen);
+  const fm=document.getElementById('dashboardFilterMenu');if(fm)fm.classList.remove('show');
+}
+function applyDashboardDateRange(){
+  dashboardDateStart=document.getElementById('dashboardDateStartInput').value;
+  dashboardDateEnd=document.getElementById('dashboardDateEndInput').value;
+  dashboardDateMenuOpen=false;
+  document.getElementById('dashboardDateMenu').classList.remove('show');
+  renderDashboardOmniTokens();
+  renderDashboard();
+}
+function clearDashboardDateRange(){
+  dashboardDateStart='';dashboardDateEnd='';
+  const s=document.getElementById('dashboardDateStartInput'),e=document.getElementById('dashboardDateEndInput');
+  if(s)s.value='';if(e)e.value='';
+  renderDashboardOmniTokens();
+  renderDashboard();
+}
 function renderDashboardAgentChips(){
-  const el=document.getElementById('dashAgentChips');
-  let html=`<span class="chip ${activeDashboardAgentFilter==='all'?'active':''}" onclick="setDashboardAgentFilter('all')">Alle</span>`;
+  const el=document.getElementById('dashboardFilterMenuAgents');
+  if(!el)return;
+  const noneSel=activeDashboardAgentFilters.length===0;
+  let html=`<div class="filtermenu-item ${noneSel?'active':''}" onclick="toggleDashboardAgentFilter('all')"><span>Alle</span>${noneSel?'<i class="ti ti-check"></i>':''}</div>`;
   AGENTS.forEach(a=>{
-    html+=`<span class="chip ${activeDashboardAgentFilter===a.id?'active':''}" onclick="setDashboardAgentFilter('${a.id}')">${esc(a.name)}</span>`;
+    const active=activeDashboardAgentFilters.includes(a.id);
+    html+=`<div class="filtermenu-item ${active?'active':''}" onclick="toggleDashboardAgentFilter('${a.id}')"><span>${esc(a.name)}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
   });
   el.innerHTML=html;
+  renderDashboardOmniTokens();
 }
-function setDashboardAgentFilter(id){
-  activeDashboardAgentFilter=id;
+function toggleDashboardAgentFilter(id){
+  if(id==='all'){activeDashboardAgentFilters=[];}
+  else{
+    const idx=activeDashboardAgentFilters.indexOf(id);
+    if(idx>-1)activeDashboardAgentFilters.splice(idx,1);else activeDashboardAgentFilters.push(id);
+  }
   renderDashboardAgentChips();
   renderDashboard();
 }
 let activeDashboardPeriod='all';
+const DASHBOARD_PERIOD_OPTIONS=[['all','Gesamt'],['week','Diese Woche'],['month','Dieser Monat'],['quarter','Dieses Quartal']];
 function renderDashboardPeriodChips(){
-  const el=document.getElementById('dashPeriodChips');
+  const el=document.getElementById('dashboardFilterMenuPeriod');
   if(!el)return;
-  const opts=[['all','Gesamt'],['week','Diese Woche'],['month','Dieser Monat'],['quarter','Dieses Quartal']];
-  el.innerHTML=opts.map(([k,label])=>`<span class="chip ${activeDashboardPeriod===k?'active':''}" onclick="setDashboardPeriod('${k}')">${label}</span>`).join('');
+  el.innerHTML=DASHBOARD_PERIOD_OPTIONS.map(([k,label])=>{
+    const active=activeDashboardPeriod===k;
+    return `<div class="filtermenu-item ${active?'active':''}" onclick="setDashboardPeriod('${k}')"><span>${label}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
+  }).join('');
+  renderDashboardOmniTokens();
+}
+function renderDashboardOmniTokens(){
+  const el=document.getElementById('dashboardOmniTokens');
+  if(!el)return;
+  let html='';
+  activeDashboardAgentFilters.forEach(id=>{
+    const a=AGENTS.find(a=>a.id===id);
+    if(a)html+=`<div class="omni-token"><i class="ti ti-user" style="font-size:12px"></i>${esc(a.name)}<i class="ti ti-x" onclick="toggleDashboardAgentFilter('${id}')"></i></div>`;
+  });
+  if(dashboardDateStart||dashboardDateEnd){
+    const label=(dashboardDateStart?fmtDate(dashboardDateStart):'…')+' – '+(dashboardDateEnd?fmtDate(dashboardDateEnd):'…');
+    html+=`<div class="omni-token"><i class="ti ti-calendar" style="font-size:12px"></i>${esc(label)}<i class="ti ti-x" onclick="clearDashboardDateRange()"></i></div>`;
+  }else if(activeDashboardPeriod!=='all'){
+    const p=DASHBOARD_PERIOD_OPTIONS.find(([k])=>k===activeDashboardPeriod);
+    if(p)html+=`<div class="omni-token"><i class="ti ti-calendar" style="font-size:12px"></i>${esc(p[1])}<i class="ti ti-x" onclick="setDashboardPeriod('all')"></i></div>`;
+  }
+  el.innerHTML=html;
+}
+let dashboardFilterMenuOpen=false;
+function toggleDashboardFilterMenu(e){
+  if(e)e.stopPropagation();
+  dashboardFilterMenuOpen=!dashboardFilterMenuOpen;
+  document.getElementById('dashboardFilterMenu').classList.toggle('show',dashboardFilterMenuOpen);
 }
 function setDashboardPeriod(p){
   activeDashboardPeriod=p;
+  dashboardDateStart='';dashboardDateEnd='';
+  const s=document.getElementById('dashboardDateStartInput'),e=document.getElementById('dashboardDateEndInput');
+  if(s)s.value='';if(e)e.value='';
   renderDashboardPeriodChips();
   renderDashboard();
 }
@@ -2462,11 +2741,236 @@ function periodStartDate(p){
   else{return null;}
   return d;
 }
+// Berechnet die 5 Dashboard-Kennzahlen fuer eine beliebige Lead-Menge (genutzt sowohl
+// fuer die gefilterte Anzeige als auch fuer die unfilterte Historie/Vortag-Basis).
+function computeDashboardKpiMetrics(arr){
+  const overdue=arr.filter(l=>l.followup&&daysUntil(l.followup)<0).length;
+  const forecastSum=arr.reduce((s,l)=>s+(parseFloat(l.forecast)||0),0);
+  const investSum=arr.reduce((s,l)=>s+l.shipPrinter.skus.reduce((ss,x)=>ss+(parseFloat(x.priceEk)||0),0),0);
+  const shippedCount=arr.filter(l=>l.tonerSent==='Ja').length;
+  const investTotal=investSum+shippedCount*SHIPPING_COST_PER_SEND;
+  const won=arr.filter(l=>isWon(l)).length;
+  const lost=arr.filter(l=>isLost(l)).length;
+  const closedCount=won+lost;
+  const winRate=closedCount?Math.round(won/closedCount*100):0;
+  const cycleDays=arr.filter(l=>isClosedLead(l)&&l.firstContact&&l.closedAt)
+    .map(l=>Math.round((new Date(l.closedAt)-new Date(l.firstContact))/86400000)).filter(d=>d>=0);
+  const avgCycle=cycleDays.length?Math.round(cycleDays.reduce((a,b)=>a+b,0)/cycleDays.length):0;
+  return {overdue,forecastSum:Math.round(forecastSum),investTotal:Math.round(investTotal),winRate,avgCycle};
+}
+// Legt/aktualisiert den heutigen Eintrag in der (max. 7 Tage) Historie; gibt true zurueck,
+// wenn sich dadurch etwas geaendert hat (dann lohnt sich ein saveState()).
+function updateDashboardKpiHistory(vals){
+  if(!PROJECT.dashboardKpiHistory)PROJECT.dashboardKpiHistory=[];
+  const arr=PROJECT.dashboardKpiHistory;
+  const idx=arr.findIndex(e=>e.date===TODAY);
+  const entry=Object.assign({date:TODAY},vals);
+  if(idx>-1){
+    if(JSON.stringify(arr[idx])!==JSON.stringify(entry)){arr[idx]=entry;return true;}
+    return false;
+  }
+  arr.push(entry);
+  while(arr.length>30)arr.shift();
+  return true;
+}
+function dashboardKpiCard(label,key,colorVar,currVal,formatFn){
+  const hist=PROJECT.dashboardKpiHistory||[];
+  const series=hist.length?hist.map(h=>h[key]||0):[currVal,currVal];
+  const prevVal=hist.length>1?(hist[hist.length-2][key]||0):currVal;
+  return `<div class="dash-kpi dash-kpi-tall">
+    <div class="dash-kpi-label">${label}</div>
+    <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+      <div class="dash-kpi-val" style="color:${colorVar}">${formatFn(currVal)} <span style="font-size:14px;vertical-align:middle;opacity:.8">${kpiTrendArrow(currVal,prevVal)}</span></div>
+      ${miniSparklineSvg(series,colorVar)}
+    </div>
+    <div class="dash-kpi-compare">Vortag: ${formatFn(prevVal)}</div>
+  </div>`;
+}
+// Petrol-Farbverlauf ueber die Trichterstufen: dunkel (Start) -> helles Teal (Ende)
+function stageGradientColor(i,n){
+  const from=[23,76,82],to=[126,210,219];
+  const t=n>1?i/(n-1):0;
+  const c=from.map((v,idx)=>Math.round(v+(to[idx]-v)*t));
+  return `rgb(${c[0]},${c[1]},${c[2]})`;
+}
+// Horizontaler Trapez-Trichter: Hoehe pro Stufe verjuengt sich proportional zur Leadanzahl
+function horizontalFunnelHtml(funnelCounts,total){
+  const active=funnelCounts.filter(x=>x.c.outcome!=='lost');
+  if(!active.length||!active.some(x=>x.count>0))return '<p style="font-size:12px;color:var(--text3)">Keine Leads im gewählten Zeitraum/Filter.</p>';
+  const maxCount=Math.max(1,...active.map(x=>x.count));
+  const h=150;
+  let html='<div class="hfunnel-wrap">';
+  active.forEach((x,i)=>{
+    const hNow=20+(x.count/maxCount)*(h-20);
+    const next=active[i+1];
+    const hNext=next?20+(next.count/maxCount)*(h-20):hNow*0.6;
+    const color=stageGradientColor(i,active.length);
+    const pct=total?Math.round(x.count/total*100):0;
+    html+=`<div class="hfunnel-seg" onclick="switchView('board')" title="${esc(x.c.name)}">
+      <svg viewBox="0 0 100 ${h}" preserveAspectRatio="none">
+        <polygon points="0,${(h-hNow)/2} 100,${(h-hNext)/2} 100,${h-(h-hNext)/2} 0,${h-(h-hNow)/2}" fill="${color}"/>
+      </svg>
+      <div class="hfunnel-seg-label">${esc(x.c.name)}<br><strong>${x.count} / ${pct}%</strong></div>
+    </div>`;
+  });
+  html+='</div>';
+  return html;
+}
+function polarPoint(cx,cy,r,angleDeg){
+  const a=(angleDeg-90)*Math.PI/180;
+  return [cx+r*Math.cos(a),cy+r*Math.sin(a)];
+}
+// Donut-Diagramm mit Gesamtzahl in der Mitte (Variante B), Petrol-Farbverlauf ueber die Segmente
+function donutChartHtml(entries,totalCount,centerLabel){
+  if(!entries.length||!totalCount)return '<p style="font-size:12px;color:var(--text3)">Noch keine verlorenen Leads.</p>';
+  const size=180,r=78,rInner=48,cx=90,cy=90;
+  let angle=0;
+  const colors=entries.map((_,i)=>stageGradientColor(i,entries.length));
+  let paths='';
+  entries.forEach((d,i)=>{
+    const sweep=totalCount?d.count/totalCount*360:0;
+    const [x1,y1]=polarPoint(cx,cy,r,angle);
+    const [x2,y2]=polarPoint(cx,cy,r,angle+sweep);
+    const [xi1,yi1]=polarPoint(cx,cy,rInner,angle+sweep);
+    const [xi2,yi2]=polarPoint(cx,cy,rInner,angle);
+    const large=sweep>180?1:0;
+    paths+=`<path d="M${x1.toFixed(1)},${y1.toFixed(1)} A${r},${r} 0 ${large} 1 ${x2.toFixed(1)},${y2.toFixed(1)} L${xi1.toFixed(1)},${yi1.toFixed(1)} A${rInner},${rInner} 0 ${large} 0 ${xi2.toFixed(1)},${yi2.toFixed(1)} Z" fill="${colors[i]}" stroke="#fff" stroke-width="2"/>`;
+    angle+=sweep;
+  });
+  const legend=entries.map((d,i)=>`<div class="donut-legend-item"><span class="donut-legend-dot" style="background:${colors[i]}"></span><span class="donut-legend-name">${esc(d.label)}</span><span class="donut-legend-val">${d.count}</span><span class="donut-legend-pct">${totalCount?Math.round(d.count/totalCount*100):0}%</span></div>`).join('');
+  return `<div class="donut-wrap">
+    <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" style="flex-shrink:0">
+      ${paths}
+      <text x="${cx}" y="${cy-4}" text-anchor="middle" font-size="24" font-weight="800" fill="var(--text)" font-family="Inter,sans-serif">${totalCount}</text>
+      <text x="${cx}" y="${cy+15}" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Inter,sans-serif">${esc(centerLabel)}</text>
+    </svg>
+    <div class="donut-legend">${legend}</div>
+  </div>`;
+}
+// Aktivitätsdiagramm (letzte 30 Tage) mit geglaetteter (interpolierter) Linie, analog zum Chart in Aktivitäten
+// Kunden-Herkunft: stilisierte Deutschlandkarte mit aggregierten Punkten je Stadt.
+// Stadt wird per Regex aus der Adresse extrahiert (Text nach der 5-stelligen PLZ) und
+// gegen eine Liste bekannter Grossstaedte mit ungefaehren Koordinaten abgeglichen.
+const GERMANY_CITY_COORDS={
+  'kiel':[150,20],'hamburg':[150,62],'bremen':[110,90],'rostock':[195,45],
+  'hannover':[150,120],'berlin':[232,108],'magdeburg':[190,138],'bielefeld':[115,130],
+  'dortmund':[80,158],'essen':[68,150],'duisburg':[65,155],'düsseldorf':[70,168],
+  'köln':[75,188],'bonn':[80,198],'leipzig':[212,178],'dresden':[242,188],
+  'erfurt':[172,168],'frankfurt':[112,220],'wiesbaden':[104,214],'mainz':[105,224],
+  'mannheim':[112,250],'karlsruhe':[105,268],'stuttgart':[132,270],'nürnberg':[182,248],
+  'saarbrücken':[70,240],'freiburg':[95,310],
+  'münchen':[200,320],'augsburg':[185,300],'regensburg':[202,268],
+  'ulm':[145,285],'kassel':[145,168],'münster':[95,140],'aachen':[55,185]
+};
+// Normalisiert gängige Umlaut-Schreibweisen (oe/ue/ae) auf die Umlaut-Form, damit
+// "Koeln" und "Köln" als dieselbe Stadt gezählt werden (statt als zwei getrennte Punkte).
+function normalizeGermanCity(s){
+  return s.toLowerCase().trim()
+    .replace(/oe/g,'ö').replace(/ue/g,'ü').replace(/ae/g,'ä');
+}
+function extractCityFromAddress(address){
+  if(!address)return null;
+  const m=address.match(/\b\d{5}\b\s+([A-Za-zÄÖÜäöüß\-\. ]+)/);
+  if(!m)return null;
+  return m[1].trim().split(',')[0].trim();
+}
+function customerOriginMapHtml(dl){
+  const cityCounts={};
+  let matched=0,unmatched=0;
+  dl.forEach(l=>{
+    const city=extractCityFromAddress(l.address);
+    if(!city){unmatched++;return;}
+    const norm=normalizeGermanCity(city);
+    if(GERMANY_CITY_COORDS[norm]){cityCounts[norm]=(cityCounts[norm]||0)+1;matched++;}
+    else unmatched++;
+  });
+  const entries=Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
+  const maxCount=Math.max(1,...entries.map(x=>x[1]));
+  const outline="M150,10 C185,8 210,20 225,15 C245,10 260,30 255,50 C270,60 265,85 250,95 C260,115 250,135 235,140 C245,160 235,180 220,185 C230,205 215,225 195,220 C200,240 185,258 165,255 C170,275 155,295 140,300 C145,320 130,340 110,335 C95,355 70,350 65,330 C50,335 35,320 40,300 C25,295 20,275 30,260 C15,250 15,230 30,220 C20,205 25,185 45,180 C35,165 45,145 65,145 C55,125 65,105 85,105 C75,85 90,65 110,68 C105,48 120,28 140,32 C138,18 143,10 150,10 Z";
+  let dots='';
+  entries.forEach(([city,count])=>{
+    const [x,y]=GERMANY_CITY_COORDS[city];
+    const r=8+(count/maxCount)*16;
+    const t=count/maxCount;
+    const from=[126,210,219],to=[23,76,82];
+    const c=from.map((v,i)=>Math.round(v+(to[i]-v)*t));
+    dots+=`<circle cx="${x}" cy="${y}" r="${r.toFixed(1)}" fill="rgb(${c[0]},${c[1]},${c[2]})" fill-opacity="0.88" stroke="#fff" stroke-width="1.5"/>
+      <text x="${x}" y="${y+4}" text-anchor="middle" font-size="10" font-weight="700" fill="#fff" font-family="Inter,sans-serif">${count}</text>`;
+  });
+  const legend=entries.slice(0,8).map(([city,count])=>{
+    const label=city.charAt(0).toUpperCase()+city.slice(1);
+    return `<div class="donut-legend-item"><span class="donut-legend-dot" style="background:var(--purple-dark)"></span><span class="donut-legend-name">${esc(label)}</span><span class="donut-legend-val">${count}</span></div>`;
+  }).join('');
+  const note=unmatched>0?`<div style="font-size:11px;color:var(--text3);margin-top:8px">${unmatched} Lead${unmatched===1?'':'s'} ohne erkennbare Stadt in der Adresse nicht auf der Karte gezeigt.</div>`:'';
+  if(!entries.length)return '<p style="font-size:12px;color:var(--text3)">Keine Adressen mit erkennbarer Stadt gefunden.</p>';
+  return `<div class="donut-wrap">
+    <svg width="300" height="360" viewBox="0 0 300 360" style="flex-shrink:0">
+      <path d="${outline}" fill="var(--glass)" stroke="var(--purple)" stroke-width="1.5" stroke-opacity="0.45"/>
+      ${dots}
+    </svg>
+    <div class="donut-legend">${legend}${note}</div>
+  </div>`;
+}
+function dashboardActivityChartHtml(dl){
+  const days=30;
+  const buckets=[];
+  for(let i=days-1;i>=0;i--){
+    const d=new Date(TODAY);d.setDate(d.getDate()-i);
+    buckets.push({date:d,key:d.toISOString().slice(0,10),count:0});
+  }
+  const bucketMap={};
+  buckets.forEach(b=>bucketMap[b.key]=b);
+  dl.forEach(l=>{
+    (l.activity||[]).forEach(a=>{
+      const key=(a.date||'').slice(0,10);
+      if(bucketMap[key])bucketMap[key].count++;
+    });
+  });
+  const w=1400,h=200,padL=10,padR=10,padT=14,padB=10;
+  const plotW=w-padL-padR,plotH=h-padT-padB;
+  const maxVal=Math.max(1,...buckets.map(b=>b.count));
+  const stepX=buckets.length>1?plotW/(buckets.length-1):0;
+  const pts=buckets.map((b,i)=>{
+    const x=padL+i*stepX;
+    const y=padT+plotH-(b.count/maxVal*plotH);
+    return [x,y];
+  });
+  const linePath=smoothSvgPath(pts);
+  const areaPath=linePath+` L${(padL+plotW).toFixed(1)},${(padT+plotH).toFixed(1)} L${padL},${(padT+plotH).toFixed(1)} Z`;
+  const total=buckets.reduce((s,b)=>s+b.count,0);
+  const avgPerDay=(total/buckets.length).toFixed(1);
+  const dotsHtml=buckets.map((b,i)=>{
+    const [x,y]=pts[i];
+    return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="8" fill="transparent" style="cursor:pointer" onmouseenter="showActivityTooltip(this,'${fmtDate(b.key)}',${b.count})" onmouseleave="hideActivityTooltip()"/>
+      <circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="3" fill="var(--purple)" style="pointer-events:none"/>`;
+  }).join('');
+  return `
+    <div class="section-hdr" style="margin-top:0">Aktivitätsdiagramm <span style="font-weight:400;color:var(--text3);font-size:11px">Letzte 30 Tage · Gesamt: ${total} · Ø ${avgPerDay}/Tag</span></div>
+    <svg viewBox="0 0 ${w} ${h}" preserveAspectRatio="none" style="width:100%;height:180px;display:block;overflow:visible">
+      <defs><linearGradient id="dashActGrad" x1="0" y1="0" x2="0" y2="1">
+        <stop offset="0%" stop-color="var(--purple)" stop-opacity="0.28"/>
+        <stop offset="100%" stop-color="var(--purple)" stop-opacity="0.02"/>
+      </linearGradient></defs>
+      <line x1="${padL}" y1="${padT+plotH}" x2="${padL+plotW}" y2="${padT+plotH}" stroke="var(--border)" stroke-width="1" vector-effect="non-scaling-stroke"/>
+      <path d="${areaPath}" fill="url(#dashActGrad)"/>
+      <path d="${linePath}" fill="none" stroke="var(--purple)" stroke-width="2" vector-effect="non-scaling-stroke"/>
+      ${dotsHtml}
+    </svg>`;
+}
 function renderDashboard(){
-  let dl=activeDashboardAgentFilter==='all'?leads:leads.filter(l=>(l.members||[]).includes(activeDashboardAgentFilter));
+  let dl=activeDashboardAgentFilters.length?leads.filter(l=>(l.members||[]).some(m=>activeDashboardAgentFilters.includes(m))):leads;
   const periodStart=periodStartDate(activeDashboardPeriod);
   let excludedNoDate=0;
-  if(periodStart){
+  if(dashboardDateStart||dashboardDateEnd){
+    excludedNoDate=dl.filter(l=>!l.firstContact).length;
+    dl=dl.filter(l=>{
+      if(!l.firstContact)return false;
+      const d=l.firstContact.slice(0,10);
+      if(dashboardDateStart&&d<dashboardDateStart)return false;
+      if(dashboardDateEnd&&d>dashboardDateEnd)return false;
+      return true;
+    });
+  }else if(periodStart){
     excludedNoDate=dl.filter(l=>!l.firstContact).length;
     dl=dl.filter(l=>l.firstContact&&new Date(l.firstContact)>=periodStart);
   }
@@ -2500,10 +3004,10 @@ function renderDashboard(){
   const overdueMilestones=PROJECT.milestones.filter(m=>!m.done&&daysUntil(m.targetDate)<0);
   const doneMilestones=PROJECT.milestones.filter(m=>m.done).length;
   const milestoneProgress=PROJECT.milestones.length?Math.round(doneMilestones/PROJECT.milestones.length*100):null;
-  let projStatus={color:'var(--green)',bg:'var(--green-bg)',label:'Im Plan'};
-  if(today>projEnd){projStatus={color:'var(--red)',bg:'var(--red-bg)',label:'Zeitrahmen überschritten'};}
-  else if(overdueMilestones.length){projStatus={color:'var(--red)',bg:'var(--red-bg)',label:overdueMilestones.length+' Meilenstein(e) überfällig'};}
-  else if(milestoneProgress!==null&&timeProgress>75&&milestoneProgress<60){projStatus={color:'var(--amber)',bg:'var(--amber-bg)',label:'Hinter Zeitplan'};}
+  let projStatus={badgeBg:'#fff',badgeColor:'var(--purple-dark)',boxBg:'linear-gradient(160deg,#0c3b40 0%,#164e54 45%,#1d6169 100%)',boxBorder:'rgba(255,255,255,.25)',label:'Im Plan',glass:true};
+  if(today>projEnd){projStatus={badgeBg:'var(--red)',badgeColor:'#fff',boxBg:'var(--red-bg)',boxBorder:'var(--red)',label:'Zeitrahmen überschritten',glass:false};}
+  else if(overdueMilestones.length){projStatus={badgeBg:'var(--red)',badgeColor:'#fff',boxBg:'var(--red-bg)',boxBorder:'var(--red)',label:overdueMilestones.length+' Meilenstein(e) überfällig',glass:false};}
+  else if(milestoneProgress!==null&&timeProgress>75&&milestoneProgress<60){projStatus={badgeBg:'var(--amber)',badgeColor:'#fff',boxBg:'var(--amber-bg)',boxBorder:'var(--amber)',label:'Hinter Zeitplan',glass:false};}
   const openRisks=PROJECT.risks.filter(r=>r.open);
 
   // Kapazitätsübersicht: offene Leads je Mitarbeiter, ueberlastet-Erkennung
@@ -2550,44 +3054,27 @@ function renderDashboard(){
     </div>`;
   }).join('');
 
+  const dashMetrics=computeDashboardKpiMetrics(dl);
+  const dashMetricsAll=computeDashboardKpiMetrics(leads);
+  const dashHistChanged=updateDashboardKpiHistory(dashMetricsAll);
+  if(dashHistChanged)saveState();
   const kpiHtml=`
-    <div class="dash-kpi-row" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">
-      <div class="dash-kpi"><i class="ti ti-phone-outgoing dash-kpi-icon"></i><div class="dash-kpi-label">Kontaktierte Leads</div><div class="dash-kpi-val">${contacted}<span style="font-size:13px;font-weight:500;color:var(--text3)"> / ${total}</span></div></div>
-      <div class="dash-kpi"><i class="ti ti-alert-triangle dash-kpi-icon" style="color:${overdue?'var(--red)':'var(--text3)'}"></i><div class="dash-kpi-label">Follow-up überfällig</div><div class="dash-kpi-val" style="color:${overdue?'var(--red)':'var(--text)'}">${overdue}</div></div>
-      <div class="dash-kpi"><i class="ti ti-trophy dash-kpi-icon" style="color:var(--green)"></i><div class="dash-kpi-label">Gewinnrate (abgeschlossen)</div><div class="dash-kpi-val" style="color:var(--green)">${winRateClosed!==null?winRateClosed+'%':'–'}</div></div>
-      <div class="dash-kpi"><i class="ti ti-chart-line dash-kpi-icon" style="color:var(--purple)"></i><div class="dash-kpi-label">Forecast gesamt</div><div class="dash-kpi-val" style="color:var(--purple)">${fmtEur(forecastSum)||'0 €'}</div></div>
-      <div class="dash-kpi"><i class="ti ti-truck-delivery dash-kpi-icon" style="color:var(--amber-dark)"></i><div class="dash-kpi-label">Investition (Versand)</div><div class="dash-kpi-val" style="color:var(--amber-dark)">${fmtEur(investSum)||'0 €'}</div></div>
-      <div class="dash-kpi"><i class="ti ti-package dash-kpi-icon" style="color:var(--red)"></i><div class="dash-kpi-label">Versandkosten (${shippedCount}× ${fmtEur(SHIPPING_COST_PER_SEND)})</div><div class="dash-kpi-val" style="color:var(--red)">${fmtEur(shippingCostSum)||'0 €'}</div></div>
-      <div class="dash-kpi"><i class="ti ti-clock-hour-4 dash-kpi-icon" style="color:var(--teal-dark)"></i><div class="dash-kpi-label">Ø Vertriebszyklus</div><div class="dash-kpi-val" style="color:var(--teal-dark)">${avgCycle!==null?avgCycle+' Tage':'–'}</div></div>
+    <div class="dash-kpi-row" style="grid-template-columns:repeat(5,1fr)">
+      ${dashboardKpiCard('Follow-up überfällig','overdue','var(--red)',dashMetrics.overdue,v=>String(v))}
+      ${dashboardKpiCard('Investition (Gesamt)','investTotal','var(--amber-dark)',dashMetrics.investTotal,v=>fmtEur(v)||'0 €')}
+      ${dashboardKpiCard('Forecast gesamt','forecastSum','var(--purple)',dashMetrics.forecastSum,v=>fmtEur(v)||'0 €')}
+      ${dashboardKpiCard('Gewinnrate (abgeschlossen)','winRate','var(--green-dark)',dashMetrics.winRate,v=>v+'%')}
+      ${dashboardKpiCard('Ø Vertriebszyklus','avgCycle','var(--teal-dark)',dashMetrics.avgCycle,v=>v?v+' Tage':'–')}
     </div>`;
 
-  // Funnel mit Prozentwerten und Konversionsrate zwischen den Stufen
+  // Horizontaler Trapez-Trichter (Variante A): "Verloren" wird bewusst ausgeklammert,
+  // da ein Trichter die Vorwaerts-Progression durch die Pipeline zeigt.
   const funnelCounts=COLUMNS.map(c=>({c,count:dl.filter(l=>l.status===c.id).length}));
-  const funnelMax=Math.max(1,...funnelCounts.map(x=>x.count));
-  let funnelHtml='';
-  funnelCounts.forEach((x,i)=>{
-    if(x.count===0)return; // Stufen ohne Leads werden nicht angezeigt, um das Dashboard nicht zu ueberladen
-    const barPct=Math.max(8,Math.round(x.count/funnelMax*100));
-    const ofTotalPct=total?Math.round(x.count/total*100):0;
-    let convHtml='<div class="funnel-conv"></div>';
-    if(i<funnelCounts.length-1){
-      const next=funnelCounts[i+1];
-      const convPct=x.count?Math.round(next.count/x.count*100):0;
-      convHtml=`<div class="funnel-conv" title="Konversion zur nächsten Stufe"><i class="ti ti-arrow-right" style="font-size:11px"></i>${convPct}%</div>`;
-    }
-    funnelHtml+=`<div class="funnel-row" onclick="switchView('board')" title="${esc(x.c.name)}">
-      <div class="funnel-label"><span class="col-dot" style="background:${COLOR_HEX[x.c.color]}"></span>${esc(x.c.name)}</div>
-      <div class="funnel-track">
-        <div class="funnel-bar" style="width:${barPct}%;background:${COLOR_HEX[x.c.color]}">${x.count} · ${ofTotalPct}%</div>
-      </div>
-      ${convHtml}
-    </div>`;
-  });
-  if(!funnelHtml)funnelHtml='<p style="font-size:12px;color:var(--text3)">Keine Leads im gewählten Zeitraum/Filter.</p>';
+  const funnelHtml=horizontalFunnelHtml(funnelCounts,total);
 
   // Forecast je Mitarbeiter (Balken)
   // (Mitarbeiter ganz ohne Leads im aktuellen Zeitraum/Filter werden nicht angezeigt, um das Dashboard nicht zu ueberladen)
-  const agentPool=activeDashboardAgentFilter==='all'?AGENTS:AGENTS.filter(a=>a.id===activeDashboardAgentFilter);
+  const agentPool=activeDashboardAgentFilters.length?AGENTS.filter(a=>activeDashboardAgentFilters.includes(a.id)):AGENTS;
   const agentData=agentPool.map(a=>{
     const agentLeads=dl.filter(l=>(l.members||[]).includes(a.id));
     const agentOverdue=agentLeads.filter(l=>l.followup&&daysUntil(l.followup)<0).length;
@@ -2656,15 +3143,7 @@ function renderDashboard(){
     if(lossByStage[c.id])lossEntries.push({label:c.name,count:lossByStage[c.id]});
   });
   if(lossByStage.unknown)lossEntries.push({label:'Unbekannt (vor Erfassung verloren)',count:lossByStage.unknown});
-  const lossMax=Math.max(1,...lossEntries.map(x=>x.count));
-  const lossHtml=lossEntries.length?lossEntries.map(x=>{
-    const pct=Math.max(8,Math.round(x.count/lossMax*100));
-    const ofLostPct=lostLeads.length?Math.round(x.count/lostLeads.length*100):0;
-    return `<div class="funnel-row">
-      <div class="funnel-label">${esc(x.label)}</div>
-      <div class="funnel-track"><div class="funnel-bar" style="width:${pct}%;background:var(--red)">${x.count} · ${ofLostPct}%</div></div>
-    </div>`;
-  }).join(''):'<p style="font-size:12px;color:var(--text3)">Noch keine verlorenen Leads.</p>';
+  const lossHtml=donutChartHtml(lossEntries,lostLeads.length,'verloren');
 
   // Finanzielle Auswirkung: Forecast gewonnen vs. verloren, Investition gesamt vs. in verlorene Leads, Netto-Effekt
   const forecastWon=dl.filter(l=>isWon(l)).reduce((s,l)=>s+(parseFloat(l.forecast)||0),0);
@@ -2689,16 +3168,8 @@ function renderDashboard(){
     const r=l.lossReason||'Kein Grund erfasst';
     reasonCounts[r]=(reasonCounts[r]||0)+1;
   });
-  const reasonEntries=Object.entries(reasonCounts).sort((a,b)=>b[1]-a[1]);
-  const reasonMax=Math.max(1,...reasonEntries.map(x=>x[1]));
-  const reasonHtml=reasonEntries.length?reasonEntries.map(([label,count])=>{
-    const pct=Math.max(8,Math.round(count/reasonMax*100));
-    const ofLostPct=lostLeads.length?Math.round(count/lostLeads.length*100):0;
-    return `<div class="funnel-row">
-      <div class="funnel-label">${label}</div>
-      <div class="funnel-track"><div class="funnel-bar" style="width:${pct}%;background:var(--amber)">${count} · ${ofLostPct}%</div></div>
-    </div>`;
-  }).join(''):'<p style="font-size:12px;color:var(--text3)">Noch keine verlorenen Leads.</p>';
+  const reasonEntries=Object.entries(reasonCounts).sort((a,b)=>b[1]-a[1]).map(([label,count])=>({label,count}));
+  const reasonHtml=donutChartHtml(reasonEntries,lostLeads.length,'verloren');
 
   const movements=getRecentMovements(dl,movementDays);
   const movementsRowsHtml=movements.rows.length?movements.rows.slice(0,8).map(r=>`
@@ -2711,19 +3182,22 @@ function renderDashboard(){
     </div>`).join(''):`<p style="font-size:12px;color:var(--text3)">Keine Bewegungen im gewählten Zeitraum (${movementDays} Tage).</p>`;
 
   document.getElementById('dashboardContent').innerHTML=`
-    <div class="info-section" style="border-color:${projStatus.color};background:${projStatus.bg}">
+    <div class="info-section ${projStatus.glass?'project-status-glass':''}" style="border-color:${projStatus.boxBorder};background:${projStatus.boxBg}">
       <div class="project-status-row">
-        <div class="project-status-badge" style="background:${projStatus.color}"><i class="ti ti-flag-3"></i> ${projStatus.label}</div>
+        <div class="project-status-badge" style="background:${projStatus.badgeBg};color:${projStatus.badgeColor}"><i class="ti ti-flag-3"></i> ${projStatus.label}</div>
         <div class="project-status-item"><span>Zeitrahmen</span><strong>${fmtDate(PROJECT.startDate)} – ${fmtDate(PROJECT.endDate)}</strong><div class="funnel-track" style="height:8px;margin-top:4px"><div class="funnel-bar" style="width:${timeProgress}%;background:var(--purple);font-size:0"></div></div><span class="project-status-sub">${daysRemaining>=0?daysRemaining+' Tage verbleibend':Math.abs(daysRemaining)+' Tage überzogen'} (${timeProgress}%)</span></div>
         <div class="project-status-item"><span>Budget</span><strong>${fmtEur(allInvestSum)} / ${fmtEur(PROJECT.budget)}</strong><div class="funnel-track" style="height:8px;margin-top:4px"><div class="funnel-bar" style="width:${Math.min(100,budgetProgress)}%;background:${budgetProgress>=100?'var(--red)':'var(--amber)'};font-size:0"></div></div><span class="project-status-sub">${budgetProgress}% verbraucht</span></div>
         <div class="project-status-item"><span>Meilensteine</span><strong>${doneMilestones} / ${PROJECT.milestones.length}</strong><div class="funnel-track" style="height:8px;margin-top:4px"><div class="funnel-bar" style="width:${milestoneProgress||0}%;background:var(--green-dark);font-size:0"></div></div><span class="project-status-sub">${overdueMilestones.length?overdueMilestones.length+' überfällig':'im Plan'}</span></div>
-        <div class="project-status-item"><span>Offene Risiken</span><strong style="color:${openRisks.length?'var(--red)':'var(--green-dark)'}">${openRisks.length}</strong><span class="project-status-sub">${openRisks.length?openRisks[0].text.slice(0,40)+(openRisks[0].text.length>40?'…':''):'keine offenen Risiken'}</span></div>
+        <div class="project-status-item"><span>Offene Risiken</span><strong style="color:${openRisks.length?'var(--red)':(projStatus.glass?'#7ED2DB':'var(--green-dark)')}">${openRisks.length}</strong><span class="project-status-sub">${openRisks.length?openRisks[0].text.slice(0,40)+(openRisks[0].text.length>40?'…':''):'keine offenen Risiken'}</span></div>
       </div>
     </div>
     ${excludedNoDate>0?`<div class="no-date-warning"><i class="ti ti-alert-triangle"></i> ${excludedNoDate} Lead${excludedNoDate===1?'':'s'} ohne Erstkontakt-Datum ${excludedNoDate===1?'wird':'werden'} bei "${activeDashboardPeriod==='week'?'Diese Woche':activeDashboardPeriod==='month'?'Dieser Monat':'Dieses Quartal'}" nicht mitgezählt, da der Zeitraum-Filter sich auf dieses Datum bezieht. <a onclick="switchView('board')">→ Im Board nachtragen</a></div>`:''}
     ${kpiHtml}
     <div class="info-section">
-      <div class="section-hdr" style="margin-top:0">Pipeline-Trichter <span style="font-weight:400;color:var(--text3);font-size:11px">(Anzahl · Anteil an allen Leads, Pfeil = Konversion zur nächsten Stufe)</span></div>
+      ${dashboardActivityChartHtml(dl)}
+    </div>
+    <div class="info-section">
+      <div class="section-hdr" style="margin-top:0">Pipeline-Trichter <span style="font-weight:400;color:var(--text3);font-size:11px">(Anzahl · Anteil an allen Leads)</span></div>
       <div class="funnel-wrap">${funnelHtml}</div>
       <div class="movements-strip">
         <div class="movements-item"><i class="ti ti-arrows-shuffle" style="color:var(--purple)"></i><strong>${movements.total}</strong> Bewegungen (${movementDays} Tage)</div>
@@ -2736,43 +3210,18 @@ function renderDashboard(){
         <div style="margin-top:8px">${movementsRowsHtml}</div>
       </details>
     </div>
+    <div class="info-section">
+      <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-map-pin" style="color:var(--purple)"></i> Kunden-Herkunft</span> <span style="font-weight:400;color:var(--text3);font-size:11px">(stilisiert, aus Adressfeld)</span></div>
+      ${customerOriginMapHtml(dl)}
+    </div>
     <div class="dash-row-1-1">
-      <div class="info-section">
-        <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-coin" style="color:var(--purple)"></i> Finanzielle Auswirkung</span></div>
-        <div class="impact-row"><span>Forecast gewonnen</span><strong style="color:var(--green-dark)">${fmtEur(forecastWon)||'0 €'}</strong></div>
-        <div class="impact-row"><span>Forecast verloren</span><strong style="color:var(--red)">${fmtEur(forecastLost)||'0 €'}</strong></div>
-        <div class="impact-row"><span>Investition in verlorene Leads</span><strong style="color:var(--amber-dark)">${fmtEur(investLost)||'0 €'}</strong></div>
-        <div class="impact-row" style="border-top:1px solid var(--border);margin-top:4px;padding-top:12px"><span>Netto-Effekt (gewonnen − verlorene Investition)</span><strong style="color:${netEffect>=0?'var(--green-dark)':'var(--red)'}">${fmtEur(netEffect)||'0 €'}</strong></div>
-        <p style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Toner-Investition in Leads, die am Ende trotzdem abgesprungen sind, gegen den Forecast-Wert der gewonnenen Leads gerechnet.</p>
-      </div>
       <div class="info-section" style="border-color:${lostLeads.length?'var(--red)':'var(--border)'}">
         <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-trending-down" style="color:var(--red)"></i> Wo wir Kunden verlieren</span> <span style="font-weight:400;color:var(--text3);font-size:11px">(Phase vor "Verloren")</span></div>
         <div class="funnel-wrap">${lossHtml}</div>
       </div>
-    </div>
-    <div class="dash-row-1-1">
       <div class="info-section" style="border-color:${lostLeads.length?'var(--amber)':'var(--border)'}">
         <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-message-circle-question" style="color:var(--amber-dark)"></i> Warum wir Kunden verlieren</span></div>
         <div class="funnel-wrap">${reasonHtml}</div>
-      </div>
-      <div class="info-section">
-        <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-building-store" style="color:var(--purple)"></i> B2B vs. B2C</span></div>
-        ${artHtml}
-        <p style="font-size:11px;color:var(--text3);margin-top:10px;line-height:1.5">Gewinnrate bezogen auf abgeschlossene Leads (gewonnen + verloren) je Kundentyp.</p>
-      </div>
-    </div>
-    <div class="info-section">
-      <div class="section-hdr" style="margin-top:0">Forecast je Mitarbeiter</div>
-      ${agentBarHtml}
-    </div>
-    <div class="dash-row-1-1">
-      <div class="info-section">
-        <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-users-group" style="color:var(--purple)"></i> Kapazitätsübersicht</span> <span style="font-weight:400;color:var(--text3);font-size:11px">(offene Leads je Mitarbeiter)</span></div>
-        <div class="funnel-wrap">${capHtml}</div>
-      </div>
-      <div class="info-section">
-        <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-bar" style="color:var(--purple)"></i> Trend (letzte 6 Wochen)</span> <span style="font-weight:400;color:var(--text3);font-size:11px">Bewegungen · davon gewonnen</span></div>
-        <div class="funnel-wrap">${trendHtml}</div>
       </div>
     </div>
     <div class="info-section" style="border-color:${riskLeads.length?'var(--red)':'var(--border)'}">
@@ -2811,6 +3260,46 @@ let editingAgentId=null;
 let newAgentColorSel=null;
 
 // ── FOLLOW-UP-ÜBERSICHT (Leads mit Follow-up-Datum, live aus dem Board) ──
+function followupBucketCountsAt(withFollowupAll,offsetDays){
+  const ref=new Date(TODAY);
+  ref.setUTCDate(ref.getUTCDate()-offsetDays);
+  const refMs=ref.getTime();
+  let overdue=0,today=0,week=0,nextweek=0;
+  withFollowupAll.forEach(l=>{
+    const diff=Math.round((new Date(l.followup)-refMs)/86400000);
+    if(diff<0)overdue++;
+    else if(diff===0)today++;
+    else if(diff<=7)week++;
+    else if(diff<=14)nextweek++;
+  });
+  return{overdue,today,week,nextweek,total:overdue+today+week+nextweek};
+}
+function miniSparklineSvg(values,color){
+  const w=64,h=26,pad=3;
+  const min=Math.min(...values),max=Math.max(...values);
+  const range=(max-min)||1;
+  const step=(w-2*pad)/((values.length-1)||1);
+  const pts=values.map((v,i)=>{
+    const x=pad+i*step;
+    const y=h-pad-((v-min)/range)*(h-2*pad);
+    return`${x.toFixed(1)},${y.toFixed(1)}`;
+  }).join(' ');
+  return`<svg viewBox="0 0 ${w} ${h}" width="${w}" height="${h}" style="overflow:visible;flex-shrink:0"><polyline points="${pts}" fill="none" stroke="${color}" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+}
+function kpiTrendArrow(curr,prev){
+  if(curr>prev)return'<i class="ti ti-trending-up"></i>';
+  if(curr<prev)return'<i class="ti ti-trending-down"></i>';
+  return'<i class="ti ti-arrow-right"></i>';
+}
+// Ordnet einer Akzentfarbe (colorVar) die passende getoente Kachel-Hintergrundklasse zu
+function kpiTint(colorVar){
+  if(!colorVar)return'';
+  if(colorVar.includes('red'))return'kpi-tint-red';
+  if(colorVar.includes('amber'))return'kpi-tint-amber';
+  if(colorVar.includes('green'))return'kpi-tint-green';
+  if(colorVar.includes('purple')||colorVar.includes('teal'))return'kpi-tint-teal';
+  return'';
+}
 function followupBucket(l){
   const d=daysUntil(l.followup);
   if(d<0)return'overdue';
@@ -2828,7 +3317,7 @@ function followupRowHtml(l){
     <span class="task-group-dot" style="background:${COLOR_HEX[colById(l.status).color]};flex-shrink:0"></span>
     <div style="flex:1;min-width:0">
       <div class="task-row-text">${esc(l.company)}</div>
-      <div style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.contact)} · ${esc(colById(l.status).name)}</div>
+      <div style="font-size:11px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(l.contact)}${l.customerNumber?' · '+esc(l.customerNumber):''} · ${esc(colById(l.status).name)}</div>
     </div>
     <div class="member-stack">${membersHtml}</div>
     <span class="due-badge ${cls}"><i class="ti ti-clock" style="font-size:11px"></i>${label}</span>
@@ -2850,26 +3339,58 @@ function quickReschedule(leadId,days){
   saveState();
   renderTasksView();
 }
-function followupGroupHtml(title,items,colorVar,icon,accentClass){
+let taskSectionOpen={assigned:true,overdue:true,today:true,week:true,nextweek:true};
+function toggleTaskSection(key){
+  taskSectionOpen[key]=!taskSectionOpen[key];
+  renderTasksView();
+}
+// Baut die Zeilen einer Sektion: im zugeklappten Zustand max. 3 Zeilen, mit leeren
+// Platzhalter-Zeilen aufgefuellt, damit alle Boxen zugeklappt gleich hoch sind.
+function collapsibleRowsHtml(rowHtmls,isOpen,minRows,emptyMsg){
+  if(isOpen)return rowHtmls.length?rowHtmls.join(''):`<div class="task-row-empty">${emptyMsg}</div>`;
+  const visible=rowHtmls.slice(0,minRows);
+  let html=visible.join('');
+  for(let i=visible.length;i<minRows;i++)html+='<div class="task-row task-row-placeholder"></div>';
+  return html;
+}
+function followupGroupHtml(title,items,colorVar,icon,accentClass,sectionKey){
+  const isOpen=taskSectionOpen[sectionKey];
+  const rowHtmls=items.map(followupRowHtml);
   return `<div class="info-section followup-group ${accentClass}">
-    <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-${icon}" style="color:${colorVar};font-size:16px"></i>${title}</span> <span class="task-group-count">${items.length} Lead${items.length===1?'':'s'}</span></div>
-    ${items.length?items.map(followupRowHtml).join(''):'<div class="task-row-empty">Keine Leads in diesem Zeitraum.</div>'}
+    <div class="section-hdr" style="margin-top:0;cursor:pointer" onclick="toggleTaskSection('${sectionKey}')"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-${icon}" style="color:${colorVar};font-size:16px"></i>${title}</span> <span style="display:flex;align-items:center;gap:8px"><span class="task-group-count">${items.length} Lead${items.length===1?'':'s'}</span><i class="ti ti-chevron-${isOpen?'up':'down'}" style="font-size:14px;color:var(--text3)"></i></span></div>
+    ${collapsibleRowsHtml(rowHtmls,isOpen,3,'Keine Leads in diesem Zeitraum.')}
   </div>`;
 }
 function renderTasksAgentChips(){
-  const el=document.getElementById('tasksAgentChips');
-  let html=`<span class="chip ${activeTasksAgentFilter==='all'?'active':''}" onclick="setTasksAgentFilter('all')">Alle</span>`;
+  const el=document.getElementById('tasksFilterMenuAgents');
+  if(!el)return;
+  let html=`<div class="filtermenu-item ${activeTasksAgentFilter==='all'?'active':''}" onclick="setTasksAgentFilter('all')"><span>Alle</span>${activeTasksAgentFilter==='all'?'<i class="ti ti-check"></i>':''}</div>`;
   AGENTS.forEach(a=>{
-    html+=`<span class="chip ${activeTasksAgentFilter===a.id?'active':''}" onclick="setTasksAgentFilter('${a.id}')">${esc(a.name)}</span>`;
+    const active=activeTasksAgentFilter===a.id;
+    html+=`<div class="filtermenu-item ${active?'active':''}" onclick="setTasksAgentFilter('${a.id}')"><span>${esc(a.name)}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
   });
   el.innerHTML=html;
+  renderTasksOmniTokens();
+}
+function renderTasksOmniTokens(){
+  const el=document.getElementById('tasksOmniTokens');
+  if(!el)return;
+  if(activeTasksAgentFilter==='all'){el.innerHTML='';return;}
+  const a=AGENTS.find(a=>a.id===activeTasksAgentFilter);
+  el.innerHTML=a?`<div class="omni-token"><i class="ti ti-user" style="font-size:12px"></i>${esc(a.name)}<i class="ti ti-x" onclick="setTasksAgentFilter('all')"></i></div>`:'';
+}
+let tasksFilterMenuOpen=false;
+function toggleTasksFilterMenu(e){
+  if(e)e.stopPropagation();
+  tasksFilterMenuOpen=!tasksFilterMenuOpen;
+  document.getElementById('tasksFilterMenu').classList.toggle('show',tasksFilterMenuOpen);
 }
 function setTasksAgentFilter(id){
   activeTasksAgentFilter=id;
   renderTasksAgentChips();
   renderTasksView();
 }
-function assignedTasksHtml(){
+function assignedTasksHtml(q){
   let items=[];
   leads.forEach(l=>{
     (l.tasks||[]).forEach(t=>{
@@ -2877,12 +3398,14 @@ function assignedTasksHtml(){
     });
   });
   if(activeTasksAgentFilter!=='all')items=items.filter(t=>t.assigneeId===activeTasksAgentFilter);
+  if(q)items=items.filter(t=>t.lead.company.toLowerCase().includes(q)||(t.lead.customerNumber||'').toLowerCase().includes(q));
   items.sort((a,b)=>{
     if(a.done!==b.done)return a.done?1:-1;
     return (a.dueDate||'9999-99-99').localeCompare(b.dueDate||'9999-99-99');
   });
   const openCount=items.filter(t=>!t.done).length;
-  const rows=items.length?items.map(t=>{
+  const isOpen=taskSectionOpen.assigned;
+  const rowHtmls=items.map(t=>{
     const a=agentById(t.assigneeId);
     let dueBadge='';
     if(t.dueDate){
@@ -2900,10 +3423,10 @@ function assignedTasksHtml(){
       </div>
       ${dueBadge}
     </div>`;
-  }).join(''):'<div class="task-row-empty">Keine zugewiesenen Aufgaben.</div>';
+  });
   return `<div class="info-section">
-    <div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-user-check" style="color:var(--purple);font-size:16px"></i>Zugewiesene Aufgaben</span> <span class="task-group-count">${openCount} offen</span></div>
-    ${rows}
+    <div class="section-hdr" style="margin-top:0;cursor:pointer" onclick="toggleTaskSection('assigned')"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-user-check" style="color:var(--purple);font-size:16px"></i>Zugewiesene Aufgaben</span> <span style="display:flex;align-items:center;gap:8px"><span class="task-group-count">${openCount} offen</span><i class="ti ti-chevron-${isOpen?'up':'down'}" style="font-size:14px;color:var(--text3)"></i></span></div>
+    ${collapsibleRowsHtml(rowHtmls,isOpen,3,'Keine zugewiesenen Aufgaben.')}
   </div>`;
 }
 function toggleAssignedTask(leadId,taskId){
@@ -2914,24 +3437,42 @@ function toggleAssignedTask(leadId,taskId){
   renderTasksView();
 }
 function renderTasksView(){
+  const q=(document.getElementById('tasksSearch').value||'').toLowerCase().trim();
   let withFollowup=leads.filter(l=>l.followup);
   if(activeTasksAgentFilter!=='all')withFollowup=withFollowup.filter(l=>(l.members||[]).includes(activeTasksAgentFilter));
+  if(q)withFollowup=withFollowup.filter(l=>l.company.toLowerCase().includes(q)||(l.customerNumber||'').toLowerCase().includes(q));
   const buckets={overdue:[],today:[],week:[],nextweek:[]};
   withFollowup.forEach(l=>{const b=followupBucket(l);if(b)buckets[b].push(l);});
   ['overdue','today','week','nextweek'].forEach(k=>buckets[k].sort((a,b)=>a.followup.localeCompare(b.followup)));
 
+  const history=Array.from({length:30},(_,i)=>29-i).map(o=>followupBucketCountsAt(withFollowup,o));
+  const curr=history[6],prev=history[5];
+  function kpiCard(label,key,colorVar){
+    const series=history.map(h=>h[key]);
+    const currVal=curr[key],prevVal=prev[key];
+    return`<div class="dash-kpi dash-kpi-tall followup-kpi-${key} ${kpiTint(colorVar)}">
+      <div class="dash-kpi-label">${label}</div>
+      <div style="display:flex;align-items:flex-start;justify-content:space-between;gap:8px">
+        <div class="dash-kpi-val" style="color:${colorVar}">${currVal} <span style="font-size:14px;vertical-align:middle;opacity:.8">${kpiTrendArrow(currVal,prevVal)}</span></div>
+        ${miniSparklineSvg(series,colorVar)}
+      </div>
+      <div class="dash-kpi-compare">Vortag: ${prevVal}</div>
+    </div>`;
+  }
+
   const html=`
-    <div class="dash-kpi-row" style="grid-template-columns:repeat(4,1fr)">
-      <div class="dash-kpi followup-kpi-overdue"><i class="ti ti-alert-triangle dash-kpi-icon" style="color:var(--red)"></i><div class="dash-kpi-label">Überfällig</div><div class="dash-kpi-val" style="color:var(--red)">${buckets.overdue.length}</div></div>
-      <div class="dash-kpi followup-kpi-today"><i class="ti ti-sun dash-kpi-icon" style="color:var(--amber-dark)"></i><div class="dash-kpi-label">Heute</div><div class="dash-kpi-val" style="color:var(--amber-dark)">${buckets.today.length}</div></div>
-      <div class="dash-kpi followup-kpi-week"><i class="ti ti-calendar-week dash-kpi-icon" style="color:var(--green-dark)"></i><div class="dash-kpi-label">Diese Woche</div><div class="dash-kpi-val" style="color:var(--green-dark)">${buckets.week.length}</div></div>
-      <div class="dash-kpi followup-kpi-nextweek"><i class="ti ti-calendar-plus dash-kpi-icon" style="color:var(--purple)"></i><div class="dash-kpi-label">Nächste Woche</div><div class="dash-kpi-val" style="color:var(--purple)">${buckets.nextweek.length}</div></div>
+    <div class="dash-kpi-row" style="grid-template-columns:repeat(5,1fr)">
+      ${kpiCard('Überfällig','overdue','var(--red)')}
+      ${kpiCard('Heute','today','var(--red)')}
+      ${kpiCard('Diese Woche','week','var(--green-dark)')}
+      ${kpiCard('Nächste Woche','nextweek','var(--purple)')}
+      ${kpiCard('Gesamt','total','var(--text)')}
     </div>
-    ${followupGroupHtml('Überfällig',buckets.overdue,'var(--red)','alert-triangle','followup-kpi-overdue')}
-    ${followupGroupHtml('Heute',buckets.today,'var(--amber-dark)','sun','followup-kpi-today')}
-    ${followupGroupHtml('Diese Woche',buckets.week,'var(--green-dark)','calendar-week','followup-kpi-week')}
-    ${followupGroupHtml('Nächste Woche',buckets.nextweek,'var(--purple)','calendar-plus','followup-kpi-nextweek')}
-    ${assignedTasksHtml()}`;
+    ${assignedTasksHtml(q)}
+    ${followupGroupHtml('Überfällig',buckets.overdue,'var(--red)','alert-triangle','followup-kpi-overdue','overdue')}
+    ${followupGroupHtml('Heute',buckets.today,'var(--amber-dark)','sun','followup-kpi-today','today')}
+    ${followupGroupHtml('Diese Woche',buckets.week,'var(--green-dark)','calendar-week','followup-kpi-week','week')}
+    ${followupGroupHtml('Nächste Woche',buckets.nextweek,'var(--purple)','calendar-plus','followup-kpi-nextweek','nextweek')}`;
   document.getElementById('tasksViewContent').innerHTML=html;
 }
 // ── CR RMA: Artikel-Stammdaten ──
@@ -2958,11 +3499,19 @@ function deleteArticle(id){
   renderCrRma();
 }
 function addArticle(){
-  ARTICLES.push({id:genId(),sku:'',title:'',ek:'',vk:'',crRma:'',crRga:''});
+  ARTICLES.push({id:genId(),sku:'',title:'',ek:'',vk:'',crRma:'',verkaufteStk:''});
   saveState();
   renderCrRma();
   const rows=document.querySelectorAll('.crrma-row input');
   if(rows.length)rows[rows.length-6].focus();
+}
+function deleteAllArticles(){
+  if(ARTICLES.length===0){alert('Es sind keine Artikel vorhanden.');return;}
+  if(!confirm(`Wirklich ALLE ${ARTICLES.length} Artikel unwiderruflich löschen? Das kann nicht rückgängig gemacht werden.`))return;
+  if(!confirm('Bist du dir sicher? Dies löscht die komplette CR-RMA-Artikelliste.'))return;
+  ARTICLES=[];
+  saveState();
+  renderCrRma();
 }
 function crRmaCellClass(v){
   if(v===''||v===null||v===undefined||isNaN(v))return'';
@@ -2982,7 +3531,7 @@ function renderCrRma(){
   filtered=[...filtered].sort((a,b)=>{
     let va,vb;
     if(crrmaSortKey==='margin'){va=(parseFloat(a.vk)||0)-(parseFloat(a.ek)||0);vb=(parseFloat(b.vk)||0)-(parseFloat(b.ek)||0);}
-    else if(['ek','vk','crRma','crRga'].includes(crrmaSortKey)){va=parseFloat(a[crrmaSortKey])||0;vb=parseFloat(b[crrmaSortKey])||0;}
+    else if(['ek','vk','crRma','verkaufteStk'].includes(crrmaSortKey)){va=parseFloat(a[crrmaSortKey])||0;vb=parseFloat(b[crrmaSortKey])||0;}
     else{va=(a[crrmaSortKey]||'').toLowerCase();vb=(b[crrmaSortKey]||'').toLowerCase();}
     if(va<vb)return -1*crrmaSortDir;
     if(va>vb)return 1*crrmaSortDir;
@@ -2996,11 +3545,11 @@ function renderCrRma(){
     <div class="crrma-row">
       <input type="text" value="${esc(a.sku)}" placeholder="SKU" oninput="updateArticleField(${a.id},'sku',this.value);saveState()">
       <input type="text" value="${esc(a.title)}" placeholder="Titel" oninput="updateArticleField(${a.id},'title',this.value);saveState()">
-      <input type="number" step="0.01" value="${fmt2(a.ek)}" placeholder="0.00" onchange="updateArticleField(${a.id},'ek',this.value);saveState();renderCrRma()">
-      <input type="number" step="0.01" value="${fmt2(a.vk)}" placeholder="0.00" onchange="updateArticleField(${a.id},'vk',this.value);saveState();renderCrRma()">
+      <input type="number" step="0.01" class="crrma-num-input" value="${fmt2(a.ek)}" placeholder="0.00" onchange="updateArticleField(${a.id},'ek',this.value);saveState();renderCrRma()">
+      <input type="number" step="0.01" class="crrma-num-input" value="${fmt2(a.vk)}" placeholder="0.00" onchange="updateArticleField(${a.id},'vk',this.value);saveState();renderCrRma()">
       <input type="number" step="0.01" class="crrma-margin-input" style="color:${margin>=0?'var(--green-dark)':'var(--red)'}" value="${margin.toFixed(2)}" title="Marge ändern → VK wird automatisch neu berechnet (EK bleibt fix)" onchange="updateArticleMargin(${a.id},this.value)">
+      <input type="number" step="1" min="0" class="crrma-num-input" value="${a.verkaufteStk===''||a.verkaufteStk===null||a.verkaufteStk===undefined?'':a.verkaufteStk}" placeholder="0" oninput="updateArticleField(${a.id},'verkaufteStk',this.value);saveState()">
       <input type="number" step="0.01" class="${crRmaCellClass(a.crRma)}" value="${fmt2(a.crRma)}" placeholder="0.00" oninput="updateArticleField(${a.id},'crRma',this.value);saveState();this.className=crRmaCellClass(parseFloat(this.value))">
-      <input type="number" step="0.01" class="${crRmaCellClass(a.crRga)}" value="${fmt2(a.crRga)}" placeholder="0.00" oninput="updateArticleField(${a.id},'crRga',this.value);saveState();this.className=crRmaCellClass(parseFloat(this.value))">
       <button class="check-item-del" onclick="deleteArticle(${a.id})" title="Löschen"><i class="ti ti-trash"></i></button>
     </div>`;
   }).join('');
@@ -3019,13 +3568,12 @@ function renderCrRma(){
           <div class="crrma-sortable" onclick="setCrrmaSort('ek')">EK (€)${sortArrow('ek')}</div>
           <div class="crrma-sortable" onclick="setCrrmaSort('vk')">VK (€)${sortArrow('vk')}</div>
           <div class="crrma-sortable" onclick="setCrrmaSort('margin')">Marge${sortArrow('margin')}</div>
+          <div class="crrma-sortable" onclick="setCrrmaSort('verkaufteStk')">Verkaufte Stk.${sortArrow('verkaufteStk')}</div>
           <div class="crrma-sortable" onclick="setCrrmaSort('crRma')">CR RMA (%)${sortArrow('crRma')}</div>
-          <div class="crrma-sortable" onclick="setCrrmaSort('crRga')">CR RGA (%)${sortArrow('crRga')}</div>
           <div></div>
         </div>
         ${rowsHtml||'<p style="font-size:12px;color:var(--text3);padding:10px 0">Keine Artikel gefunden.</p>'}
       </div>
-      <button class="pill-btn" style="margin-top:10px" onclick="addArticle()"><i class="ti ti-plus"></i> Artikel hinzufügen</button>
     </div>`;
 }
 
@@ -3034,13 +3582,58 @@ let activityPeriod='30'; // Tage als String, oder 'all'
 let activityAgentFilter='all';
 let activityTypeFilter='all';
 let activityStatusFilter='all';
+const ACTIVITY_TYPE_OPTIONS=[['all','Alle'],['comment','Kommentare'],['activity','Aktivitäten']];
 function renderActivityFilterChips(){
-  document.getElementById('activityAgentChips').innerHTML=`<span class="chip ${activityAgentFilter==='all'?'active':''}" onclick="setActivityFilter('agent','all')">Alle</span>`+
-    AGENTS.map(a=>`<span class="chip ${activityAgentFilter===a.id?'active':''}" onclick="setActivityFilter('agent','${a.id}')">${esc(a.name)}</span>`).join('');
-  document.getElementById('activityTypeChips').innerHTML=[['all','Alle'],['comment','Kommentare'],['activity','Aktivitäten']]
-    .map(([v,l])=>`<span class="chip ${activityTypeFilter===v?'active':''}" onclick="setActivityFilter('type','${v}')">${l}</span>`).join('');
-  document.getElementById('activityStatusChips').innerHTML=`<span class="chip ${activityStatusFilter==='all'?'active':''}" onclick="setActivityFilter('status','all')">Alle</span>`+
-    COLUMNS.map(c=>`<span class="chip ${activityStatusFilter===c.id?'active':''}" onclick="setActivityFilter('status','${c.id}')">${esc(c.name)}</span>`).join('');
+  const agentEl=document.getElementById('activityFilterMenuAgents');
+  if(agentEl){
+    let html=`<div class="filtermenu-item ${activityAgentFilter==='all'?'active':''}" onclick="setActivityFilter('agent','all')"><span>Alle</span>${activityAgentFilter==='all'?'<i class="ti ti-check"></i>':''}</div>`;
+    AGENTS.forEach(a=>{
+      const active=activityAgentFilter===a.id;
+      html+=`<div class="filtermenu-item ${active?'active':''}" onclick="setActivityFilter('agent','${a.id}')"><span>${esc(a.name)}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
+    });
+    agentEl.innerHTML=html;
+  }
+  const typeEl=document.getElementById('activityFilterMenuTypes');
+  if(typeEl){
+    typeEl.innerHTML=ACTIVITY_TYPE_OPTIONS.map(([v,l])=>{
+      const active=activityTypeFilter===v;
+      return `<div class="filtermenu-item ${active?'active':''}" onclick="setActivityFilter('type','${v}')"><span>${l}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
+    }).join('');
+  }
+  const statusEl=document.getElementById('activityFilterMenuStatus');
+  if(statusEl){
+    let html=`<div class="filtermenu-item ${activityStatusFilter==='all'?'active':''}" onclick="setActivityFilter('status','all')"><span>Alle</span>${activityStatusFilter==='all'?'<i class="ti ti-check"></i>':''}</div>`;
+    COLUMNS.forEach(c=>{
+      const active=activityStatusFilter===c.id;
+      html+=`<div class="filtermenu-item ${active?'active':''}" onclick="setActivityFilter('status','${c.id}')"><span>${esc(c.name)}</span>${active?'<i class="ti ti-check"></i>':''}</div>`;
+    });
+    statusEl.innerHTML=html;
+  }
+  renderActivityOmniTokens();
+}
+function renderActivityOmniTokens(){
+  const el=document.getElementById('activityOmniTokens');
+  if(!el)return;
+  let html='';
+  if(activityAgentFilter!=='all'){
+    const a=AGENTS.find(a=>a.id===activityAgentFilter);
+    if(a)html+=`<div class="omni-token"><i class="ti ti-user" style="font-size:12px"></i>${esc(a.name)}<i class="ti ti-x" onclick="setActivityFilter('agent','all')"></i></div>`;
+  }
+  if(activityTypeFilter!=='all'){
+    const t=ACTIVITY_TYPE_OPTIONS.find(([v])=>v===activityTypeFilter);
+    if(t)html+=`<div class="omni-token"><i class="ti ti-category" style="font-size:12px"></i>${esc(t[1])}<i class="ti ti-x" onclick="setActivityFilter('type','all')"></i></div>`;
+  }
+  if(activityStatusFilter!=='all'){
+    const c=COLUMNS.find(c=>c.id===activityStatusFilter);
+    if(c)html+=`<div class="omni-token"><i class="ti ti-flag" style="font-size:12px"></i>${esc(c.name)}<i class="ti ti-x" onclick="setActivityFilter('status','all')"></i></div>`;
+  }
+  el.innerHTML=html;
+}
+let activityFilterMenuOpen=false;
+function toggleActivityFilterMenu(e){
+  if(e)e.stopPropagation();
+  activityFilterMenuOpen=!activityFilterMenuOpen;
+  document.getElementById('activityFilterMenu').classList.toggle('show',activityFilterMenuOpen);
 }
 // Wandelt eine Punktreihe in einen geglaetteten Kurvenpfad um (Catmull-Rom -> kubische Bezier)
 function smoothSvgPath(pts){
@@ -3168,12 +3761,18 @@ function renderActivities(){
   const chartHtml=renderActivityTrendChart(entries);
   const protocolHtml=entries.length?entries.map(e=>{
     const ag=agentById(e.author);
-    return `<div class="dash-lead-row" style="align-items:flex-start" onclick="switchView('board');setTimeout(function(){openLeadModal(${e.lead.id})},50)">
-      <div style="flex:1;min-width:0">
-        <span style="font-weight:600;font-size:13px">${esc(e.lead.company)}</span>
-        <span style="font-size:12px;color:var(--text2)"> ${e.type==='comment'?'– Kommentar: ':'– '}${esc(e.text)}</span>
+    const typeLabel=e.type==='comment'?'Kommentar':'Aktivität';
+    return `<div class="activity-row" onclick="switchView('board');setTimeout(function(){openLeadModal(${e.lead.id})},50)">
+      <div class="activity-row-date"><span>${fmtWeekday(e.date)},</span><span>${fmtDate(e.date)}</span></div>
+      <div class="activity-row-avatar" style="background:${ag?COLOR_BG[ag.color]:COLOR_BG.gray};color:${ag?COLOR_TEXT[ag.color]:COLOR_TEXT.gray}">${ag?ini(ag.name):'?'}</div>
+      <div class="activity-row-body">
+        <div class="activity-row-head">
+          <span class="activity-row-author">${ag?esc(ag.name):'Unbekannt'}</span>
+          <span class="activity-type-badge activity-type-${e.type}">${typeLabel}</span>
+          <span class="activity-row-text">${esc(e.text)}</span>
+        </div>
+        <div class="activity-row-sub">${esc(e.lead.company)}${e.lead.customerNumber?' · '+esc(e.lead.customerNumber):''} · ${fmtWeekday(e.date)}, ${fmtDate(e.date)}</div>
       </div>
-      <span style="font-size:11px;color:var(--text3);flex-shrink:0;white-space:nowrap">${ag?ag.name:'?'} · ${fmtDateTime(e.date)}</span>
     </div>`;
   }).join(''):'<p style="font-size:12px;color:var(--text3)">Keine Einträge im gewählten Zeitraum/Filter gefunden.</p>';
 
@@ -3183,12 +3782,28 @@ function renderActivities(){
       ${chartHtml}
     </div>
     <div class="info-section">
-      <div class="section-hdr" style="margin-top:0">Protokoll ${q?`für "${q}"`:'(alle Kunden)'} <span style="font-weight:400;color:var(--text3);font-size:11px">${entries.length} Einträge</span></div>
+      <div class="section-hdr" style="margin-top:0">Verlauf ${q?`für "${q}"`:'(alle Kunden)'} <span style="font-weight:400;color:var(--text3);font-size:11px">${entries.length} Einträge</span></div>
       ${protocolHtml}
     </div>`;
 }
 
 let settingsTab='team';
+let settingsNavOpen=false;
+function toggleSettingsNav(){
+  settingsNavOpen=!settingsNavOpen;
+  document.getElementById('settingsSubNav').classList.toggle('hidden',!settingsNavOpen);
+  const chev=document.getElementById('settingsNavChevron');
+  if(chev)chev.className='ti ti-chevron-'+(settingsNavOpen?'up':'down')+' ';
+  switchView('settings');
+}
+function goSettingsTab(tab){
+  settingsNavOpen=true;
+  document.getElementById('settingsSubNav').classList.remove('hidden');
+  const chev=document.getElementById('settingsNavChevron');
+  if(chev)chev.className='ti ti-chevron-up';
+  setSettingsTab(tab);
+  switchView('settings');
+}
 function setSettingsTab(tab){
   settingsTab=tab;
   renderSettings();
@@ -4843,7 +5458,7 @@ function recomputeForecast(){
   if(el)el.textContent=fmtEur(total)||'0 €';
   const marginEl=document.getElementById('forecastMarginValue');
   if(marginEl){marginEl.textContent=fmtEur(margin)||'0 €';marginEl.style.color=margin>=0?'var(--green-dark)':'var(--red)';}
-  const statEl=document.getElementById('statsBar');
+  const statEl=document.getElementById('statsPopover');
   if(statEl)renderStats();
 }
 
@@ -5003,7 +5618,7 @@ async function migrateLegacyAttachmentsToStorage(){
 // Datenbank zeigte) nicht mehr unbemerkt einschleichen kann. Zwei getrennte Pruefungen:
 // 1) Zeigen Dev und Live wirklich auf unterschiedliche Supabase-Projekte?
 // 2) Ist der uebrige Code (Titel/Test-Banner/DB-Verbindung ausgenommen) identisch?
-const DEV_REPO_RAW_URL='https://raw.githubusercontent.com/wiegand-sales/toner-kampagne-kanban-dev/main/index.html';
+const DEV_REPO_RAW_URL='https://raw.githubusercontent.com/wiegand-sales/SalesOS-DEV/main/index.html';
 const LIVE_REPO_RAW_URL='https://raw.githubusercontent.com/wiegand-sales/SalesOS/main/index.html';
 function extractSupabaseUrl(code){
   const m=code.match(/const SUPABASE_URL=['"]([^'"]+)['"]/);
@@ -5957,6 +6572,24 @@ function parseGermanNumber(v){
   const num=parseFloat(s);
   return isNaN(num)?'':String(num);
 }
+// Robuste Zahlen-Erkennung fuer CSV-Importe: deutsches Excel exportiert Dezimalzahlen
+// oft mit Komma statt Punkt (z.B. "12,50"). parseFloat() allein wuerde davon nur den
+// Teil VOR dem Komma lesen ("12") und den Nachkommateil stillschweigend verwerfen -
+// dadurch landeten beim Import immer nur ganze Zahlen (angezeigt als "X,00") in der
+// Tabelle, unabhaengig vom tatsaechlichen Wert in der Datei.
+function parseLocaleNumber(v){
+  if(v===undefined||v===null)return NaN;
+  let s=String(v).trim().replace(/[€\s]/g,'');
+  if(s==='')return NaN;
+  const hasComma=s.includes(','),hasDot=s.includes('.');
+  if(hasComma&&hasDot){
+    if(s.lastIndexOf(',')>s.lastIndexOf('.'))s=s.replace(/\./g,'').replace(',','.');
+    else s=s.replace(/,/g,'');
+  }else if(hasComma){
+    s=s.replace(',','.');
+  }
+  return parseFloat(s);
+}
 function parseCSV(text){
   // Trennzeichen erkennen: Semikolon (deutsches Excel) oder Komma
   const firstLine=text.split(/\r?\n/)[0]||'';
@@ -6145,14 +6778,14 @@ const ARTICLE_CSV_FIELD_ALIASES={
   ek:['ek','ek (eur)','einkaufspreis','einkauf'],
   vk:['vk','vk (eur)','verkaufspreis','verkauf'],
   crRma:['cr rma','cr rma (%)','cr-rma','rma','rma-quote'],
-  crRga:['cr rga','cr rga (%)','cr-rga','rga','rga-quote'],
+  verkaufteStk:['verkaufte stk.','verkaufte stk','verkaufte stück','verkaufte stueck','stk.','stk','stückzahl','anzahl verkauft','verkaufsmenge'],
 };
 function triggerArticleCSVImport(){
   document.getElementById('articleCsvImportInput').click();
 }
 function exportArticleCSV(){
-  const headers=['SKU','Titel','EK (EUR)','VK (EUR)','CR RMA (%)','CR RGA (%)'];
-  const rows=ARTICLES.map(a=>[a.sku,a.title,a.ek,a.vk,a.crRma,a.crRga]);
+  const headers=['SKU','Titel','EK (EUR)','VK (EUR)','Verkaufte Stk.','CR RMA (%)'];
+  const rows=ARTICLES.map(a=>[a.sku,a.title,a.ek,a.vk,a.verkaufteStk,a.crRma]);
   const csvEscape=v=>{
     v=(v===undefined||v===null)?'':String(v);
     return /[;,"\n]/.test(v)?'"'+v.replace(/"/g,'""')+'"':v;
@@ -6205,10 +6838,10 @@ function importArticleCSVFile(file){
           id:genId(),
           sku,
           title:get('title'),
-          ek:parseFloat(get('ek'))||0,
-          vk:parseFloat(get('vk'))||0,
-          crRma:parseFloat(get('crRma'))||0,
-          crRga:parseFloat(get('crRga'))||0,
+          ek:parseLocaleNumber(get('ek'))||0,
+          vk:parseLocaleNumber(get('vk'))||0,
+          crRma:parseLocaleNumber(get('crRma'))||0,
+          verkaufteStk:parseLocaleNumber(get('verkaufteStk'))||0,
         });
         added++;
       });
@@ -6252,6 +6885,13 @@ document.addEventListener('click',e=>{
   if(!e.target.closest('.label-row-editor')&&labelPopoverOpen){labelPopoverOpen=false;renderLeadModal();}
   if(!e.target.closest('.member-row-editor')&&memberPopoverOpen){memberPopoverOpen=false;renderLeadModal();}
   if(!e.target.closest('.col-hdr-wrap')&&colMenuOpenId){colMenuOpenId=null;renderBoard();}
+  if(!e.target.closest('.omni-addfilter-wrap')&&filterMenuOpen){filterMenuOpen=false;document.getElementById('filterMenu').classList.remove('show');}
+  if(!e.target.closest('.infobtn-wrap')&&overflowMenuOpen){overflowMenuOpen=false;document.getElementById('overflowMenu').classList.remove('show');}
+  if(!e.target.closest('.crrma-menu-wrap')&&crrmaMenuOpen){crrmaMenuOpen=false;document.getElementById('crrmaOverflowMenu').classList.remove('show');}
+  if(!e.target.closest('.omni-addfilter-wrap')&&tasksFilterMenuOpen){tasksFilterMenuOpen=false;const m=document.getElementById('tasksFilterMenu');if(m)m.classList.remove('show');}
+  if(!e.target.closest('.omni-addfilter-wrap')&&activityFilterMenuOpen){activityFilterMenuOpen=false;const m2=document.getElementById('activityFilterMenu');if(m2)m2.classList.remove('show');}
+  if(!e.target.closest('.omni-addfilter-wrap')&&dashboardFilterMenuOpen){dashboardFilterMenuOpen=false;const m3=document.getElementById('dashboardFilterMenu');if(m3)m3.classList.remove('show');}
+  if(!e.target.closest('.omni-addfilter-wrap')&&dashboardDateMenuOpen){dashboardDateMenuOpen=false;const m4=document.getElementById('dashboardDateMenu');if(m4)m4.classList.remove('show');}
 });
 
 function showSyncFailureBanner(msg){
@@ -6334,9 +6974,12 @@ async function bootstrapApp(){
   // Hintergrund weiter, waehrend der naechste Abgleich (manchmal nach nur wenigen
   // Millisekunden) schon parallel startete - zwei Ablaeufe, die gleichzeitig auf dieselben
   // Daten zugreifen, konnten sich dabei gegenseitig in die Quere kommen.
-  // Zusaetzlich in try/catch abgesichert (Haertung): schlaegt dieser allererste Sync-Versuch
-  // fehl, darf das nicht den Rest von bootstrapApp() verhindern - sonst wuerde der
-  // wiederkehrende 5-Sekunden-Abgleich in diesem Fall nie eingerichtet.
+  // KRITISCH: in try/catch abgesichert - schlaegt dieser allererste Sync-Versuch fehl (z.B.
+  // weil die Sitzung genau in diesem Moment als abgelaufen erkannt wird), darf das NICHT den
+  // Rest von bootstrapApp() verhindern. Ohne dieses try/catch wurde der wiederkehrende
+  // 5-Sekunden-Abgleich in diesem Fall NIE eingerichtet - der Tab zeigte "Cloud verbunden",
+  // synchronisierte aber bis zum naechsten kompletten Neuladen ueberhaupt nichts mehr
+  // (Ursache eines echten Datenverlust-Vorfalls am 12.07.2026).
   try{
     await sbInitialSync();
   }catch(e){
@@ -6410,6 +7053,23 @@ function showApp(){
   document.querySelector('.app-shell').classList.remove('hidden');
   if(!window.__appBootstrapped){window.__appBootstrapped=true;bootstrapApp();}
 }
+function openLoginPanel(){
+  const tag=document.getElementById('loginHeroTag');
+  if(tag){
+    tag.style.opacity='0';
+    setTimeout(()=>{tag.innerHTML='Vertrieb, der sich selbst erklärt.';tag.style.opacity='1';},200);
+  }
+  document.getElementById('loginScreen').classList.add('panel-open');
+  setTimeout(()=>{const el=document.getElementById('loginEmail');if(el)el.focus();},50);
+}
+function closeLoginPanel(){
+  document.getElementById('loginScreen').classList.remove('panel-open');
+  const tag=document.getElementById('loginHeroTag');
+  if(tag){
+    tag.style.opacity='0';
+    setTimeout(()=>{tag.innerHTML='Jede Pipeline. Jedes Investment.<br><strong>Ein FlowBoard.</strong>';tag.style.opacity='1';},200);
+  }
+}
 function showLoginScreen(msg){
   if(workingOfflineIntentionally){
     // Bewusst offline gewaehlt: nicht staendig zurueck zum Login zwingen,
@@ -6420,9 +7080,16 @@ function showLoginScreen(msg){
   document.querySelector('.app-shell').classList.add('hidden');
   document.getElementById('loginScreen').classList.remove('hidden');
   const msgEl=document.getElementById('loginMessage');
-  if(msg){msgEl.className='login-message login-message-info';msgEl.textContent=msg;}
-  else{msgEl.className='login-message hidden';msgEl.textContent='';}
-  setTimeout(()=>{const el=document.getElementById('loginEmail');if(el)el.focus();},50);
+  if(msg){
+    msgEl.className='login-message login-message-info';msgEl.textContent=msg;
+    // Bei einer Meldung (z.B. abgelaufene Sitzung) gleich das Formular zeigen,
+    // statt erst wieder den Trailer-Bildschirm anzuzeigen.
+    document.getElementById('loginScreen').classList.add('panel-open');
+    setTimeout(()=>{const el=document.getElementById('loginEmail');if(el)el.focus();},50);
+  }else{
+    msgEl.className='login-message hidden';msgEl.textContent='';
+    document.getElementById('loginScreen').classList.remove('panel-open');
+  }
 }
 async function attemptLogin(){
   const email=document.getElementById('loginEmail').value.trim();
@@ -6457,7 +7124,7 @@ if(isSbSessionValid()){
 
 </body>
 </html>
-<!-- rebuild: 2026-07-12T11:38:08.000Z -->
+<!-- rebuild: 2026-07-05T15:00:00Z -->
 
 
 

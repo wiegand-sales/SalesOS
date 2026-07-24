@@ -6,7 +6,7 @@
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
-<title>SFP Coaching – Wiegand &amp; Partner</title>
+<title>Sales OS – Wiegand &amp; Partner</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/dist/tabler-icons.min.css">
@@ -39,12 +39,9 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .sb-nav{padding:8px 10px 4px;}
 .sb-item{display:flex;align-items:center;gap:9px;padding:6px 10px;cursor:pointer;font-size:13px;font-weight:500;color:var(--text2);border-radius:8px;margin-bottom:2px;transition:all .12s;}
 .sb-item:hover{background:rgba(32,106,114,0.08);color:var(--text);}
-.sb-item.active{background:rgba(32,106,114,0.14);color:var(--purple-dark);font-weight:600;}
+.sb-item.active{background:rgba(32,106,114,0.14);color:var(--purple-dark);font-weight:600;}.sb-navsub{padding:6px 10px 6px 20px;font-size:12.5px;}.wiegand-subnav{margin:2px 0 4px 14px;padding-left:6px;border-left:1px solid var(--border);display:flex;flex-direction:column;gap:1px;}.wiegand-subnav.hidden{display:none;}
 .sb-item i{font-size:15px;color:inherit;}
-.sb-icon{width:26px;height:26px;border-radius:8px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:opacity .12s;color:#fff;}
-.sb-item.active .sb-icon{opacity:1;}
-.sb-item:not(.active) .sb-icon{opacity:0.55;}
-.sb-item:hover .sb-icon{opacity:0.85;}
+.sb-icon{width:26px;height:26px;border-radius:8px;background:linear-gradient(180deg,#27808a 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;color:#fff;box-shadow:0 2px 6px rgba(32,106,114,.22);}
 .sb-divider{height:1px;background:var(--border);margin:8px 14px;}
 .sb-section{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;color:var(--text3);padding:4px 14px 6px;}
 .emp-list{flex:1;overflow-y:auto;padding:0 10px;}
@@ -63,7 +60,7 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .tb-left{display:flex;align-items:center;gap:14px;}
 .tb-name{font-size:18px;font-weight:700;}
 .tb-meta{font-size:12px;color:var(--text2);margin-top:1px;}
-.btn{padding:7px 13px;font-size:13px;font-weight:500;border-radius:var(--r-md);cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,0.5);color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s ease;font-family:inherit;}
+.btn{padding:8px 13px;font-size:13px;font-weight:500;border-radius:var(--r-md);cursor:pointer;border:1px solid var(--border2);background:rgba(255,255,255,0.5);color:var(--text);display:flex;align-items:center;gap:6px;transition:all .15s ease;font-family:inherit;}
 .btn:hover{background:rgba(255,255,255,0.85);box-shadow:0 2px 8px rgba(15,61,66,.1);}
 .btn-primary{background:linear-gradient(180deg,#27808a 0%,#206A72 100%);color:#fff;border-color:var(--purple);box-shadow:0 6px 16px rgba(32,106,114,.28);}
 .btn-primary:hover{background:linear-gradient(180deg,#1f6d76 0%,#174C52 100%);box-shadow:0 4px 14px rgba(32,106,114,.38);transform:translateY(-1px);}
@@ -86,10 +83,34 @@ body{font-family:'Inter',sans-serif;background:linear-gradient(155deg,#f2f3f0 0%
 .sec-title{font-size:12px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.05em;margin-bottom:11px;}
 .badge{font-size:11px;font-weight:600;padding:3px 9px;border-radius:20px;backdrop-filter:blur(8px);}
 /* KPI GRIDS */
-.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}
+select{accent-color:#206A72;}select option:checked{background:#206A72;color:#fff;}
+.wizard-overlay{position:fixed;inset:0;background:rgba(15,40,44,.4);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;z-index:200;padding:20px;}
+.wizard-overlay.hidden{display:none;}
+.wizard-card{width:420px;max-width:100%;min-height:460px;border-radius:20px;overflow:hidden;background:linear-gradient(160deg,#0c3b40 0%,#164e54 45%,#1d6169 100%);color:#fff;display:flex;flex-direction:column;box-shadow:0 24px 60px rgba(0,0,0,.4);position:relative;font-family:Inter,sans-serif;}
+.wizard-skip{position:absolute;top:16px;right:18px;color:rgba(255,255,255,.6);font-size:12px;cursor:pointer;background:none;border:none;font-family:inherit;}
+.wizard-skip:hover{color:#fff;}
+.wizard-body{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px 34px 24px;gap:12px;}
+.wizard-icon{width:60px;height:60px;border-radius:16px;background:rgba(255,255,255,.14);display:flex;align-items:center;justify-content:center;font-size:28px;margin-bottom:4px;}
+.wizard-title{font-size:19px;font-weight:800;}
+.wizard-sub{font-size:13px;color:rgba(255,255,255,.7);max-width:290px;line-height:1.5;}
+.wizard-stat{font-size:42px;font-weight:800;line-height:1;}
+.wizard-stagerow{display:flex;gap:12px;margin-top:6px;}
+.wizard-stagebox{background:rgba(255,255,255,.12);border-radius:12px;padding:14px;min-width:78px;}
+.wizard-stagebox strong{display:block;font-size:24px;font-weight:800;}
+.wizard-stagebox span{font-size:9.5px;color:rgba(255,255,255,.65);}
+.wizard-taskrow{display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.1);border-radius:10px;padding:9px 12px;width:100%;font-size:12.5px;margin-bottom:7px;}
+.wizard-taskrow i{flex-shrink:0;color:rgba(255,255,255,.7);}
+.wizard-quote{font-size:18px;font-weight:700;line-height:1.55;font-style:italic;max-width:320px;}
+.wizard-footer{padding:18px 26px 22px;display:flex;align-items:center;justify-content:space-between;}
+.wizard-dots{display:flex;gap:6px;}
+.wizard-dot{width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,.3);transition:all .2s;}
+.wizard-dot.active{background:#fff;width:18px;border-radius:4px;}
+.wizard-next-btn{background:#fff;color:#174C52;border:none;border-radius:8px;padding:9px 18px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:6px;font-family:inherit;}
+.wizard-next-btn:hover{background:#f0f0f0;}
+.g5{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:18px;}.month-bar{background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);border-radius:var(--r-lg);padding:16px 24px;display:grid;grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr;align-items:start;margin-top:76px;margin-bottom:22px;box-shadow:0 12px 28px rgba(15,61,66,0.22);}.mb-month{padding-right:22px;border-right:1px solid rgba(255,255,255,0.14);}.mb-month .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:5px;}.mb-month .v{font-size:15px;font-weight:700;color:#fff;margin-top:1px;}.mb-stat{padding:0 22px;border-right:1px solid rgba(255,255,255,0.14);}.mb-stat:last-child{border-right:none;}.mb-stat .l{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:rgba(255,255,255,0.55);font-weight:600;margin-bottom:5px;}.mb-stat .row{display:flex;align-items:baseline;gap:8px;}.mb-stat .n{font-size:20px;font-weight:700;color:#fff;}.mb-stat .n-unit{font-size:11px;font-weight:600;color:rgba(255,255,255,0.5);}.mb-stat .m{font-size:12.5px;font-weight:600;color:#7ED2DB;margin-top:2px;}.mb-total .l{color:rgba(255,255,255,0.75);}
 .g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:14px;}
 .g3{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:14px;}
-.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}
+.g2{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-bottom:14px;}.section-hdr{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;margin-bottom:8px;display:flex;align-items:center;justify-content:space-between;gap:8px;}.funnel-wrap{display:flex;flex-direction:column;gap:5px;padding-top:2px;}.donut-wrap{display:flex;gap:24px;align-items:center;flex-wrap:wrap;}.donut-legend{display:flex;flex-direction:column;gap:9px;flex:1;min-width:140px;}.donut-legend-item{display:flex;align-items:center;gap:9px;font-size:12.5px;}.donut-legend-dot{width:10px;height:10px;border-radius:3px;flex-shrink:0;}.donut-legend-name{flex:1;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}.donut-legend-val{font-weight:700;color:var(--text);}.donut-legend-pct{font-size:11px;color:var(--text3);width:34px;text-align:right;}
 /* ── STANDARD-KACHEL (verbindlich für ALLE Kacheln in Coaching OS, auch künftige):
    padding:12px 14px · Label 10.5px/600 · Wert 20px/700 · Sub/Trend 10.5px
    Nutze wo möglich die Klasse .kpi + .kpi-label/.kpi-val/.kpi-sub statt eigener Inline-Maße. ── */
@@ -196,7 +217,26 @@ tr:hover td{background:var(--bg2);}
 .sb-group-header:hover{color:var(--text2);}
 .sb-group-arrow{margin-left:auto;transition:transform .2s;font-size:11px;}
 .sb-group-header.collapsed .sb-group-arrow{transform:rotate(-90deg);}
-.sb-group-body{overflow:hidden;transition:max-height .25s ease;}</style>
+.sb-group-body{overflow:hidden;transition:max-height .25s ease;}
+.login-screen{position:fixed;inset:0;background:linear-gradient(160deg,#0c3b40 0%,#164e54 45%,#1d6169 100%);overflow-y:auto;z-index:20000;display:flex;align-items:center;justify-content:center;padding:40px 20px;}
+.login-hero{display:flex;flex-direction:column;align-items:center;text-align:center;color:#fff;width:300px;font-family:'Inter',sans-serif;}
+.login-hero-logo{width:52px;height:52px;border-radius:14px;background:linear-gradient(180deg,#3fa3ab 0%,#206A72 100%);display:flex;align-items:center;justify-content:center;margin-bottom:18px;box-shadow:0 6px 20px rgba(0,0,0,.3);flex-shrink:0;font-weight:700;font-size:18px;color:#fff;}
+.login-hero-title{font-size:40px;font-weight:800;letter-spacing:-0.02em;margin-bottom:6px;color:#fff;}
+.login-hero-tag{font-size:14px;color:rgba(255,255,255,.75);font-weight:500;margin-bottom:32px;transition:opacity .2s ease;}
+.login-hero-btn{width:100%;background:#fff;color:var(--purple-dark);border:none;border-radius:8px;height:44px;box-sizing:border-box;font-size:14px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 14px rgba(0,0,0,.2);font-family:inherit;}
+.login-hero-btn:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(0,0,0,.28);}
+.login-intro{width:100%;}.login-screen.panel-open .login-intro{display:none;}
+.login-fields{display:none;flex-direction:column;align-items:stretch;width:100%;}
+.login-screen.panel-open .login-fields{display:flex;}
+.login-box .field{width:100%;text-align:left;margin-bottom:12px;}
+.login-box label{display:block;font-size:11px;font-weight:600;color:rgba(255,255,255,.7);text-transform:uppercase;letter-spacing:.03em;margin-bottom:5px;font-family:inherit;}
+.login-box input{width:100%;height:44px;box-sizing:border-box;border-radius:8px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.16);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);color:#fff;padding:0 12px;font-family:inherit;font-size:14px;outline:none;}
+.login-box input::placeholder{color:rgba(255,255,255,.45);}
+.login-box input:focus{border-color:rgba(255,255,255,.6);background:rgba(255,255,255,.18);}
+.login-submit-btn{width:100%;height:44px;box-sizing:border-box;border-radius:8px;border:none;background:#fff;color:var(--purple-dark);font-weight:600;font-size:14px;cursor:pointer;margin-top:6px;font-family:inherit;}
+.login-back-link{font-size:12px;color:rgba(255,255,255,.55);margin-top:16px;cursor:pointer;text-decoration:underline;font-family:inherit;}
+.login-message{width:100%;font-size:12px;border-radius:8px;padding:9px 11px;margin-bottom:14px;font-family:inherit;}.login-message-error{background:rgba(189,45,41,.85);color:#fff;}.login-message-info{background:rgba(217,65,9,.85);color:#fff;}
+</style>
 </head>
 <body>
 <div id="stg-banner" style="display:none;position:fixed;top:0;left:0;right:0;z-index:9999;background:#BA7517;color:#fff;text-align:center;padding:6px 12px;font-size:12px;font-weight:600;font-family:inherit">⚠ STAGING · <a href="https://wiegand-sales.github.io/CoachingOS/" style="color:#fff;text-decoration:underline">→ Live</a></div><style id="stg-banner-style"></style>
@@ -242,29 +282,52 @@ tr:hover td{background:var(--bg2);}
 
 
 
-<div id="auth-gate" style="position:fixed;inset:0;z-index:20000;background:var(--bg,#f5f5f4);display:flex;align-items:center;justify-content:center;font-family:inherit;">
-  <div style="background:#fff;border-radius:12px;padding:32px;width:340px;box-shadow:0 4px 24px rgba(0,0,0,.08);">
-    <h2 style="margin:0 0 4px;font-size:18px;">Coaching OS</h2>
-    <p style="margin:0 0 20px;color:#6b6b68;font-size:13px;">Anmeldung</p>
-    <div id="auth-form">
-      <input id="auth-email" type="email" placeholder="name@wiegand-gmbh.de" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;">
-      <input id="auth-password" type="password" placeholder="Passwort" style="width:100%;box-sizing:border-box;padding:10px 12px;border:1px solid #ddd;border-radius:8px;font-size:14px;margin-bottom:10px;">
-      <button onclick="loginWithPassword()" style="width:100%;padding:10px;border:none;border-radius:8px;background:#3C3489;color:#fff;font-weight:600;font-size:14px;cursor:pointer;">Anmelden</button>
-      <div id="auth-msg" style="margin-top:10px;font-size:12px;color:#6b6b68;"></div>
+<div id="auth-gate" class="login-screen">
+  <div class="login-hero">
+    <div class="login-hero-logo">SO</div>
+    <div class="login-hero-title">Sales OS</div>
+    <div class="login-hero-tag" id="loginHeroTag">Sales Coaching, einfach gemacht.</div>
+    <div class="login-intro">
+      <button class="login-hero-btn" onclick="openLoginPanel()">Anmelden</button>
+    </div>
+    <div class="login-fields login-box">
+      <div id="auth-msg" class="login-message" style="display:none"></div>
+      <div class="field">
+        <label>E-Mail</label>
+        <input type="email" id="auth-email" placeholder="name@wiegand-gmbh.de">
+      </div>
+      <div class="field">
+        <label>Passwort</label>
+        <input type="password" id="auth-password" placeholder="••••••••">
+      </div>
+      <button class="login-submit-btn" onclick="loginWithPassword()">Anmelden</button>
+      <div class="login-back-link" onclick="closeLoginPanel()">← zurück</div>
     </div>
   </div>
 </div>
 <div class="sidebar">
   <div class="sb-header" style="position:relative">
-    <div class="sb-logo"><div class="sb-brand-badge">SC</div><span class="sb-title">SFP Coaching</span></div>
-    <div class="sb-sub">Wiegand &amp; Partner</div>
+    <div class="sb-logo"><div class="sb-brand-badge">SO</div><span class="sb-title">Sales OS</span></div>
     <button onclick="logout()" title="Abmelden" style="position:absolute;top:0;right:0;background:none;border:none;cursor:pointer;color:var(--text3);font-size:16px;padding:4px"><i class="ti ti-logout"></i></button>
   </div>
   <div class="sb-nav">
-    <div class="sb-item" id="nav-team" onclick="showView('team')"><div class="sb-icon"><i class="ti ti-layout-grid"></i></div> SFP Wiegand</div>
-    <div class="sb-item" id="nav-coaching" onclick="showView('coaching')"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching</div>
-    <div class="sb-item" id="nav-activity" onclick="showView('activity')"><div class="sb-icon"><i class="ti ti-activity"></i></div> Aktivität</div>
-    <div class="sb-item" id="nav-settings" onclick="showView('settings')"><div class="sb-icon"><i class="ti ti-settings"></i></div> Settings</div>
+    <div class="sb-item" id="nav-team" onclick="toggleWiegandNav()"><div class="sb-icon"><i class="ti ti-layout-grid"></i></div> SFP Wiegand <i class="ti ti-chevron-up" id="wiegandNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
+    <div id="wiegandSubNav" class="wiegand-subnav">
+      <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Overview</div>
+      <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">KPIs</div>
+    </div>
+    <div class="sb-item" id="nav-coaching" onclick="toggleCoachingNav()"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching <i class="ti ti-chevron-down" id="coachingNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
+    <div id="coachingSubNav" class="wiegand-subnav hidden">
+      <div class="sb-item sb-navsub" id="nav-coaching-team" onclick="selectCoachingTeam()">Overview KPIs</div>
+      <div class="sb-item sb-navsub" id="nav-coaching-overview" onclick="setCoachFilterView('overview')">Overview Coachings</div>
+      <div class="sb-item sb-navsub" id="nav-coaching-activity" onclick="selectCoachingActivity()">Aktivitäten</div>
+      <div id="coachingCoachSubItems"></div>
+    </div>
+    <div class="sb-item" id="nav-settings" onclick="toggleSettingsNav()"><div class="sb-icon"><i class="ti ti-settings"></i></div> Settings <i class="ti ti-chevron-up" id="settingsNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
+    <div id="settingsSubNav" class="wiegand-subnav">
+      <div class="sb-item sb-navsub" id="nav-settings-integrations" onclick="selectSettingsSub('integrations')">Integrationen</div>
+      <div class="sb-item sb-navsub" id="nav-settings-data" onclick="selectSettingsSub('data')">Daten & Backup</div>
+    </div>
   </div>
   <div class="sb-divider"></div>
   <div class="sb-section">Staff</div>
@@ -272,6 +335,16 @@ tr:hover td{background:var(--bg2);}
   <button class="sb-add" onclick="openModal('addEmpModal')"><i class="ti ti-plus"></i> Mitarbeiter hinzufügen</button>
 </div>
 <div class="main" id="mainArea"></div>
+<div class="wizard-overlay hidden" id="loginWizardOverlay">
+  <div class="wizard-card">
+    <button class="wizard-skip" onclick="closeLoginWizard()">Überspringen</button>
+    <div class="wizard-body" id="wizardBody"></div>
+    <div class="wizard-footer">
+      <div class="wizard-dots" id="wizardDots"></div>
+      <button class="wizard-next-btn" id="wizardNextBtn" onclick="wizardNext()">Weiter <i class="ti ti-arrow-right"></i></button>
+    </div>
+  </div>
+</div>
 
 <!-- MODALS -->
 <div class="modal-ov hidden" id="addEmpModal"><div class="modal">
@@ -563,14 +636,33 @@ function logout(){
   });
 }
 
+function openLoginPanel(){
+  var tag=document.getElementById('loginHeroTag');
+  if(tag){
+    tag.style.opacity='0';
+    setTimeout(function(){tag.innerHTML='Schön, dich wiederzusehen.';tag.style.opacity='1';},200);
+  }
+  document.getElementById('auth-gate').classList.add('panel-open');
+  setTimeout(function(){var el=document.getElementById('auth-email');if(el)el.focus();},50);
+}
+function closeLoginPanel(){
+  document.getElementById('auth-gate').classList.remove('panel-open');
+  var tag=document.getElementById('loginHeroTag');
+  if(tag){
+    tag.style.opacity='0';
+    setTimeout(function(){tag.innerHTML='Sales Coaching, einfach gemacht.';tag.style.opacity='1';},200);
+  }
+}
 function loginWithPassword(){
   var email = document.getElementById('auth-email').value.trim();
   var password = document.getElementById('auth-password').value;
   var msg = document.getElementById('auth-msg');
-  if(!email || !password){ msg.textContent = 'Bitte E-Mail und Passwort eingeben.'; return; }
-  msg.textContent = 'Anmelden…';
+  function showMsg(text,cls){msg.textContent=text;msg.className='login-message '+cls;msg.style.display='block';}
+  if(!email || !password){ showMsg('Bitte E-Mail und Passwort eingeben.','login-message-info'); return; }
+  showMsg('Anmelden…','login-message-info');
+  window._freshLoginClick=true;
   sb.auth.signInWithPassword({ email: email, password: password }).then(function(res){
-    if(res.error){ msg.textContent = 'Fehler: ' + res.error.message; }
+    if(res.error){ showMsg('Fehler: ' + res.error.message,'login-message-error'); }
     // Bei Erfolg uebernimmt onAuthStateChange den Rest (initAppAfterLogin)
   });
 }
@@ -617,14 +709,30 @@ function toggleOverviewEmpId(id){
 function setOverviewSelectAll(allIds){overviewSelectedIds=allIds.slice();renderTeam();}
 function setOverviewSelectNone(){overviewSelectedIds=[];renderTeam();}
 var overviewPerfGroup='day'; // 'day' | 'week' | 'month' – eigener Zustand, unabhängig vom Mitarbeiter-Tab
+var overviewPerfSortKey=null; // aktuell aktive Sortierspalte der Performance-Tabelle (Overview)
+var overviewPerfSortDir='asc'; // 'asc' | 'desc'
+function setOverviewPerfSort(key){
+  if(overviewPerfSortKey===key){overviewPerfSortDir=overviewPerfSortDir==='asc'?'desc':'asc';}
+  else{overviewPerfSortKey=key;overviewPerfSortDir='asc';}
+  renderTeam();
+}
 var overviewFromDate=null; // Von-Datum (Overview Performance-Tabelle), null = Standard (Monatsanfang)
-var overviewChartMetric='crOEM';
-var settingsView='kpi'; // 'kpi' | 'integrations' | 'data' | 'log'
+var overviewChartMetric='margeGesamt';
+var settingsView='integrations'; // 'integrations' | 'data'
 var activityFilterPerson='ALL'; // 'ALL' | employee-id (Coach)
 var activityFilterDays=7;
 function setActivityFilterPerson(v){activityFilterPerson=v;renderActivity();}
 function setActivityFilterDays(d){activityFilterDays=d;renderActivity();}
 function setSettingsView(v){settingsView=v;renderEinstellungen();}
+var settingsNavOpen=true;
+function toggleSettingsNav(){
+  settingsNavOpen=!settingsNavOpen;
+  var sub=document.getElementById('settingsSubNav');if(sub)sub.classList.toggle('hidden',!settingsNavOpen);
+  var chev=document.getElementById('settingsNavChevron');if(chev)chev.className='ti ti-chevron-'+(settingsNavOpen?'up':'down');
+  if(settingsNavOpen){closeWiegandSubnav();closeCoachingSubnav();}
+  selectSettingsSub(settingsView);
+}
+function selectSettingsSub(v){settingsView=v;view='settings';renderSidebar();renderMain();}
 function setOverviewChartMetric(m){overviewChartMetric=m;renderTeam();}
 var overviewToDate=null;   // Bis-Datum (Overview Performance-Tabelle), null = Standard (Monatsende/heute)
 function setOverviewDateRange(from,to){overviewFromDate=from||null;overviewToDate=to||null;renderTeam();}
@@ -675,6 +783,45 @@ var FOCUS_METRICS=[
   {key:'crMegaYes',label:'CR Mega Yes %'},
   {key:'margeGesamt',label:'Marge Gesamt €'}
 ];
+// Petrol-Farbverlauf ueber n Segmente: dunkel -> helles Teal (analog SalesOS stageGradientColor)
+function stageGradientPetrol(i,n){
+  var from=[15,61,66],to=[159,225,232];
+  var t=n>1?i/(n-1):0;
+  var c=from.map(function(v,idx){return Math.round(v+(to[idx]-v)*t);});
+  return 'rgb('+c[0]+','+c[1]+','+c[2]+')';
+}
+function polarPointCoS(cx,cy,r,angleDeg){
+  var a=(angleDeg-90)*Math.PI/180;
+  return [cx+r*Math.cos(a),cy+r*Math.sin(a)];
+}
+// Reines SVG-Donut mit Zentrums-Zahl und Legende (Punkt/Name/Wert/Prozent), analog
+// "Wo/Warum wir Kunden verlieren" in SalesOS - kein Chart.js noetig.
+function donutSvg(entries,totalCount,centerLabel){
+  if(!entries.length||!totalCount)return '<p style="font-size:12px;color:var(--text3)">Keine Daten im gewaehlten Zeitraum/Filter.</p>';
+  var size=180,r=78,rInner=48,cx=90,cy=90,angle=0;
+  var colors=entries.map(function(_,i){return stageGradientPetrol(i,entries.length);});
+  var paths='';
+  entries.forEach(function(d,i){
+    var sweep=totalCount?d.count/totalCount*360:0;
+    var p1=polarPointCoS(cx,cy,r,angle),p2=polarPointCoS(cx,cy,r,angle+sweep);
+    var pi1=polarPointCoS(cx,cy,rInner,angle+sweep),pi2=polarPointCoS(cx,cy,rInner,angle);
+    var large=sweep>180?1:0;
+    paths+='<path d="M'+p1[0].toFixed(1)+','+p1[1].toFixed(1)+' A'+r+','+r+' 0 '+large+' 1 '+p2[0].toFixed(1)+','+p2[1].toFixed(1)+' L'+pi1[0].toFixed(1)+','+pi1[1].toFixed(1)+' A'+rInner+','+rInner+' 0 '+large+' 0 '+pi2[0].toFixed(1)+','+pi2[1].toFixed(1)+' Z" fill="'+colors[i]+'" stroke="#fff" stroke-width="2"/>';
+    angle+=sweep;
+  });
+  var legend=entries.map(function(d,i){
+    var pct=totalCount?Math.round(d.count/totalCount*100):0;
+    return '<div class="donut-legend-item"><span class="donut-legend-dot" style="background:'+colors[i]+'"></span><span class="donut-legend-name">'+d.label+'</span><span class="donut-legend-val">'+d.count+'</span><span class="donut-legend-pct">'+pct+'%</span></div>';
+  }).join('');
+  return '<div class="donut-wrap">'
+    +'<svg width="'+size+'" height="'+size+'" viewBox="0 0 '+size+' '+size+'" style="flex-shrink:0">'
+    +paths
+    +'<text x="'+cx+'" y="'+(cy-4)+'" text-anchor="middle" font-size="24" font-weight="800" fill="var(--text)" font-family="Inter,sans-serif">'+totalCount+'</text>'
+    +'<text x="'+cx+'" y="'+(cy+15)+'" text-anchor="middle" font-size="10" fill="var(--text3)" font-family="Inter,sans-serif">'+centerLabel+'</text>'
+    +'</svg>'
+    +'<div class="donut-legend">'+legend+'</div>'
+    +'</div>';
+}
 function sparkline(values,color,w,h){
   w=w||90;h=h||30;
   values=(values||[]).filter(function(v){return v!==undefined&&v!==null;});
@@ -729,24 +876,25 @@ function initAppAfterLogin(){
   loadEmployeesFromSupabase().then(function(){
     return resolveCurrentCoach();
   }).then(function(){
-    Promise.all([loadPerformanceFromSupabase(), loadProtocolsFromSupabase(), loadCallRatingsFromSupabase(), loadTasksFromSupabase(), loadReviewsFromSupabase(), loadKpiTargetsFromSupabase(), loadRatingCriteriaFromSupabase(), loadSettingsFromSupabase(), loadAdminSecretsFromSupabase(), loadEmployeeKpiTargetsFromSupabase(), loadSolidroadFromSupabase(), loadEmployeeHistoryFromSupabase(), loadEmployeeDocumentsFromSupabase(), loadGoalsFromSupabase(), loadAdminAuditLogFromSupabase(), loadActivityLogFromSupabase()]).then(function(){
+    Promise.all([loadPerformanceFromSupabase(), loadProtocolsFromSupabase(), loadCallRatingsFromSupabase(), loadTasksFromSupabase(), loadReviewsFromSupabase(), loadKpiTargetsFromSupabase(), loadRatingCriteriaFromSupabase(), loadSettingsFromSupabase(), loadAdminSecretsFromSupabase(), loadEmployeeKpiTargetsFromSupabase(), loadSolidroadFromSupabase(), loadEmployeeHistoryFromSupabase(), loadEmployeeDocumentsFromSupabase(), loadGoalsFromSupabase(), loadAdminAuditLogFromSupabase(), loadActivityLogFromSupabase(), loadZielvereinbarungFromSupabase()]).then(function(){
       lsLoad();               // Rest der Daten (protocols, ...) bleibt vorerst lokal
       runAppInit();
+      if(window._freshLoginClick){
+        window._freshLoginClick=false;
+        openLoginWizard();
+      }
     });
   });
 }
 
 sb.auth.getSession().then(function(res){
   if(res.data.session){ initAppAfterLogin(); }
-  else {
-    document.getElementById('auth-form').style.display = 'block';
-  }
 });
 sb.auth.onAuthStateChange(function(event, session){
   if(session){ initAppAfterLogin(); }
 });
 
-function setCoachFilterView(v){coachFilterView=v;renderCoachingAnsicht();}
+function setCoachFilterView(v){coachFilterView=v;view='coaching';coachingNavOpen=true;renderSidebar();renderMain();}
 // Coach-Wirksamkeit: für jede abgeschlossene Session mit Coach + Ziel-KPI wird die
 // Ø-Veränderung 14 Tage vor vs. nach der Session berechnet (in Zielrichtung normalisiert:
 // positiv = Bewegung Richtung Ziel, unabhängig davon ob das KPI "mind." oder "max." ist).
@@ -788,6 +936,245 @@ function computeCoachEffectiveness(){
   return result;
 }
 // ── Coaching-Abdeckung: eigener, ausgebauter Tab mit mehr Informationen ──
+// ── SFP Coaching > Overview Coachings: Petrol-Infobox (ersetzt die frühere 3-Kacheln+Chart-Zeile) ──
+function coachingOverviewInfoBoxHtml(liste,hD,heute){
+  var HIDDEN=[];
+  var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var coachEmps=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var ueberfaellig=visible.filter(function(e){var t=tageSeitLetzterSession(e.id);return t===null||t>30;});
+  function qaFaelligCountAt(refDate){
+    var cutoff=addDaysUTC(refDate,-60);
+    return visible.filter(function(e){
+      var cnt=(callRatings[e.id]||[]).filter(function(r){return r.date>=cutoff&&r.date<=refDate;}).length;
+      return cnt<5;
+    }).length;
+  }
+  var qaFaelligNow=qaFaelligCountAt(heute);
+  var qaFaelligVorwoche=qaFaelligCountAt(addDaysUTC(heute,-7));
+  var qaDelta=qaFaelligNow-qaFaelligVorwoche;
+  var qaTrendCol=qaDelta===0?'#7ED2DB':(qaDelta>0?'#f0a5a3':'#7ED2DB'); // mehr QA-faellig = schlechter (rot), weniger/gleich = gut (teal)
+  var qaTrendTxt='Vorwoche: '+qaFaelligVorwoche+' ('+(qaDelta>=0?'+':'')+qaDelta+')';
+  var coachCounts={},totalCoached=0;
+  visible.forEach(function(e){
+    (protocols[e.id]||[]).forEach(function(p){
+      if(p.status==='geplant')return;
+      totalCoached++;
+      if(p.coachId)coachCounts[p.coachId]=(coachCounts[p.coachId]||0)+1;
+    });
+  });
+  var coachDistRows=coachEmps.map(function(c){return {name:c.name,n:coachCounts[c.id]||0};}).sort(function(a,b){return b.n-a.n;});
+  var monthLabel=MONTH_NAMES_ZIEL[hD.getMonth()]+' '+hD.getFullYear();
+  var coachColors=['#7ED2DB','#5FBAC4','#247982','#164e54','#0c3b40'];
+
+  var totalStatCols=3+coachDistRows.length;
+  var h='<div class="month-bar" style="grid-template-columns:auto '+Array(totalStatCols).fill('1fr').join(' ')+'">';
+  h+='<div class="mb-month"><div class="l">Zeitraum</div><div class="v">'+monthLabel+'</div></div>';
+  h+='<div class="mb-stat"><div class="l">QA fällig</div><div class="row"><span class="n">'+qaFaelligNow+'</span></div><div class="m" style="color:'+qaTrendCol+'">'+qaTrendTxt+'</div></div>';
+  h+='<div class="mb-stat"><div class="l">Überfällige Coachings</div><div class="row"><span class="n">'+ueberfaellig.length+'</span></div><div class="m">&gt;30 Tage kein Coaching</div></div>';
+  h+='<div class="mb-stat"><div class="l">Sessions gesamt</div><div class="row"><span class="n">'+totalCoached+'</span></div><div class="m">Alle abgeschlossenen Coachings</div></div>';
+  coachDistRows.forEach(function(r,idx){
+    var col=coachColors[idx%coachColors.length];
+    var anteil=totalCoached>0?Math.round(r.n/totalCoached*100):0;
+    h+='<div class="mb-stat"><div class="l" style="display:flex;align-items:center;gap:5px"><span style="width:8px;height:8px;border-radius:50%;background:'+col+';display:inline-block;flex-shrink:0"></span>'+r.name.split(' ')[0]+'</div><div class="row"><span class="n">'+r.n+'</span></div><div class="m">Anteil: '+anteil+'%</div></div>';
+  });
+  h+='</div>';
+  return h;
+}
+// ═══════════════ LOGIN-WIZARD (Petrol-Karussell, wie in SalesOS) ═══════════════
+var MOTIVATION_QUOTES=[
+"Kleine Schritte, jeden Tag - das ist der Unterschied.","Disziplin schlägt Motivation, jedes Mal.","Der beste Zeitpunkt anzufangen war gestern. Der zweitbeste ist jetzt.",
+"Fortschritt zählt mehr als Perfektion.","Wer nicht dranbleibt, hat schon verloren, bevor es losging.","Aus jedem Nein lernst du etwas fürs nächste Ja.",
+"Erfolg ist die Summe kleiner Anstrengungen, jeden Tag wiederholt.","Konzentrier dich auf das, was du beeinflussen kannst.","Ein Rückschlag ist kein Ausstieg, sondern eine Kurve.",
+"Wer fragt, führt das Gespräch.","Zuhören ist die unterschätzteste Vertriebstechnik.","Vertrauen wird verdient, nicht verlangt.",
+"Gute Vorbereitung schlägt spontanes Talent.","Jeder Anruf ist eine neue Chance, nicht eine Wiederholung.","Der Kunde kauft nie das Produkt, sondern das Ergebnis.",
+"Wachstum passiert außerhalb der Komfortzone.","Konsequenz ist die Brücke zwischen Zielen und Ergebnissen.","Wer aufgibt, bevor der Erfolg kommt, hat ihn nie gesehen.",
+"Ein gutes Coaching verändert mehr als tausend Tipps.","Reflektier täglich - auch fünf Minuten reichen.","Die besten Verkäufer sind die besten Fragensteller.",
+"Motivation bringt dich in Gang, Gewohnheit hält dich in Bewegung.","Kritik ist Feedback in Verkleidung - nutze sie.","Wer wächst, macht Fehler. Wer nichts macht, wächst nicht.",
+"Ehrlichkeit im Gespräch schlägt jeden Trick.","Der erste Eindruck entscheidet, der zweite bestätigt.","Konstanz schlägt Intensität, langfristig immer.",
+"Erfolgreiche Menschen tun das, was andere aufschieben.","Ziele ohne Plan sind nur Wünsche.","Sei neugierig auf den Kunden, nicht nur auf den Abschluss.",
+"Jede Ablehnung bringt dich näher ans nächste Ja.","Was du wiederholst, wird du.","Struktur gibt Freiheit, kein Chaos.",
+"Der Unterschied zwischen gut und großartig ist Übung.","Bleib ruhig, wenn's hart wird - genau da entscheidet sich alles.","Ein Lächeln hört man auch am Telefon.",
+"Wer über sich hinauswächst, verändert auch das Team.","Kleine Erfolge feiern - sie summieren sich.","Vorbereitung ist der Unterschied zwischen Zufall und Können.",
+"Der Kunde merkt, ob du an dein Produkt glaubst.","Frag nach dem Warum, bevor du das Was verkaufst.","Beharrlichkeit gewinnt gegen Talent, wenn Talent nicht beharrlich ist.",
+"Wachstum beginnt mit ehrlichem Feedback.","Verantwortung übernehmen ist der erste Schritt zur Verbesserung.","Ein starkes Nein heute kann ein besseres Ja morgen sein.",
+"Die Energie im ersten Satz entscheidet oft über das ganze Gespräch.","Sei der Grund, warum ein Kunde gerne wiederkommt.","Übung schlägt Zufall, jedes Mal.",
+"Wer nach vorne schaut, verliert die Angst vor dem letzten Anruf.","Dein Mindset bestimmt deine Zahlen, nicht umgekehrt.","Klarheit im Ziel bringt Ruhe im Handeln.",
+"Der Unterschied liegt oft im letzten Prozent Einsatz.","Gute Gewohnheiten bauen sich langsam, aber sicher auf.","Jeder Tag ist eine neue Chance, die gestern verpasst wurde, nachzuholen.",
+"Sei präzise in der Sprache, dann wirkst du sicherer.","Vertrieb ist Beziehungsarbeit mit Zahlen am Ende.","Wer den Kunden versteht, muss ihn nicht überzeugen.",
+"Bleib dran, auch wenn's mühsam wird - genau dort trennt sich die Spreu vom Weizen.","Erfolg hinterlässt Spuren - folge deinen eigenen guten.","Der beste Verkäufer im Raum ist oft der beste Zuhörer.",
+"Fokus schlägt Fleiß, wenn der Fleiß am falschen Ort ansetzt.","Ein ehrliches Coaching-Gespräch bringt mehr als zehn Standardtipps.","Sei geduldig mit dem Prozess, ungeduldig mit dem Fortschritt.",
+"Wer nicht fragt, bekommt selten die volle Antwort.","Deine Stimme trägt mehr Überzeugung als deine Worte.","Ziele schriftlich festhalten verdoppelt die Wahrscheinlichkeit, sie zu erreichen.",
+"Ein Nein heute ist kein Nein für immer.","Konzentriere dich auf den nächsten Schritt, nicht auf die ganze Treppe.","Wer sich selbst reflektiert, wächst schneller als der Rest.",
+"Beständigkeit im Kleinen erzeugt Großes im Ganzen.","Der Unterschied zwischen Traum und Ziel ist ein Datum.","Sei der Mensch, mit dem der Kunde gerne noch mal spricht.",
+"Ein starkes Team trägt auch schwache Tage.","Frage zweimal nach, bevor du eine Lösung anbietest.","Übe die schwierigen Gespräche öfter als die einfachen.",
+"Wachstum fühlt sich selten bequem an.","Wer den Prozess liebt, gewinnt auch ohne sofortigen Erfolg.","Dein nächster Anruf kennt deine letzten Ergebnisse nicht - nutze das.",
+"Beharrlichkeit ist lauter als Talent.","Ein gutes Ziel motiviert auch an einem schlechten Tag.","Vertrauen aufbauen dauert länger, als es zu verlieren.",
+"Sei konkret in deinen Vorsätzen, nicht nur ambitioniert.","Wer sich verbessern will, muss sich beobachten lassen.","Kleine Disziplin heute erspart große Reue morgen.",
+"Ein starker Pitch beginnt mit einer starken Frage.","Der Erfolg von morgen beginnt mit der Vorbereitung von heute.","Sei geduldig mit dir selbst - Wachstum ist kein Sprint.",
+"Wer den Kunden ernst nimmt, verdient sein Vertrauen.","Übe Einwandsbehandlung wie einen Muskel - regelmäßig.","Konstante kleine Verbesserungen schlagen sporadische große Sprünge.",
+"Dein Ton macht mehr als die Hälfte der Botschaft aus.","Wer nicht nachfragt, verpasst die eigentliche Chance.","Bleib neugierig - das hält dich scharf.",
+"Ein motiviertes Team schlägt ein talentiertes Team ohne Zusammenhalt.","Reflektiere Erfolge genauso gründlich wie Misserfolge.","Jeder Tag zählt - auch die ruhigen.",
+"Sei mutig genug, unbequeme Fragen zu stellen.","Der beste Moment für Feedback ist jetzt, nicht später.","Vertrieb beginnt mit Zuhören und endet mit Vertrauen.","Wer heute übt, gewinnt morgen leichter."
+];
+function nextMotivationQuote(){
+  var bag=[];
+  try{bag=JSON.parse(localStorage.getItem('motivationBag')||'[]');}catch(e){bag=[];}
+  if(!bag||!bag.length){
+    bag=MOTIVATION_QUOTES.map(function(_,i){return i;});
+    for(var i=bag.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=bag[i];bag[i]=bag[j];bag[j]=t;}
+  }
+  var idx=bag.pop();
+  try{localStorage.setItem('motivationBag',JSON.stringify(bag));}catch(e){}
+  return MOTIVATION_QUOTES[idx];
+}
+function employeeActiveList(){return employees.filter(function(e){return e.active!==false&&!e.isPureCoach;});}
+function getCoacheesFor(coachId){
+  return employeeActiveList().filter(function(e){
+    var sessions=(protocols[e.id]||[]).filter(function(p){return p.status!=='geplant';}).sort(function(a,b){return b.date.localeCompare(a.date);});
+    return sessions.length&&sessions[0].coachId===coachId;
+  });
+}
+function wizardMargeInfo(){
+  var mk=today().slice(0,7);
+  var liste=employeeActiveList();
+  var monatIst=0;
+  liste.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if((x.date||'').slice(0,7)!==mk)return;
+      monatIst+=x.margeGesamt||x.margin||0;
+    });
+  });
+  var wMeta=getMonthWeeksZiel(mk);
+  var mRec=zielStore[mk]||{};
+  var mVisible=liste.filter(function(e){return empActiveInZielMonth(e,mk);});
+  var monatZiel=0;
+  mVisible.forEach(function(e){
+    var r=mRec[e.id]||{};
+    var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+    var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+    var optTag=r.optTag!=null?r.optTag:0;
+    var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+    monatZiel+=monthSum*optTag*margeOpt;
+  });
+  var pct=monatZiel>0?Math.round(monatIst/monatZiel*100):0;
+  return {ist:monatIst,ziel:monatZiel,pct:pct};
+}
+function wizardOverdueList(scopeList){
+  return scopeList.filter(function(e){var t=tageSeitLetzterSession(e.id);return t===null||t>30;});
+}
+function wizardQaFaelligList(scopeList){
+  var cutoff=addDaysUTC(today(),-60);
+  return scopeList.filter(function(e){
+    var cnt=(callRatings[e.id]||[]).filter(function(r){return r.date>=cutoff;}).length;
+    return cnt<5;
+  });
+}
+function wizardUpcomingSessions(coachIdOrNull){
+  var all=[];
+  employeeActiveList().forEach(function(e){
+    (protocols[e.id]||[]).forEach(function(p){
+      if(p.status!=='geplant')return;
+      if(p.date<today())return;
+      if(coachIdOrNull!==null&&p.coachId!==coachIdOrNull)return;
+      all.push({empName:e.name,date:p.date});
+    });
+  });
+  all.sort(function(a,b){return a.date.localeCompare(b.date);});
+  return all;
+}
+function wizardPerformanceScore(empId){
+  var cutoff=addDaysUTC(today(),-30);
+  var rows=(performance[empId]||[]).filter(function(x){return(x.date||'')>=cutoff;});
+  if(!rows.length)return null;
+  var sum=0,n=0;
+  rows.forEach(function(x){if(x.crOEM!=null){sum+=x.crOEM;n++;}});
+  return n?sum/n:null;
+}
+function wizardTopWorst(scopeList,count){
+  var scored=scopeList.map(function(e){return{e:e,score:wizardPerformanceScore(e.id)};}).filter(function(x){return x.score!==null;});
+  scored.sort(function(a,b){return b.score-a.score;});
+  return {top:scored.slice(0,count),worst:scored.slice(-count).reverse()};
+}
+function buildAdminWizardPages(){
+  var liste=employeeActiveList();
+  var overdue=wizardOverdueList(liste);
+  var qaList=wizardQaFaelligList(liste);
+  var marge=wizardMargeInfo();
+  var upcoming=wizardUpcomingSessions(null);
+  var coachEmps=employees.filter(function(e){return(e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var coachCounts={};
+  liste.forEach(function(e){
+    (protocols[e.id]||[]).forEach(function(p){
+      if(p.status==='geplant')return;
+      if(p.coachId)coachCounts[p.coachId]=(coachCounts[p.coachId]||0)+1;
+    });
+  });
+  var dist=coachEmps.map(function(c){return{n:String(coachCounts[c.id]||0),l:c.name.split(' ')[0].toUpperCase()};}).sort(function(a,b){return(+b.n)-(+a.n);});
+  return [
+    {type:'stat',icon:'ti-alert-triangle',stat:String(overdue.length),title:'Überfällige Coachings',sub:overdue.length?('Team-weit: '+overdue.slice(0,3).map(function(e){return e.name;}).join(', ')+(overdue.length>3?' und weitere.':'.')):'Aktuell ist niemand überfällig.'},
+    {type:'stat',icon:'ti-clipboard-check',stat:String(qaList.length),title:'QA fällig',sub:qaList.length?(qaList.length+' Mitarbeiter mit unter 5 QA-Calls in den letzten 60 Tagen.'):'Alle Mitarbeiter sind im QA-Ziel.'},
+    {type:'stat',icon:'ti-chart-bar',stat:'€ '+Math.round(marge.ist).toLocaleString('de-DE'),title:'Margenerhöhung diesen Monat',sub:'Ziel: € '+Math.round(marge.ziel).toLocaleString('de-DE')+' · aktuell bei '+marge.pct+'% des Monatsziels.'},
+    {type:'tasklist',title:'Anstehende Sessions',sub:'Die nächsten geplanten Coachings im Team.',items:upcoming.length?upcoming.slice(0,5).map(function(u){return{icon:'ti-calendar-event',text:u.empName+' · '+fd(u.date)};}):[{icon:'ti-calendar-off',text:'Keine geplanten Sessions'}]},
+    {type:'stagerow',title:'Verteilung über Coaches',sub:'Alle abgeschlossenen Coachings, gesamt.',boxes:dist.length?dist:[{n:'0',l:'—'}]},
+    {type:'quote',quote:nextMotivationQuote()}
+  ];
+}
+function buildCoachWizardPages(coach){
+  var coachees=getCoacheesFor(coach.id);
+  var overdue=wizardOverdueList(coachees);
+  var qaList=wizardQaFaelligList(coachees);
+  var marge=wizardMargeInfo();
+  var upcoming=wizardUpcomingSessions(coach.id);
+  var tw=wizardTopWorst(coachees,3);
+  return [
+    {type:'stat',icon:'ti-alert-triangle',stat:String(overdue.length),title:'Überfällige Coaching Sessions',sub:overdue.length?(overdue.slice(0,3).map(function(e){return e.name;}).join(', ')+(overdue.length>3?' und weitere.':'.')):'Bei deinen Mitarbeitern ist aktuell niemand überfällig.'},
+    {type:'tasklist',title:'Geplante Coaching Sessions',sub:'Deine anstehenden Termine.',items:upcoming.length?upcoming.slice(0,5).map(function(u){return{icon:'ti-calendar-event',text:u.empName+' · '+fd(u.date)};}):[{icon:'ti-calendar-off',text:'Keine geplanten Sessions'}]},
+    {type:'stat',icon:'ti-clipboard-check',stat:String(qaList.length),title:'QA fällig',sub:qaList.length?(qaList.map(function(e){return e.name;}).join(', ')+' brauchen eine QA-Bewertung.'):'Alle deine Mitarbeiter sind im QA-Ziel.'},
+    {type:'stat',icon:'ti-chart-bar',stat:'€ '+Math.round(marge.ist).toLocaleString('de-DE'),title:'Margenerhöhung diesen Monat',sub:'Ziel: € '+Math.round(marge.ziel).toLocaleString('de-DE')+' · aktuell bei '+marge.pct+'% des Monatsziels.'},
+    {type:'stagerow',title:'Top 3 Mitarbeiter',sub:'Ø CR OEM der letzten 30 Tage.',boxes:tw.top.length?tw.top.map(function(x){return{n:Math.round(x.score)+'%',l:x.e.name.split(' ')[0].toUpperCase()};}):[{n:'—',l:'Keine Daten'}]},
+    {type:'stagerow',title:'Worst 3 Mitarbeiter',sub:'Ø CR OEM der letzten 30 Tage.',boxes:tw.worst.length?tw.worst.map(function(x){return{n:Math.round(x.score)+'%',l:x.e.name.split(' ')[0].toUpperCase()};}):[{n:'—',l:'Keine Daten'}]},
+    {type:'quote',quote:nextMotivationQuote()}
+  ];
+}
+var wizardPage=0,wizardPages=[];
+function openLoginWizard(){
+  wizardPages=currentCoach?buildCoachWizardPages(currentCoach):buildAdminWizardPages();
+  wizardPage=0;
+  renderWizardPage();
+  document.getElementById('loginWizardOverlay').classList.remove('hidden');
+}
+function closeLoginWizard(){
+  document.getElementById('loginWizardOverlay').classList.add('hidden');
+}
+function wizardNext(){
+  if(wizardPage>=wizardPages.length-1){closeLoginWizard();return;}
+  wizardPage++;
+  renderWizardPage();
+}
+function renderWizardPage(){
+  var pageCount=wizardPages.length;
+  var dotsEl=document.getElementById('wizardDots');
+  dotsEl.innerHTML='';
+  for(var i=0;i<pageCount;i++){
+    var d=document.createElement('span');
+    d.className='wizard-dot'+(i===wizardPage?' active':'');
+    dotsEl.appendChild(d);
+  }
+  document.getElementById('wizardNextBtn').innerHTML=wizardPage===pageCount-1?'Los geht\'s <i class="ti ti-check"></i>':'Weiter <i class="ti ti-arrow-right"></i>';
+  var p=wizardPages[wizardPage];
+  var body=document.getElementById('wizardBody');
+  if(p.type==='quote'){
+    body.innerHTML='<div class="wizard-icon"><i class="ti ti-bulb"></i></div><div class="wizard-quote">"'+p.quote+'"</div>';
+  } else if(p.type==='tasklist'){
+    body.innerHTML='<div class="wizard-title">'+p.title+'</div><div class="wizard-sub">'+p.sub+'</div>'
+      +p.items.map(function(it){return '<div class="wizard-taskrow"><i class="ti '+it.icon+'"></i>'+it.text+'</div>';}).join('');
+  } else if(p.type==='stagerow'){
+    body.innerHTML='<div class="wizard-title">'+p.title+'</div><div class="wizard-sub">'+p.sub+'</div>'
+      +'<div class="wizard-stagerow">'+p.boxes.map(function(b){return '<div class="wizard-stagebox"><strong>'+b.n+'</strong><span>'+b.l+'</span></div>';}).join('')+'</div>';
+  } else {
+    body.innerHTML='<div class="wizard-icon"><i class="ti '+p.icon+'"></i></div><div class="wizard-stat">'+p.stat+'</div><div class="wizard-title">'+p.title+'</div><div class="wizard-sub">'+p.sub+'</div>';
+  }
+}
 function buildCoachingAbdeckungTab(liste,hD,heute){
   var HIDDEN=[];
   var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
@@ -979,7 +1366,7 @@ function renderCoachingAnsicht(){
   }
   var gep=all.filter(function(x){return x.d>=heute&&x.s==='geplant';}).sort(function(a,b){return a.d.localeCompare(b.d);});
   var abg=all.filter(function(x){return x.s==='abgeschlossen';});
-  function ec(id){var e=employees.find(function(x){return x.id===id;});return e?COLORS[e.color%COLORS.length]:{bg:'#EEEDFE',text:'#3C3489'};}
+  function ec(id){var e=employees.find(function(x){return x.id===id;});return e?COLORS[e.color%COLORS.length]:{bg:'var(--purple-bg)',text:'var(--purple-dark)'};}
   function wday(d){return new Date(d+'T00:00:00').toLocaleDateString('de-DE',{weekday:'short'});}
   function mday(d){var dt=new Date(d+'T00:00:00'),m=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];return dt.getDate()+'. '+m[dt.getMonth()];}
   function tdiff(d){var df=Math.round((new Date(d+'T00:00:00')-hD)/86400000);return df===0?'Heute':df===1?'Morgen':df<0?Math.abs(df)+'d her':'in '+df+'d';}
@@ -1129,25 +1516,14 @@ function renderCoachingAnsicht(){
     return k;
   }
 
-  var h='<div class="topbar"><div class="tb-left">'+
-    '<div style="width:40px;height:40px;border-radius:9px;background:var(--purple-bg);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ti ti-calendar-event"></i></div>'+
-    '<div><div class="tb-name">SFP Coaching</div><div class="tb-meta">'+liste.length+' Mitarbeiter · '+gep.length+' geplant · '+abg.length+' abgeschlossen</div></div></div>'+
-    '<button class="btn btn-primary" onclick="openSessionModal(0)"><i class="ti ti-plus"></i> Session planen</button>'+
-    '</div>';
-  h+='<div class="tab-bar">';
-  h+='<div class="tab'+(coachFilterView==='overview'?' active':'')+'" onclick="setCoachFilterView(\'overview\')">Overview</div>';
-  h+='<div class="tab'+(coachFilterView==='coverage'?' active':'')+'" onclick="setCoachFilterView(\'coverage\')">Coverage</div>';
-  if(coachList.length){
-    coachList.forEach(function(c){
-      h+='<div class="tab'+(coachFilterView===c.id?' active':'')+'" onclick="setCoachFilterView(\''+c.id+'\')">'+c.name.split(' ')[0]+'</div>';
-    });
-  }
-  h+='</div>';
-  h+='<div class="content">';
+  var h='<div class="content">';
 
   if(coachFilterView==='coverage'){
     h+=buildCoachingAbdeckungTab(liste,hD,heute);
   } else {
+
+  // ══ Petrol-Infobox: Zeitraum, QA fällig, Überfällige Coachings, Sessions gesamt, je Coach eine Spalte ══
+  h+=coachingOverviewInfoBoxHtml(liste,hD,heute);
 
   // ══ ZEILE 1: 3 Stat-Kacheln + Linien-Chart (volle Breite) ══
   h+='<div style="display:grid;grid-template-columns:repeat(3,140px) 1fr;gap:12px;margin-bottom:16px;align-items:stretch">';
@@ -1187,7 +1563,7 @@ function renderCoachingAnsicht(){
   }
 
   // ══ ZEILE 2: Kalender volle Breite ══
-  h+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-lg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:16px 18px;margin-bottom:16px">';
+  h+='<div class="card" style="padding:16px 18px;margin-bottom:16px">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
   h+='<div class="sec-title" style="margin:0">Kalender <span style="font-weight:400;font-size:12px;color:var(--text3)">· Klick auf Tag = Session planen</span></div>';
   h+='<div style="display:flex;gap:10px"><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;border:1px solid var(--purple);background:var(--purple-bg);display:inline-block"></span>Heute</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#EEEDFE;display:inline-block"></span>Geplant</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#9FE1CB;display:inline-block"></span>Abgeschlossen</span></div>';
@@ -1670,7 +2046,7 @@ function emailSession(eid,datum,fokus){
 
 // ── C
 // ── CONSTANTS ──
-var COLORS=[{bg:'#EEEDFE',text:'#3C3489'},{bg:'#E1F5EE',text:'#085041'},{bg:'#FAECE7',text:'#712B13'},{bg:'#FBEAF0',text:'#72243E'},{bg:'#E6F1FB',text:'#0C447C'},{bg:'#EAF3DE',text:'#27500A'}];
+var COLORS=[{bg:'var(--purple-bg)',text:'var(--purple-dark)'}];
 var RATINGS=['Mega Yes','Super Yes','Yes','Teilweise'];
 var RS={'Mega Yes':{bg:'#EAF3DE',color:'#27500A'},'Super Yes':{bg:'#EEEDFE',color:'#3C3489'},'Yes':{bg:'#E6F1FB',color:'#0C447C'},'Teilweise':{bg:'#FAEEDA',color:'#633806'}};
 var SKILLS=['Needs Analysis','Value Argumentation','Objection Handling','Trust Building','Closing Technique'];
@@ -1688,7 +2064,7 @@ var CR_GOOD=KPI_TARGETS.crOEM.val;
 var teamRange=7;
 var teamCustomFrom=null;
 var teamCustomTo=null;
-var teamPerfMetric='crOEM';
+var teamPerfMetric='margeGesamt';
 var settings={srApiKey:'',srOrgId:'',ftpUrl:''};
 var view='team', selectedEmp=null, activeTab='performance';
 var teamFilter='ALL';
@@ -1865,6 +2241,453 @@ function logActivity(category,action,description,targetEmployeeId,targetLabel){
 var employeeDocuments={}; // {empId: [{id, filename, storagePath, description, uploadedBy, uploadedAt}]}
 
 // ── HELPERS ──
+// ── Zielvereinbarung: Feiertagsberechnung Bayern (Gauss-Osterformel + fixe/bewegliche Feiertage) ──
+function easterSundayUTC(year){
+  var a=year%19,b=Math.floor(year/100),c=year%100,d=Math.floor(b/4),e=b%4,
+      f=Math.floor((b+8)/25),g=Math.floor((b-f+1)/3),h=(19*a+b-d-g+15)%30,
+      i=Math.floor(c/4),k=c%4,l=(32+2*e+2*i-h-k)%7,m=Math.floor((a+11*h+22*l)/451),
+      month=Math.floor((h+l-7*m+114)/31),day=((h+l-7*m+114)%31)+1;
+  return new Date(Date.UTC(year,month-1,day));
+}
+function addUTCDaysToDate(d,n){var r=new Date(d);r.setUTCDate(r.getUTCDate()+n);return r;}
+function bayernFeiertage(year){
+  var ostern=easterSundayUTC(year);
+  var liste=[
+    {d:new Date(Date.UTC(year,0,1)),n:'Neujahr'},
+    {d:new Date(Date.UTC(year,0,6)),n:'Heilige Drei Könige'},
+    {d:addUTCDaysToDate(ostern,-2),n:'Karfreitag'},
+    {d:addUTCDaysToDate(ostern,1),n:'Ostermontag'},
+    {d:new Date(Date.UTC(year,4,1)),n:'Tag der Arbeit'},
+    {d:addUTCDaysToDate(ostern,39),n:'Christi Himmelfahrt'},
+    {d:addUTCDaysToDate(ostern,50),n:'Pfingstmontag'},
+    {d:addUTCDaysToDate(ostern,60),n:'Fronleichnam'},
+    {d:new Date(Date.UTC(year,7,15)),n:'Mariä Himmelfahrt'},
+    {d:new Date(Date.UTC(year,9,3)),n:'Tag der Deutschen Einheit'},
+    {d:new Date(Date.UTC(year,10,1)),n:'Allerheiligen'},
+    {d:new Date(Date.UTC(year,11,25)),n:'1. Weihnachtsfeiertag'},
+    {d:new Date(Date.UTC(year,11,26)),n:'2. Weihnachtsfeiertag'}
+  ];
+  var map={};
+  liste.forEach(function(h){map[h.d.toISOString().slice(0,10)]=h.n;});
+  return map;
+}
+function isoWeekNum(d){
+  var dt=new Date(Date.UTC(d.getUTCFullYear(),d.getUTCMonth(),d.getUTCDate()));
+  var dayNum=dt.getUTCDay()||7;
+  dt.setUTCDate(dt.getUTCDate()+4-dayNum);
+  var yearStart=new Date(Date.UTC(dt.getUTCFullYear(),0,1));
+  return Math.ceil((((dt-yearStart)/86400000)+1)/7);
+}
+// Liefert je Kalenderwoche im Monat: KW-Nummer, Standard-Werktage (Mo-Fr im Monat, abzgl. Feiertage), Feiertagsnamen fuer Tooltip
+function getMonthWeeksZiel(monthKey){
+  var year=+monthKey.slice(0,4),month=+monthKey.slice(5,7);
+  var firstDay=new Date(Date.UTC(year,month-1,1));
+  var lastDay=new Date(Date.UTC(year,month,0));
+  var feiertage=bayernFeiertage(year);
+  if(month===12)Object.assign(feiertage,bayernFeiertage(year+1));
+  if(month===1)Object.assign(feiertage,bayernFeiertage(year-1));
+  var d=new Date(firstDay);
+  var dow=d.getUTCDay()||7;
+  d.setUTCDate(d.getUTCDate()-(dow-1));
+  var weeks=[];
+  while(d<=lastDay){
+    var weekStart=new Date(d);
+    var days=0,holidayNames=[];
+    for(var i=0;i<5;i++){
+      var day=new Date(weekStart);day.setUTCDate(day.getUTCDate()+i);
+      if(day.getUTCFullYear()===year&&day.getUTCMonth()+1===month){
+        var key=day.toISOString().slice(0,10);
+        if(feiertage[key])holidayNames.push(feiertage[key]);
+        else days++;
+      }
+    }
+    weeks.push({kw:isoWeekNum(weekStart),defaultDays:days,holidayNames:holidayNames});
+    d.setUTCDate(d.getUTCDate()+7);
+  }
+  return weeks;
+}
+var MONTH_NAMES_ZIEL=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+var zielMonth=today().slice(0,7);
+var zielStore={};
+function loadZielvereinbarungFromSupabase(){
+  return sb.from('zielvereinbarung').select('*').then(function(res){
+    if(res.error){console.warn('zielvereinbarung load failed:',res.error);return false;}
+    zielStore={};
+    res.data.forEach(function(r){
+      if(!zielStore[r.month])zielStore[r.month]={};
+      zielStore[r.month][r.employee_id]={weeks:[r.week1,r.week2,r.week3,r.week4,r.week5],optTag:r.opt_per_tag,margeOpt:r.marge_per_opt};
+    });
+    return true;
+  });
+}
+var zielYearView=today().slice(0,4);
+function setZielYearView(delta){zielYearView=(+zielYearView+delta)+'';renderTeam();}
+function jumpToZielMonth(monthKey){zielMonth=monthKey;renderTeam();}
+function toggleZielMonth(monthKey){zielMonth=(zielMonth===monthKey)?'':monthKey;renderTeam();}
+var zielNlTargets={};
+function updateZielNlTarget(monthKey,value){
+  var num=parseFloat(value);if(isNaN(num))num=0;
+  zielNlTargets[monthKey]=num;
+  sb.from('settings').upsert({key:'ziel_nl_'+monthKey,value:String(num)},{onConflict:'key'}).then(function(res){
+    if(res.error)console.warn('Ziel NL Marge speichern fehlgeschlagen:',res.error);
+  });
+  renderTeam();
+}
+function setZielMonth(delta){
+  var y=+zielMonth.slice(0,4),m=+zielMonth.slice(5,7);
+  m+=delta;if(m<1){m=12;y--;}else if(m>12){m=1;y++;}
+  zielMonth=y+'-'+(m<10?'0'+m:m);
+  renderTeam();
+}
+function updateZielField(empId,field,weekIdx,value){
+  if(!zielStore[zielMonth])zielStore[zielMonth]={};
+  if(!zielStore[zielMonth][empId])zielStore[zielMonth][empId]={};
+  var rec=zielStore[zielMonth][empId];
+  var num=parseFloat(value);if(isNaN(num))num=0;
+  if(field==='week'){if(!rec.weeks)rec.weeks=[];rec.weeks[weekIdx]=num;}
+  else{rec[field]=num;}
+  renderTeam();
+}
+// Farbe fuer KPI-Werte OHNE hinterlegten Zielwert: nur Petrol (besser/gleich Vormonat) oder Rot
+// (schlechter als Vormonat) - nie neutral schwarz. Ohne Vormonatswert (z.B. neuer Mitarbeiter) faellt
+// die Farbe auf Petrol zurueck, da kein Vergleich moeglich ist.
+function noTargetKpiCol(cur,prev,dir){
+  if(cur===null)return 'var(--text3)';
+  if(prev===null)return '#206A72';
+  var better=(dir==='lte')?(cur<=prev):(cur>=prev);
+  return better?'#206A72':'var(--red)';
+}
+function empActiveInZielMonth(e,monthKey){
+  var b=monthBoundsUTC(monthKey+'-01',0);
+  if(e.endDate)return e.endDate>=b.from&&(!e.startDate||e.startDate<=b.to);
+  if(e.active===false)return false;
+  if(e.startDate&&e.startDate>b.to)return false;
+  return true;
+}
+// ── Zielvereinbarung — Jahresverlauf: Ziel NL (gestrichelte Referenzlinie) vs. Ziel/Erzielte Marge (Balken) ──
+// Eigenstaendige Funktion, damit dasselbe Diagramm sowohl in Overview als auch in Zielvereinbarung genutzt werden kann.
+function zielverlaufJahrChartHtml(){
+  var yr=today().slice(0,4);
+  var MONTH_SHORT_DE=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  var zielNlArr=[],zielMargeArr=[],erzieltArr=[];
+  for(var m=1;m<=12;m++){
+    var mk=yr+'-'+(m<10?'0'+m:m);
+    var wMeta=getMonthWeeksZiel(mk);
+    var mRec=zielStore[mk]||{};
+    var mVisible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
+    var mTargetSum=0;
+    mVisible.forEach(function(e){
+      var r=mRec[e.id]||{};
+      var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+      var optTag=r.optTag!=null?r.optTag:0;
+      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+      mTargetSum+=monthSum*optTag*margeOpt;
+    });
+    var erzieltSum=0,hasData=false;
+    mVisible.forEach(function(e){
+      (performance[e.id]||[]).forEach(function(x){
+        if((x.date||'').slice(0,7)!==mk)return;
+        erzieltSum+=x.margeGesamt||x.margin||0; hasData=true;
+      });
+    });
+    zielNlArr.push(zielNlTargets[mk]!=null?zielNlTargets[mk]:0);
+    zielMargeArr.push(Math.round(mTargetSum));
+    erzieltArr.push(hasData?Math.round(erzieltSum):null);
+  }
+  var maxV=Math.max.apply(null,zielNlArr.concat(zielMargeArr).concat(erzieltArr.filter(function(v){return v!=null;})).concat([1]));
+  var CH=200; // Diagrammhoehe in px
+  function pct(v){return v==null?0:Math.max(v>0?2:0,Math.round(v/maxV*100));}
+  var barsHtml='<div style="display:flex;align-items:flex-end;gap:6px;height:'+CH+'px;padding:0 4px">';
+  for(var i=0;i<12;i++){
+    var pctNl=pct(zielNlArr[i]),pctZiel=pct(zielMargeArr[i]),pctErz=erzieltArr[i]!=null?pct(erzieltArr[i]):null;
+    var tipTxt='Ziel NL Marge/Mon. (Mindestziel): €'+zielNlArr[i].toLocaleString('de-DE')
+      +'\nZiel Marge/Mon.: €'+zielMargeArr[i].toLocaleString('de-DE')
+      +'\nErzielte Marge: '+(erzieltArr[i]!=null?'€'+erzieltArr[i].toLocaleString('de-DE'):'—');
+    barsHtml+='<div style="flex:1;position:relative;height:100%;display:flex;align-items:flex-end;justify-content:center;cursor:default" title="'+tipTxt+'">'
+      +'<div style="position:absolute;left:26px;right:26px;bottom:'+pctNl+'%;border-top:2px dashed #BD2D29"></div>'
+      +'<div style="display:flex;align-items:flex-end;gap:4px;height:100%">'
+      +'<div style="width:24px;height:'+pctZiel+'%;background:linear-gradient(180deg,#7ED2DB,#5FBAC4);border-radius:3px 3px 0 0"></div>'
+      +(pctErz!=null?'<div style="width:24px;height:'+pctErz+'%;background:linear-gradient(180deg,#247982,#0F3D42);border-radius:3px 3px 0 0"></div>':'<div style="width:24px"></div>')
+      +'</div>'
+      +'</div>';
+  }
+  barsHtml+='</div>';
+  barsHtml+='<div style="display:flex;gap:6px;padding:0 4px;margin-top:8px">';
+  for(var i=0;i<12;i++){barsHtml+='<div style="flex:1;text-align:center;font-size:10.5px;color:var(--text3)">'+MONTH_SHORT_DE[i]+'</div>';}
+  barsHtml+='</div>';
+  var h='<div class="card">';
+  h+='<div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-bar" style="color:var(--purple)"></i> Monatliche Zielvereinbarung</span> <span style="font-weight:400;color:var(--text3);font-size:11px">'+yr+'</span></div>';
+  h+=barsHtml;
+  h+='</div>';
+  return h;
+}
+// ── Zielwerte & Richtung (ehemals Settings > KPI-Ziele, jetzt unter Zielvereinbarung) ──
+function kpiZieleHtml(){
+  function zRow(key,label,einheit,step){
+    var t=KPI_TARGETS[key];
+    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">'
+      +'<div style="width:170px;font-size:13px;font-weight:500">'+label+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px">'
+      +'<select id="dir-'+key+'" style="width:64px;height:34px;box-sizing:border-box;font-size:13px;padding:0 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
+      +'<option value="gte"'+(t.dir==='gte'?' selected':'')+'>≥</option>'
+      +'<option value="lte"'+(t.dir==='lte'?' selected':'')+'>≤</option>'
+      +'</select>'
+      +'<input type="number" id="val-'+key+'" value="'+t.val+'" step="'+(step||1)+'" min="0" max="100" style="width:80px;height:34px;box-sizing:border-box;font-size:13px;padding:0 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
+      +(einheit?'<span style="font-size:12px;color:var(--text2)">'+einheit+'</span>':'')
+      +'</div>'
+      +'<div style="margin-left:auto;font-size:11px;color:var(--text3)">Aktuell: '+t.dir+' '+t.val+(einheit||'')+'</div>'
+      +'</div>';
+  }
+  return '<div class="card">'
+    +'<div class="card-title"><i class="ti ti-target"></i> Allgemeine KPIs</div>'
+    +'<p style="font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.6">Lege fest ob ein Wert <strong>größer (≥)</strong> oder <strong>kleiner (≤)</strong> als der Zielwert sein soll. Gilt als globaler Standard für alle Mitarbeiter.</p>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 40px">'
+    +zRow('crOEM','CR OEM','%',1)
+    +zRow('crSuperYes','CR SY (Super Yes)','%',1)
+    +zRow('crTeilweise','CR TW (Teilweise)','%',1)
+    +zRow('crMegaYes','CR MY (Mega Yes)','%',1)
+    +zRow('optPerH','Opt./Stunde','',0.1)
+    +'</div>'
+    +'<div style="margin-top:16px;display:flex;align-items:center;gap:12px">'
+    +'<button class="btn btn-primary" style="width:auto;height:34px" onclick="zieleSpeichern()"><i class="ti ti-check"></i> Zielwerte speichern</button>'
+    +'<span id="ziele-status" style="font-size:12px;color:var(--teal)"></span>'
+    +'</div></div>';
+}
+// ── Zielvereinbarung: volle Jahres-/Wochenansicht (unter SFP Wiegand > Zielvereinbarung) ──
+// ── Zielvereinbarung: Petrol-Infobox (Zeitraum, Jahr, Monat, Ø/Monat, Ist/Soll Monat, Ist/Soll Jahr) ──
+// Nutzt dieselben .month-bar/.mb-stat-Klassen wie die Overview-Monatsleiste (buildMonthBar) - keine neuen CSS-Regeln noetig.
+function zielInfoBoxHtml(){
+  var HIDDEN=[];
+  var liste=employees.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var year=today().slice(0,4);
+  var curMonthNum=+today().slice(5,7);
+  var mk=today().slice(0,7);
+  var monthLabel=MONTH_NAMES_ZIEL[curMonthNum-1]+' '+year;
+  var eur=function(v){return '€ '+Math.round(v).toLocaleString('de-DE');};
+
+  function istForMonth(mkey){
+    var sum=0;
+    liste.forEach(function(e){
+      (performance[e.id]||[]).forEach(function(x){
+        if((x.date||'').slice(0,7)!==mkey)return;
+        sum+=x.margeGesamt||x.margin||0;
+      });
+    });
+    return sum;
+  }
+  function zielForMonth(mkey){
+    var wMeta=getMonthWeeksZiel(mkey);
+    var mRec=zielStore[mkey]||{};
+    var mVisible=liste.filter(function(e){return empActiveInZielMonth(e,mkey);});
+    var sum=0;
+    mVisible.forEach(function(e){
+      var r=mRec[e.id]||{};
+      var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+      var optTag=r.optTag!=null?r.optTag:0;
+      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+      sum+=monthSum*optTag*margeOpt;
+    });
+    return sum;
+  }
+
+  var monatIst=istForMonth(mk);
+  var monatZiel=zielForMonth(mk);
+
+  var jahrIst=0,jahrZiel=0,monthsCount=0;
+  for(var m=1;m<=curMonthNum;m++){
+    var mkey=year+'-'+(m<10?'0'+m:m);
+    jahrIst+=istForMonth(mkey);
+    jahrZiel+=zielForMonth(mkey);
+    monthsCount++;
+  }
+  var avgIst=monthsCount?jahrIst/monthsCount:0;
+  var avgZiel=monthsCount?jahrZiel/monthsCount:0;
+  var pctMonat=monatZiel>0?Math.round(monatIst/monatZiel*100):(monatIst>0?100:0);
+  var pctJahr=jahrZiel>0?Math.round(jahrIst/jahrZiel*100):(jahrIst>0?100:0);
+
+  return '<div class="month-bar">'
+    +'<div class="mb-month"><div class="l">Zeitraum</div><div class="v">'+monthLabel+'</div></div>'
+    +'<div class="mb-stat"><div class="l">Jahr</div><div class="row"><span class="n">'+eur(jahrIst)+'</span></div><div class="m">Ziel: '+eur(jahrZiel)+'</div></div>'
+    +'<div class="mb-stat"><div class="l">Monat</div><div class="row"><span class="n">'+eur(monatIst)+'</span></div><div class="m">Ziel: '+eur(monatZiel)+'/Mon.</div></div>'
+    +'<div class="mb-stat"><div class="l">Ø pro Monat</div><div class="row"><span class="n">'+eur(avgIst)+'</span></div><div class="m">Ziel: '+eur(avgZiel)+'/Mon.</div></div>'
+    +'<div class="mb-stat"><div class="l">Ist/Soll Monat</div><div class="row"><span class="n">'+pctMonat+'%</span></div><div class="m">'+eur(monatIst)+' / '+eur(monatZiel)+'</div></div>'
+    +'<div class="mb-stat"><div class="l">Ist/Soll Jahr</div><div class="row"><span class="n">'+pctJahr+'%</span></div><div class="m">'+eur(jahrIst)+' / '+eur(jahrZiel)+'</div></div>'
+    +'</div>';
+}
+function zielvereinbarungHtml(){
+  var GH='background:var(--bg2);padding:9px 14px;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;display:flex;align-items:center';
+  var GD='padding:10px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;min-width:0';
+  // Zwei strukturell unterschiedliche Tabellen (Monats-Aggregat vs. Mitarbeiter-Wochendetail) -
+  // jede bekommt ihre EIGENE, in sich sinnvolle Spaltenverteilung. Kein erzwungenes
+  // Pixel-Matching zwischen beiden mehr (das erzeugte nur eine haessliche Luecke). Beide fuellen
+  // die volle Kartenbreite ueber fr-Anteile, keine separate Leerspalte.
+  var ZIEL_WK_COL=64; // KW-Felder bleiben fest, brauchen konsistente lesbare Breite
+  var weeksMeta=getMonthWeeksZiel(zielMonth);
+  var weekGridTemplate='2.2fr repeat('+weeksMeta.length+','+ZIEL_WK_COL+'px) 0.8fr 0.9fr 1fr 1.3fr';
+  var yearGridTemplate='1.6fr 1fr 0.9fr 1fr 1.2fr 1.3fr';
+
+  // ── Aufgeklappter Wochen-Detailblick fuer den aktuell gewaehlten Monat (wird unter dessen Monatszeile eingehaengt) ──
+  var weekDetailHtml=(function(){
+    if(!zielMonth)return '';
+    var monthLabel=MONTH_NAMES_ZIEL[+zielMonth.slice(5,7)-1]+' '+zielMonth.slice(0,4);
+    var visibleEmps=employees.filter(function(e){return empActiveInZielMonth(e,zielMonth)&&!e.isPureCoach;}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var rec=zielStore[zielMonth]||{};
+    var teamDaysSum=0,teamTargetSum=0,margeVals=[];
+    var weekHeaderCells=weeksMeta.map(function(wm){
+      var isHol=wm.holidayNames.length>0;
+      var isShort=wm.defaultDays<5;
+      var numCol=isHol?'var(--amber-dark)':(isShort?'var(--red)':'var(--text3)');
+      return '<div style="'+GH+';justify-content:center"'
+        +(isHol?' title="'+wm.holidayNames.join(', ')+'"':'')
+        +'>KW '+wm.kw+' <span style="font-weight:700;color:'+numCol+';margin-left:3px">('+wm.defaultDays+')</span></div>';
+    }).join('');
+    var rowsHtml=visibleEmps.map(function(e,idx){
+      var r=rec[e.id]||{};
+      var weeks=weeksMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+      var optTag=r.optTag!=null?r.optTag:0;
+      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+      var target=monthSum*optTag*margeOpt;
+      teamDaysSum+=monthSum;teamTargetSum+=target;if(margeOpt)margeVals.push(margeOpt);
+      var c=COLORS[e.color%COLORS.length];
+      var weekCells=weeksMeta.map(function(wm,i){
+        var isHol=wm.holidayNames.length>0;
+        return '<div style="'+GD+';justify-content:center"><input type="number" min="0" max="7" value="'+weeks[i]+'" onchange="updateZielField(\''+e.id+'\',\'week\','+i+',this.value)" style="width:48px;height:34px;box-sizing:border-box;padding:0 2px;text-align:center'+(isHol?';border-color:var(--amber)':'')+'"></div>';
+      }).join('');
+      var rowBg=idx%2===1?'background:rgba(0,0,0,0.03);':'';
+      return '<div style="display:grid;grid-template-columns:'+weekGridTemplate+';'+rowBg+'">'
+        +'<div style="'+GD+'"><div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden"><div class="av" style="width:28px;height:28px;font-size:10.5px;background:'+c.bg+';color:'+c.text+';flex-shrink:0">'+ini(e.name)+'</div><div style="min-width:0;overflow:hidden"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+e.name+'</div><div style="font-size:10.5px;color:var(--text3)">'+e.role+'</div></div></div></div>'
+        +weekCells
+        +'<div style="'+GD+';justify-content:center;font-weight:600">'+monthSum+'</div>'
+        +'<div style="'+GD+'"><input type="number" min="0" value="'+optTag+'" onchange="updateZielField(\''+e.id+'\',\'optTag\',null,this.value)" style="height:34px;box-sizing:border-box;text-align:right"></div>'
+        +'<div style="'+GD+'"><input type="number" min="0" value="'+margeOpt+'" onchange="updateZielField(\''+e.id+'\',\'margeOpt\',null,this.value)" style="height:34px;box-sizing:border-box;text-align:right"></div>'
+        +'<div style="'+GD+';justify-content:flex-end;font-weight:600;color:var(--purple)">€ '+Math.round(target).toLocaleString('de-DE')+'</div>'
+        +'</div>';
+    }).join('');
+    var avgMarge=margeVals.length?Math.round(margeVals.reduce(function(a,b){return a+b;},0)/margeVals.length):0;
+    var weekTotalCells=weeksMeta.map(function(){return '<div style="border-top:1px solid var(--border2)"></div>';}).join('');
+    return '<div style="grid-column:1/-1;padding:16px 14px 18px;background:rgba(32,106,114,0.03);border-top:2px solid var(--purple)">'
+      +'<div style="font-size:12.5px;font-weight:700;color:var(--purple-dark);margin-bottom:12px"><i class="ti ti-calendar-event" style="margin-right:5px"></i>Wochen-Detail · '+monthLabel+'</div>'
+      +'<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--bg-solid,#fff)">'
+      +'<div style="display:grid;grid-template-columns:'+weekGridTemplate+'">'
+      +'<div style="'+GH+'">Mitarbeiter</div>'
+      +weekHeaderCells
+      +'<div style="'+GH+';justify-content:center">Σ Mon.</div>'
+      +'<div style="'+GH+';justify-content:flex-end">Opt./Tag</div>'
+      +'<div style="'+GH+';justify-content:flex-end">Marge/Opt.</div>'
+      +'<div style="'+GH+';justify-content:flex-end">Ziel Marge/Mon.</div>'
+      +'</div>'
+      +rowsHtml
+      +'<div style="display:grid;grid-template-columns:'+weekGridTemplate+';background:var(--bg2)">'
+      +'<div style="font-weight:700;padding:10px 14px;border-top:1px solid var(--border2);display:flex;align-items:center">Team gesamt</div>'
+      +weekTotalCells
+      +'<div style="font-weight:700;text-align:center;padding:10px 14px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:center">'+teamDaysSum+'</div>'
+      +'<div style="padding:10px 14px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:flex-end">–</div>'
+      +'<div style="font-weight:700;padding:10px 14px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:flex-end">Ø € '+avgMarge+'</div>'
+      +'<div style="font-weight:700;color:var(--purple);padding:10px 14px;border-top:1px solid var(--border2);display:flex;align-items:center;justify-content:flex-end">€ '+Math.round(teamTargetSum).toLocaleString('de-DE')+'</div>'
+      +'</div>'
+      +'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:11px;color:var(--text3)"><span style="width:7px;height:7px;border-radius:50%;background:var(--amber);display:inline-block"></span> Woche enthält einen bayerischen Feiertag — Standardwert bereits reduziert, Hover für Details</div>'
+      +'</div>';
+  })();
+
+  // ── Eine Tabelle: 12 Monatszeilen, Klick klappt den Wochen-Detailblick direkt darunter auf/zu ──
+  var year=zielYearView;
+  var monthRows=[];
+  var yearDaysSum=0,yearNlSum=0,yearTargetSum=0;
+  for(var m=1;m<=12;m++){
+    var mk=year+'-'+(m<10?'0'+m:m);
+    var wMeta=getMonthWeeksZiel(mk);
+    var mRec=zielStore[mk]||{};
+    var mVisible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
+    var mDaysSum=0,mTargetSum=0,mMargeVals=[],mOptVals=[];
+    mVisible.forEach(function(e){
+      var r=mRec[e.id]||{};
+      var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+      var optTag=r.optTag!=null?r.optTag:0;
+      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+      mDaysSum+=monthSum;mTargetSum+=monthSum*optTag*margeOpt;
+      if(margeOpt)mMargeVals.push(margeOpt);
+      if(optTag)mOptVals.push(optTag);
+    });
+    var mAvgMarge=mMargeVals.length?Math.round(mMargeVals.reduce(function(a,b){return a+b;},0)/mMargeVals.length):0;
+    var mAvgOpt=mOptVals.length?Math.round(mOptVals.reduce(function(a,b){return a+b;},0)/mOptVals.length):0;
+    var mNl=zielNlTargets[mk]!=null?zielNlTargets[mk]:0;
+    yearDaysSum+=mDaysSum;yearNlSum+=mNl;yearTargetSum+=mTargetSum;
+    var isCurrent=mk===zielMonth;
+    var rowBg=isCurrent?'background:var(--purple-bg);':(m%2===0?'background:rgba(0,0,0,0.03);':'');
+    monthRows.push('<div style="display:grid;grid-template-columns:'+yearGridTemplate+';cursor:pointer;'+rowBg+(isCurrent?'border-left:3px solid var(--purple);':'')+'" onclick="toggleZielMonth(\''+mk+'\')">'
+      +'<div style="'+GD+';font-weight:'+(isCurrent?'700':'600')+'"><i class="ti ti-chevron-'+(isCurrent?'down':'right')+'" style="font-size:12px;margin-right:6px;color:var(--text3)"></i>'+MONTH_NAMES_ZIEL[m-1]+'</div>'
+      +'<div style="'+GD+';justify-content:center;font-weight:600">'+mDaysSum+'</div>'
+      +'<div style="'+GD+';justify-content:center;color:var(--text2)">'+(mAvgOpt||'–')+'</div>'
+      +'<div style="'+GD+';justify-content:center;color:var(--text2)">'+(mAvgMarge?'€ '+mAvgMarge:'–')+'</div>'
+      +'<div style="'+GD+'" onclick="event.stopPropagation()"><input type="number" min="0" value="'+mNl+'" onchange="updateZielNlTarget(\''+mk+'\',this.value)" style="height:34px;box-sizing:border-box;text-align:right" placeholder="0"></div>'
+      +'<div style="'+GD+';justify-content:flex-end;font-weight:600;color:var(--purple)">€ '+Math.round(mTargetSum).toLocaleString('de-DE')+'</div>'
+      +'</div>');
+    if(isCurrent)monthRows.push(weekDetailHtml);
+  }
+  var yearTotalRow='<div style="display:grid;grid-template-columns:'+yearGridTemplate+';background:var(--bg2)">'
+    +'<div style="font-weight:800;padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center">Jahresergebnis</div>'
+    +'<div style="font-weight:800;padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center;justify-content:center">'+yearDaysSum+'</div>'
+    +'<div style="padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center;justify-content:center">–</div>'
+    +'<div style="padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center;justify-content:center">–</div>'
+    +'<div style="font-weight:800;padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center;justify-content:flex-end">€ '+Math.round(yearNlSum).toLocaleString('de-DE')+'</div>'
+    +'<div style="font-weight:800;color:var(--purple-dark);padding:10px 14px;border-top:2px solid var(--purple);display:flex;align-items:center;justify-content:flex-end">€ '+Math.round(yearTargetSum).toLocaleString('de-DE')+'</div>'
+    +'</div>';
+  return zielInfoBoxHtml()
+    +zielverlaufJahrChartHtml()
+    +'<div class="card">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
+    +'<div class="card-title" style="margin:0"><i class="ti ti-target"></i> Zielvereinbarung</div>'
+    +'<div style="display:flex;align-items:center;gap:10px">'
+    +'<button class="btn" style="height:34px" onclick="setZielYearView(-1)">◀</button>'
+    +'<div style="font-size:14px;font-weight:700;min-width:60px;text-align:center">'+year+'</div>'
+    +'<button class="btn" style="height:34px" onclick="setZielYearView(1)">▶</button>'
+    +'</div></div>'
+    +'<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)">'
+    +'<div style="display:grid;grid-template-columns:'+yearGridTemplate+'">'
+    +'<div style="'+GH+'">Monat</div>'
+    +'<div style="'+GH+';justify-content:center">Σ Einsatztage</div>'
+    +'<div style="'+GH+';justify-content:center">Ø Opt./Tag</div>'
+    +'<div style="'+GH+';justify-content:center">Ø Marge/Opt.</div>'
+    +'<div style="'+GH+';justify-content:flex-end">Ziel NL Marge/Mon.</div>'
+    +'<div style="'+GH+';justify-content:flex-end">Ziel Marge/Mon.</div>'
+    +'</div>'
+    +monthRows.join('')
+    +yearTotalRow
+    +'</div>'
+    +'<div style="margin-top:16px;display:flex;align-items:center;gap:12px">'
+    +'<button class="btn btn-primary" style="width:auto;height:34px" onclick="saveZielvereinbarung()"><i class="ti ti-check"></i> Zielvereinbarung speichern</button>'
+    +'<span id="ziel-status" style="font-size:12px;color:var(--teal)"></span>'
+    +'</div>'
+    +'<div style="font-size:11px;color:var(--text3);margin-top:10px">Monat anklicken, um die Mitarbeiter-Wochenansicht auf-/zuzuklappen. "Ziel NL Marge/Mon." ist der zu Jahresbeginn kalkulierte Referenzwert und wird beim Eintragen sofort gespeichert.</div>'
+    +'</div>'
+    +kpiZieleHtml();
+}
+function saveZielvereinbarung(){
+  var st=document.getElementById('ziel-status');
+  if(st)st.textContent='Speichere...';
+  var weeksMeta=getMonthWeeksZiel(zielMonth);
+  var visibleEmps=employees.filter(function(e){return empActiveInZielMonth(e,zielMonth)&&!e.isPureCoach;});
+  var rec=zielStore[zielMonth]||{};
+  var rows=visibleEmps.map(function(e){
+    var r=rec[e.id]||{};
+    var weeks=weeksMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+    return {
+      employee_id:e.id,month:zielMonth,
+      week1:weeks[0],week2:weeks[1],week3:weeks[2],week4:weeks[3],week5:weeks[4],
+      opt_per_tag:r.optTag!=null?r.optTag:0,
+      marge_per_opt:r.margeOpt!=null?r.margeOpt:0
+    };
+  });
+  sb.from('zielvereinbarung').upsert(rows,{onConflict:'employee_id,month'}).then(function(res){
+    if(res.error){console.warn('zielvereinbarung save failed:',res.error);if(st)st.textContent='Fehler beim Speichern — siehe Konsole';return;}
+    if(st)st.textContent='Gespeichert · '+new Date().toLocaleTimeString('de-DE');
+  });
+}
 function ini(n){return n.split(' ').map(function(x){return x[0];}).join('').toUpperCase().slice(0,2);}
 function fd(d){
   if(!d)return '';
@@ -1874,6 +2697,30 @@ function fd(d){
   return wd+', '+p[2]+'.'+p[1]+'.'+p[0];
 }
 function today(){return new Date().toISOString().slice(0,10);}
+function hexToRgba(hex,alpha){
+  hex=(hex||'#206A72').replace('#','');
+  if(hex.length===3)hex=hex.split('').map(function(c){return c+c;}).join('');
+  var r=parseInt(hex.substring(0,2),16),g=parseInt(hex.substring(2,4),16),b=parseInt(hex.substring(4,6),16);
+  return 'rgba('+r+','+g+','+b+','+alpha+')';
+}
+function vGradient(canvas,color,a1,a2,y0,y1){
+  var ctx=canvas.getContext('2d');
+  var top=(y0!==undefined&&y0!==null)?y0:0;
+  var bottom=(y1!==undefined&&y1!==null&&y1>top)?y1:(canvas.clientHeight||260);
+  var grad=ctx.createLinearGradient(0,top,0,bottom);
+  grad.addColorStop(0,hexToRgba(color,a1));
+  grad.addColorStop(1,hexToRgba(color,a2));
+  return grad;
+}
+// Setzt den Gradient erst NACH dem ersten Chart.js-Render neu, da erst dann die echte
+// Zeichenflaeche (chartArea) bekannt ist - vorher war canvas.clientHeight oft 0/zu klein
+// und der Verlauf wirkte "zerdrueckt".
+function reapplyChartGradient(chart,canvas,a1,a2){
+  if(!chart||!chart.data||!chart.data.datasets[0])return;
+  var ca=chart.chartArea||{top:0,bottom:canvas.clientHeight||260};
+  chart.data.datasets[0].backgroundColor=vGradient(canvas,chart.data.datasets[0].borderColor,a1,a2,ca.top,ca.bottom);
+  chart.update('none');
+}
 // UTC-sichere Datumsberechnung: vermeidet den Bug, dass new Date(dateStr+'T00:00:00') lokale Zeit
 // interpretiert und .toISOString() dann in Zeitzonen mit positivem UTC-Offset (z.B. Deutschland)
 // auf den Vortag zurückrutscht. Immer nutzen, wenn ein berechnetes Datum mit echten
@@ -1938,6 +2785,16 @@ function allTeams(){
 function activeEmployees(){
   return employees.filter(function(e){return e.active!==false;});
 }
+// Fuer die SFP Wiegand Overview: aktuell Aktive PLUS Mitarbeiter, deren Vertragsende innerhalb der
+// letzten 12 Monate liegt - damit sie in der Performance-Tabelle so lange sichtbar bleiben, wie ihr
+// Vertragsende es hergibt, statt sofort beim Deaktivieren zu verschwinden.
+function activeOrRecentlyEndedEmployees(){
+  var cutoff=monthBoundsUTC(today(),12).from;
+  return employees.filter(function(e){
+    if(e.active!==false)return true;
+    return e.endDate&&e.endDate>=cutoff;
+  });
+}
 
 function empTargets(emp){
   var g=KPI_TARGETS||{};
@@ -1963,12 +2820,40 @@ function renderSidebar(){
   var el=document.getElementById('empList');
   el.innerHTML='';
   document.querySelectorAll('.sb-item').forEach(function(x){x.classList.remove('active');});
-  if(view==='team')document.getElementById('nav-team').classList.add('active');
-  var nc=document.getElementById('nav-coaching');if(nc)nc.classList.toggle('active',view==='coaching');
-  var na=document.getElementById('nav-activity');if(na)na.classList.toggle('active',view==='activity');
+  var isTeamTab=(view==='team'&&wiegandView==='team');
+  if(view==='team'&&!isTeamTab)document.getElementById('nav-team').classList.add('active');
+  var nto=document.getElementById('nav-team-overview');if(nto)nto.classList.toggle('active',view==='team'&&wiegandView==='overview');
+  var ntz=document.getElementById('nav-team-ziel');if(ntz)ntz.classList.toggle('active',view==='team'&&wiegandView==='ziel');
+  var nc=document.getElementById('nav-coaching');if(nc)nc.classList.toggle('active',view==='coaching'||isTeamTab||view==='activity');
+  var nco=document.getElementById('nav-coaching-overview');if(nco)nco.classList.toggle('active',view==='coaching'&&coachFilterView==='overview');
+  var nct=document.getElementById('nav-coaching-team');if(nct)nct.classList.toggle('active',isTeamTab);
+  var na=document.getElementById('nav-coaching-activity');if(na)na.classList.toggle('active',view==='activity');
   if(view==='settings')document.getElementById('nav-settings').classList.add('active');
+  ['integrations','data'].forEach(function(sv){
+    var el=document.getElementById('nav-settings-'+sv);if(el)el.classList.toggle('active',view==='settings'&&settingsView===sv);
+  });
+  // Dynamische Coach-Untermenüpunkte (SDM/SC), ersetzt die frühere horizontale Tab-Leiste in SFP Coaching
+  var coachSubEl=document.getElementById('coachingCoachSubItems');
+  if(coachSubEl){
+    coachSubEl.innerHTML='';
+    var coachOrder=['Kathrin','Dogoro','Joey'];
+    var coachListSb=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;}).sort(function(a,b){
+      var ia=coachOrder.indexOf(a.name.split(' ')[0]),ib=coachOrder.indexOf(b.name.split(' ')[0]);
+      if(ia===-1&&ib===-1)return a.name.localeCompare(b.name,'de');
+      if(ia===-1)return 1;
+      if(ib===-1)return -1;
+      return ia-ib;
+    });
+    coachListSb.forEach(function(c){
+      var d=document.createElement('div');
+      d.className='sb-item sb-navsub'+((view==='coaching'&&coachFilterView===c.id)?' active':'');
+      d.textContent=c.name.split(' ')[0];
+      d.onclick=(function(cid){return function(){setCoachFilterView(cid);};})(c.id);
+      coachSubEl.appendChild(d);
+    });
+  }
   var HIDDEN=[];
-  var visible=employees.filter(function(e){return e.active!==false&&HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var visible=activeOrRecentlyEndedEmployees().filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
   // Mitarbeiter in Onboarding-Phase kommen alle in eine Gruppe -- AUSSER VLC (Valencia):
   // VLC wird immer als eigener Standort gefuehrt, unabhaengig vom Onboarding-Status
   var onboardingEmps=visible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
@@ -2041,7 +2926,52 @@ function applyTeamCustomRange(){
 }
 function clearTeamCustomRange(){teamCustomFrom=null;teamCustomTo=null;renderTeam();}
 function setTeamMetric(m){teamPerfMetric=m;renderTeam();}
-function showView(v){view=v;renderSidebar();renderMain();}
+function showView(v){
+  view=v;
+  if(v!=='team')closeWiegandSubnav();
+  if(v!=='settings')closeSettingsSubnav();
+  if(v!=='coaching'&&v!=='team'&&v!=='activity')closeCoachingSubnav();
+  renderSidebar();renderMain();
+}
+function selectCoachingActivity(){view='activity';coachingNavOpen=true;renderSidebar();renderMain();}
+function closeWiegandSubnav(){
+  wiegandNavOpen=false;
+  var sub=document.getElementById('wiegandSubNav');if(sub)sub.classList.add('hidden');
+  var chev=document.getElementById('wiegandNavChevron');if(chev)chev.className='ti ti-chevron-down';
+}
+function closeSettingsSubnav(){
+  settingsNavOpen=false;
+  var sub=document.getElementById('settingsSubNav');if(sub)sub.classList.add('hidden');
+  var chev=document.getElementById('settingsNavChevron');if(chev)chev.className='ti ti-chevron-down';
+}
+function closeCoachingSubnav(){
+  coachingNavOpen=false;
+  var sub=document.getElementById('coachingSubNav');if(sub)sub.classList.add('hidden');
+  var chev=document.getElementById('coachingNavChevron');if(chev)chev.className='ti ti-chevron-down';
+}
+var wiegandNavOpen=true;
+function toggleWiegandNav(){
+  wiegandNavOpen=!wiegandNavOpen;
+  var sub=document.getElementById('wiegandSubNav');if(sub)sub.classList.toggle('hidden',!wiegandNavOpen);
+  var chev=document.getElementById('wiegandNavChevron');if(chev)chev.className='ti ti-chevron-'+(wiegandNavOpen?'up':'down');
+  if(wiegandNavOpen){closeSettingsSubnav();closeCoachingSubnav();}
+  if(wiegandView==='team')wiegandView='overview'; // 'team' gehoert jetzt zu SFP Coaching, nicht mehr zu SFP Wiegand
+  selectWiegandSub(wiegandView);
+}
+function selectWiegandSub(v){wiegandView=v;view='team';renderSidebar();renderMain();}
+var coachingNavOpen=false;
+function toggleCoachingNav(){
+  coachingNavOpen=!coachingNavOpen;
+  var sub=document.getElementById('coachingSubNav');if(sub)sub.classList.toggle('hidden',!coachingNavOpen);
+  var chev=document.getElementById('coachingNavChevron');if(chev)chev.className='ti ti-chevron-'+(coachingNavOpen?'up':'down');
+  if(coachingNavOpen){
+    closeWiegandSubnav();closeSettingsSubnav();
+    selectCoachingTeam(); // Klick auf SFP Coaching oeffnet immer Overview KPIs
+  } else {
+    renderSidebar();
+  }
+}
+function selectCoachingTeam(){wiegandView='team';view='team';coachingNavOpen=true;renderSidebar();renderMain();}
 function renderMain(){if(view==='team')renderTeam();else if(view==='coaching')renderCoachingAnsicht();else if(view==='activity')renderActivity();else if(view==='settings')renderEinstellungen();else renderEmpDetail();}
 
 // ── TEAM VIEW ──
@@ -2158,14 +3088,53 @@ function aufmerksamkeitFarbe(tage){
 
 
 function setTeamFilter(k){teamFilter=k;renderMain();}
+// ── Petrol-Monatsbalken: Conv. OEM / Upsells / WKA / Gesamt für den aktuellen Kalendermonat, teamweit ──
+var MONTH_NAMES_DE=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+function buildMonthBar(liste){
+  var mk=today().slice(0,7);
+  var sums={convOEM:0,margeOEM:0,upsells:0,margeUpsell:0,wka:0,margeWKA:0,margeGesamt:0};
+  liste.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if((x.date||'').slice(0,7)!==mk)return;
+      sums.convOEM+=x.convOEM||0; sums.margeOEM+=x.margeOEM||0;
+      sums.upsells+=x.upsells||0; sums.margeUpsell+=x.margeUpsell||0;
+      sums.wka+=x.wka||0; sums.margeWKA+=x.margeWKA||0;
+      sums.margeGesamt+=x.margeGesamt||x.margin||0;
+    });
+  });
+  var gesamtAnzahl=sums.convOEM+sums.upsells+sums.wka;
+  // Ziel Marge/Mon. team-weit fuer den aktuellen Kalendermonat (gleiche Berechnung wie Zielvereinbarung-Jahresverlauf)
+  var wMeta=getMonthWeeksZiel(mk);
+  var mRec=zielStore[mk]||{};
+  var mVisible=liste.filter(function(e){return empActiveInZielMonth(e,mk);});
+  var zielMargeSum=0;
+  mVisible.forEach(function(e){
+    var r=mRec[e.id]||{};
+    var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+    var monthSum=weeks.reduce(function(a,b){return a+b;},0);
+    var optTag=r.optTag!=null?r.optTag:0;
+    var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+    zielMargeSum+=monthSum*optTag*margeOpt;
+  });
+  var eur=function(v){return '€ '+Math.round(v).toLocaleString('de-DE');};
+  var monthLabel=MONTH_NAMES_DE[new Date(today()+'T00:00:00Z').getUTCMonth()]+' '+today().slice(0,4);
+  return '<div class="month-bar">'
+    +'<div class="mb-month"><div class="l">Zeitraum</div><div class="v">'+monthLabel+'</div></div>'
+    +'<div class="mb-stat"><div class="l">Conv. OEM</div><div class="row"><span class="n">'+sums.convOEM+'</span><span class="n-unit">Stk.</span></div><div class="m">'+eur(sums.margeOEM)+' Marge</div></div>'
+    +'<div class="mb-stat"><div class="l">Upsells</div><div class="row"><span class="n">'+sums.upsells+'</span><span class="n-unit">Stk.</span></div><div class="m">'+eur(sums.margeUpsell)+' Marge</div></div>'
+    +'<div class="mb-stat"><div class="l">WKA</div><div class="row"><span class="n">'+sums.wka+'</span><span class="n-unit">Stk.</span></div><div class="m">'+eur(sums.margeWKA)+' Marge</div></div>'
+    +'<div class="mb-stat mb-total"><div class="l">Gesamt</div><div class="row"><span class="n">'+gesamtAnzahl+'</span><span class="n-unit">Stk.</span></div><div class="m">'+eur(sums.margeGesamt)+' Marge</div></div>'
+    +'<div class="mb-stat mb-margin"><div class="l">Margenerhöhung</div><div class="row"><span class="n">'+eur(sums.margeGesamt)+'</span></div><div class="m">Ziel: '+eur(zielMargeSum)+'/Mon.</div></div>'
+    +'</div>';
+}
 // ── SFP Wiegand > Overview: 5 Kacheln + Performance-Tabelle für einen wählbaren Mitarbeiter ──
 function buildOverviewTab(liste){
   var HIDDEN=[];
   var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;}).slice().sort(function(a,b){return a.name.localeCompare(b.name);});
   if(!visible.length)return '<div class="card" style="text-align:center;color:var(--text3);padding:40px">Keine Mitarbeiter vorhanden</div>';
-  if(!overviewSelectedIds){overviewSelectedIds=[visible[0].id];}
+  if(!overviewSelectedIds){overviewSelectedIds=visible.map(function(e){return e.id;});}
   overviewSelectedIds=overviewSelectedIds.filter(function(id){return visible.some(function(e){return e.id===id;});});
-  if(!overviewSelectedIds.length)overviewSelectedIds=[visible[0].id];
+  if(!overviewSelectedIds.length)overviewSelectedIds=visible.map(function(e){return e.id;});
   var selectedEmps=visible.filter(function(e){return overviewSelectedIds.indexOf(e.id)>=0;});
   var isAll=selectedEmps.length!==1;
   var emp=isAll?null:selectedEmps[0];
@@ -2177,8 +3146,22 @@ function buildOverviewTab(liste){
   var effTo=overviewToDate||monthEnd;
   var perfAll=isAll?[]:(performance[emp.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
 
-  function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'var(--teal)':'var(--red)';}
+  function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'#206A72':'var(--red)';}
+  // Ziel fuer Opt. OEM-Kachel: Durchschnitt aller eingetragenen "Opt./Tag"-Werte aus der Zielvereinbarung (aktueller Monat)
+  function avgOptTagZielvereinbarung(){
+    var zmk=today().slice(0,7);
+    var zRec=zielStore[zmk]||{};
+    var zVisible=visible.filter(function(e){return empActiveInZielMonth(e,zmk);});
+    var zVals=[];
+    zVisible.forEach(function(e){
+      var r=zRec[e.id]||{};
+      if(r.optTag!=null)zVals.push(r.optTag);
+    });
+    return zVals.length?zVals.reduce(function(a,b){return a+b;},0)/zVals.length:null;
+  }
+  var optOemZiel=avgOptTagZielvereinbarung();
   var h='';
+  h+=buildMonthBar(visible);
 
   if(isAll){
     function teamMonthAvg(key,monthsAgo){
@@ -2206,10 +3189,10 @@ function buildOverviewTab(liste){
     }
     var kpisAll=[
       {label:'CR OEM', key:'crOEM',      target:CR_GOOD, dir:'gte', pct:true},
-      {label:'CR TW',  key:'crTeilweise', target:null,    dir:'lte', pct:true},
-      {label:'CR SY',  key:'crSuperYes',  target:null,    dir:'gte', pct:true},
-      {label:'CR MY',  key:'crMegaYes',   target:null,    dir:'gte', pct:true},
-      {label:'Conv. OEM',key:'convOEM',   target:null,    dir:'gte', pct:false},
+      {label:'CR TW',  key:'crTeilweise', target:KPI_TARGETS.crTeilweise.val, dir:KPI_TARGETS.crTeilweise.dir, pct:true},
+      {label:'CR SY',  key:'crSuperYes',  target:KPI_TARGETS.crSuperYes.val,  dir:KPI_TARGETS.crSuperYes.dir,  pct:true},
+      {label:'CR MY',  key:'crMegaYes',   target:KPI_TARGETS.crMegaYes.val,   dir:KPI_TARGETS.crMegaYes.dir,   pct:true},
+      {label:'Opt. OEM',key:'convOEM',   target:optOemZiel!=null?Math.round(optOemZiel*10)/10:null, dir:'gte', pct:false},
     ];
     h+='<div class="g5" style="margin-bottom:22px">';
     kpisAll.forEach(function(k){
@@ -2217,7 +3200,7 @@ function buildOverviewTab(liste){
       var prev=teamMonthAvg(k.key,1);
       var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
       var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
-      var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):'var(--text)'):'var(--text3)';
+      var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):noTargetKpiCol(cur,prev,k.dir)):'var(--text3)';
       var trend=(cur!==null&&prev!==null)?cur-prev:null;
       var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
       var trendCol=trend===null?'var(--text3)':(trend>0.5?'var(--teal-dark)':trend<-0.5?'var(--red)':'var(--text2)');
@@ -2231,7 +3214,7 @@ function buildOverviewTab(liste){
         +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
         +'</div>'
-        +sparkline(spark7K,'#7ED2DB',54,26)
+        +sparkline(spark7K,col,54,26)
         +'</div>'
         +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:10.5px;color:'+targetCol+';margin-top:2px;font-weight:600">'+targetTxt+'</div>'
@@ -2244,7 +3227,7 @@ function buildOverviewTab(liste){
     {label:'CR TW',  key:'crTeilweise', target:empT.crTeilweise.val, dir:empT.crTeilweise.dir, pct:true},
     {label:'CR SY',  key:'crSuperYes',  target:empT.crSuperYes.val,  dir:empT.crSuperYes.dir,  pct:true},
     {label:'CR MY',  key:'crMegaYes',   target:empT.crMegaYes.val,   dir:empT.crMegaYes.dir,   pct:true},
-    {label:'Conv. OEM',key:'convOEM',   target:null,                  dir:'gte',               pct:false},
+    {label:'Opt. OEM',key:'convOEM',   target:optOemZiel!=null?Math.round(optOemZiel*10)/10:null, dir:'gte', pct:false},
   ];
   h+='<div class="g5" style="margin-bottom:22px">';
   kpis.forEach(function(k){
@@ -2252,7 +3235,7 @@ function buildOverviewTab(liste){
     var prev=monthAvg(emp.id,k.key,1);
     var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
     var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
-    var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):'var(--text)'):'var(--text3)';
+    var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):noTargetKpiCol(cur,prev,k.dir)):'var(--text3)';
     var trend=(cur!==null&&prev!==null)?cur-prev:null;
     var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
     var trendCol=trend===null?'var(--text3)':(trend>0.5?'var(--teal-dark)':trend<-0.5?'var(--red)':'var(--text2)');
@@ -2270,7 +3253,7 @@ function buildOverviewTab(liste){
       +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+'</div>'
       +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
       +'</div>'
-      +sparkline(spark7K,'#7ED2DB',54,26)
+      +sparkline(spark7K,col,54,26)
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+'</div>'
       +'<div style="font-size:10.5px;color:'+targetCol+';margin-top:2px;font-weight:600">'+targetTxt+'</div>'
@@ -2287,14 +3270,125 @@ function buildOverviewTab(liste){
   h+='<div class="card" style="margin-bottom:22px">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
   h+='<div class="card-title" style="margin:0">Performance Trend <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+selLabel+'</span></div>';
-  h+='<select onchange="setOverviewChartMetric(this.value)" style="width:auto;height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer">';
-  [{k:'aktivitaeten',l:'Aktivitäten'},{k:'convOEM',l:'Conv. OEM'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSuperYes',l:'CR SY'},{k:'crMegaYes',l:'CR MY'},{k:'upsells',l:'Upsells'},{k:'wka',l:'WKA'},{k:'margeGesamt',l:'Marge'}].forEach(function(it){
+  h+='<select onchange="setOverviewChartMetric(this.value)" style="width:auto;height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;accent-color:#206A72">';
+  [{k:'margeGesamt',l:'Marge Gesamt'},{k:'aktivitaeten',l:'Aktivitäten'},{k:'optGesamt',l:'Opt. Gesamt'},{k:'convOEM',l:'Opt. OEM'},{k:'upsells',l:'Opt. Upsell'},{k:'wka',l:'Opt. WKA'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSuperYes',l:'CR SY'},{k:'crMegaYes',l:'CR MY'}].forEach(function(it){
     h+='<option value="'+it.k+'"'+(overviewChartMetric===it.k?' selected':'')+'>'+it.l+'</option>';
   });
   h+='</select>';
   h+='</div>';
   h+='<div style="height:280px;position:relative"><canvas id="overviewPerfChart"></canvas></div>';
   h+='</div>';
+
+  // ── Conversion-Mix (OEM/Upsells/WKA) & CR-Verteilung (TW/Yes/SY/MY) — SVG-Donut analog "Wo/Warum wir Kunden verlieren" (SalesOS) ──
+  (function(){
+    var oemSum=0,upsSum=0,wkaSum=0,crTWs=[],crYess=[],crSYs=[],crMYs=[];
+    chartRows.forEach(function(x){
+      oemSum+=x.convOEM||0; upsSum+=x.upsells||0; wkaSum+=x.wka||0;
+      if(x.crTeilweise!=null)crTWs.push(x.crTeilweise);
+      if(x.crYes!=null)crYess.push(x.crYes);
+      if(x.crSuperYes!=null)crSYs.push(x.crSuperYes);
+      if(x.crMegaYes!=null)crMYs.push(x.crMegaYes);
+    });
+    function avg(arr){return arr.length?Math.round(arr.reduce(function(a,b){return a+b;},0)/arr.length):0;}
+    var mixEntries=[{label:'OEM',count:oemSum},{label:'Upsells',count:upsSum},{label:'WKA',count:wkaSum}].filter(function(e){return e.count>0;});
+    var mixTotal=oemSum+upsSum+wkaSum;
+    var crRaw=[{label:'TW',count:avg(crTWs)},{label:'Yes',count:avg(crYess)},{label:'SY',count:avg(crSYs)},{label:'MY',count:avg(crMYs)}].filter(function(e){return e.count>0;});
+    var crSumRaw=crRaw.reduce(function(a,b){return a+b.count;},0);
+
+    h+='<div class="g2" style="margin-bottom:22px">';
+    h+='<div class="card" style="margin-bottom:0">';
+    h+='<div class="section-hdr" style="margin-top:0;justify-content:flex-start"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-donut" style="color:var(--purple)"></i> Conversion-Mix</span> <span style="font-weight:400;color:var(--text3);font-size:11px">'+selLabel+'</span></div>';
+    h+='<div class="funnel-wrap">'+donutSvg(mixEntries,mixTotal,'Gesamt')+'</div>';
+    h+='</div>';
+    h+='<div class="card" style="margin-bottom:0">';
+    h+='<div class="section-hdr" style="margin-top:0;justify-content:flex-start"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-donut" style="color:var(--purple)"></i> CR-Verteilung</span> <span style="font-weight:400;color:var(--text3);font-size:11px">'+selLabel+'</span></div>';
+    h+='<div class="funnel-wrap">'+donutSvg(crRaw,crSumRaw,'Ø Verteilung')+'</div>';
+    h+='</div>';
+    h+='</div>';
+  })();
+
+  // ── Zielvereinbarung — Jahresverlauf (Entwurf C: Ziel NL als gestrichelte Referenzlinie, Ziel/Erzielt als Balken mit Farbverlauf) ──
+  h+=zielverlaufJahrChartHtml();
+
+  // ── Top 3 (höchste Margenerhöhung) & Worst 3 (schwächste CR OEM/CR MY) im aktuellen Kalendermonat ──
+  (function(){
+    var mk=today().slice(0,7);
+    var wMeta=getMonthWeeksZiel(mk);
+    var mRec=zielStore[mk]||{};
+    var pool=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
+
+    var topRows=pool.map(function(e){
+      var total=0;
+      (performance[e.id]||[]).forEach(function(x){
+        if((x.date||'').slice(0,7)!==mk)return;
+        total+=x.margeGesamt||x.margin||0;
+      });
+      var r=mRec[e.id]||{};
+      var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      var einsatztage=weeks.reduce(function(a,b){return a+b;},0);
+      var optTag=r.optTag!=null?r.optTag:0;
+      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+      var zielMonat=einsatztage*optTag*margeOpt;
+      var zielTag=einsatztage>0?zielMonat/einsatztage:0;
+      var proTag=einsatztage>0?total/einsatztage:0;
+      return {e:e,total:total,proTag:proTag,pctMonat:zielMonat>0?Math.min(100,Math.round(total/zielMonat*100)):(total>0?100:0),pctTag:zielTag>0?Math.min(100,Math.round(proTag/zielTag*100)):(proTag>0?100:0)};
+    }).filter(function(r){return r.total>0;}).sort(function(a,b){return b.total-a.total;}).slice(0,3);
+
+    var worstRows=pool.map(function(e){
+      var crOEM=monthAvg(e.id,'crOEM',0);
+      var crMY=monthAvg(e.id,'crMegaYes',0);
+      return {e:e,crOEM:crOEM,crMY:crMY,score:(crOEM!=null&&crMY!=null)?(crOEM+crMY):null};
+    }).filter(function(r){return r.score!=null;}).sort(function(a,b){return a.score-b.score;}).slice(0,3);
+
+    function initials(nm){return nm.split(' ').map(function(x){return x[0];}).join('').toUpperCase().slice(0,2);}
+    function metricRow(label,pct,valTxt,cls){
+      return '<div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)">'
+        +'<span style="width:52px;flex-shrink:0">'+label+'</span>'
+        +'<div style="flex:1;height:5px;border-radius:3px;overflow:hidden;background:'+(cls==='p'?'rgba(32,106,114,0.12)':'rgba(189,45,41,0.12)')+'"><div style="height:100%;border-radius:3px;width:'+Math.max(2,pct)+'%;background:'+(cls==='p'?'var(--purple)':'var(--red)')+'"></div></div>'
+        +'<span style="width:52px;text-align:right;font-weight:700;color:'+(cls==='p'?'var(--purple-dark)':'var(--red)')+'">'+valTxt+'</span>'
+        +'</div>';
+    }
+
+    h+='<div class="g2" style="margin-bottom:22px">';
+
+    h+='<div class="card" style="margin-bottom:0">';
+    h+='<div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-trophy" style="color:var(--purple)"></i> Top 3</span></div>';
+    if(!topRows.length){
+      h+='<div style="font-size:12px;color:var(--text3);padding:8px 0">Noch keine Performance-Daten in diesem Monat.</div>';
+    } else {
+      topRows.forEach(function(r,idx){
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;'+(idx<topRows.length-1?'border-bottom:1px solid var(--border);':'')+'">'
+          +'<div style="width:30px;height:30px;border-radius:9px;background:var(--purple-bg);color:var(--purple-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+initials(r.e.name)+'</div>'
+          +'<div><div style="font-weight:600;font-size:12.5px">'+r.e.name+'</div><div style="font-size:10px;color:var(--text3)">'+r.e.role+'</div></div>'
+          +'<div style="margin-left:auto;display:flex;flex-direction:column;gap:3px;width:150px">'
+          +metricRow('Gesamt',r.pctMonat,'€ '+Math.round(r.total).toLocaleString('de-DE'),'p')
+          +metricRow('Ø/Tag',r.pctTag,'€ '+Math.round(r.proTag).toLocaleString('de-DE'),'p')
+          +'</div>'
+          +'</div>';
+      });
+    }
+    h+='</div>';
+
+    h+='<div class="card" style="margin-bottom:0">';
+    h+='<div class="section-hdr" style="margin-top:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-alert-triangle" style="color:var(--red)"></i> Worst 3</span></div>';
+    if(!worstRows.length){
+      h+='<div style="font-size:12px;color:var(--text3);padding:8px 0">Noch keine Performance-Daten in diesem Monat.</div>';
+    } else {
+      worstRows.forEach(function(r,idx){
+        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;'+(idx<worstRows.length-1?'border-bottom:1px solid var(--border);':'')+'">'
+          +'<div style="width:30px;height:30px;border-radius:9px;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+initials(r.e.name)+'</div>'
+          +'<div><div style="font-weight:600;font-size:12.5px">'+r.e.name+'</div><div style="font-size:10px;color:var(--text3)">'+r.e.role+'</div></div>'
+          +'<div style="margin-left:auto;display:flex;flex-direction:column;gap:3px;width:150px">'
+          +metricRow('CR OEM',Math.round(r.crOEM),Math.round(r.crOEM)+'%','r')
+          +metricRow('CR MY',Math.round(r.crMY),Math.round(r.crMY)+'%','r')
+          +'</div>'
+          +'</div>';
+      });
+    }
+    h+='</div>';
+
+    h+='</div>';
+  })();
 
   // Performance-Tabelle (Tag/Woche/Monat) für den gewählten Mitarbeiter
   h+='<div class="card">';
@@ -2362,14 +3456,8 @@ function buildOverviewTab(liste){
   } else {
     var firstColLabel=overviewPerfGroup==='day'?'Datum':overviewPerfGroup==='week'?'Woche':'Monat';
     var rowsToRender=isAll?combinedGroupedRows:groupPerfRows(perfAll,overviewPerfGroup).map(function(g){return {g:g,emp:emp,empT:empT};});
-    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse"><thead><tr>'
-      +'<th style="background:var(--bg2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap">Mitarbeiter</th>'
-      +'<th style="background:var(--bg2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap">'+firstColLabel+'</th>'
-      +['Aktivitäten','NE','NM','NErr','Conv. OEM','TW','Yes','SY','MY','CR OEM%','CR TW%','CR SY%','CR MY%','Upsells','WKA','Opt. Ges.','Marge Ges.'].map(function(hh){
-        return '<th style="background:var(--bg2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap">'+hh+'</th>';
-      }).join('')
-      +'</tr></thead><tbody>';
-    rowsToRender.forEach(function(item,ridx){
+    // Werte je Zeile einmal vorab berechnen, damit Sortierung und Rendering dieselben Werte nutzen
+    var sortableRows=rowsToRender.map(function(item){
       var g=item.g,rowEmp=item.emp,rowEmpT=item.empT;
       var row=g.row;
       var akt=row.aktivitaeten||row.calls||0;
@@ -2380,6 +3468,31 @@ function buildOverviewTab(liste){
       var optGes=row.optGesamt||(convOEM+ups+wka)||0;
       var marge=row.margeGesamt||row.margin||0;
       var crOEM=Math.round(row.crOEM||0),crTW=Math.round(row.crTeilweise||0),crSY=Math.round(row.crSuperYes||0),crMY=Math.round(row.crMegaYes||0);
+      return {item:item,rowEmp:rowEmp,rowEmpT:rowEmpT,g:g,name:rowEmp.name,period:g.label,akt:akt,notR:notR,notP:notP,notS:notS,
+        convOEM:convOEM,tw:tw,yes:yes,sy:sy,my:my,crOEM:crOEM,crTW:crTW,crSY:crSY,crMY:crMY,ups:ups,wka:wka,optGes:optGes,marge:marge};
+    });
+    if(overviewPerfSortKey){
+      sortableRows.sort(function(a,b){
+        var av=a[overviewPerfSortKey],bv=b[overviewPerfSortKey];
+        var cmp=(typeof av==='string'||typeof bv==='string')?(''+av).localeCompare(''+bv,'de'):((av||0)-(bv||0));
+        return overviewPerfSortDir==='asc'?cmp:-cmp;
+      });
+    }
+    function sortTh(label,key,extraStyle){
+      var active=overviewPerfSortKey===key;
+      var arrow=active?(overviewPerfSortDir==='asc'?' ▲':' ▼'):'';
+      return '<th style="background:var(--bg2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:'+(active?'var(--purple)':'var(--text2)')+';text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;cursor:pointer;user-select:none'+(extraStyle||'')+'" onclick="setOverviewPerfSort(\''+key+'\')">'+label+arrow+'</th>';
+    }
+    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse"><thead><tr>'
+      +sortTh('Mitarbeiter','name')
+      +sortTh(firstColLabel,'period')
+      +[['Aktivitäten','akt'],['NE','notR'],['NM','notP'],['NErr','notS'],['Conv. OEM','convOEM'],['TW','tw'],['Yes','yes'],['SY','sy'],['MY','my'],['CR OEM%','crOEM'],['CR TW%','crTW'],['CR SY%','crSY'],['CR MY%','crMY'],['Upsells','ups'],['WKA','wka'],['Opt. Ges.','optGes'],['Marge Ges.','marge']].map(function(cc){
+        return sortTh(cc[0],cc[1]);
+      }).join('')
+      +'</tr></thead><tbody>';
+    sortableRows.forEach(function(sr,ridx){
+      var rowEmp=sr.rowEmp,rowEmpT=sr.rowEmpT,g=sr.g;
+      var akt=sr.akt,convOEM=sr.convOEM,tw=sr.tw,yes=sr.yes,sy=sr.sy,my=sr.my,notR=sr.notR,notP=sr.notP,notS=sr.notS,ups=sr.ups,wka=sr.wka,optGes=sr.optGes,marge=sr.marge,crOEM=sr.crOEM,crTW=sr.crTW,crSY=sr.crSY,crMY=sr.crMY;
       function fc(v,t,dir){if(!t&&t!==0)return '';return(dir==='lte'?v<=t:v>=t)?'color:var(--teal-dark)':'color:var(--red)';}
       var rowBg=ridx%2===1?'background:rgba(0,0,0,0.03);':'';
       h+='<tr style="'+rowBg+'">'
@@ -2412,20 +3525,21 @@ function buildOverviewTab(liste){
   (function(allRows,metric,groupMode){
     var mMap={
       crOEM:      {f:'crOEM',      l:'CR OEM %', c:'#206A72'},
-      crTeilweise:{f:'crTeilweise',l:'CR TW %',  c:'#2A8792'},
-      crYes:      {f:'crYes',      l:'CR Yes %', c:'#32A8B4'},
-      crSuperYes: {f:'crSuperYes', l:'CR SY %',  c:'#5FBAC4'},
-      crMegaYes:  {f:'crMegaYes',  l:'CR MY %',  c:'#7ED2DB'},
-      aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',c:'#0F3D42'},
-      convOEM:    {f:'convOEM',    l:'Conv. OEM',c:'#174C52'},
-      upsells:    {f:'upsells',    l:'Upsells',  c:'#3f6c72'},
-      wka:        {f:'wka',        l:'WKA',      c:'#88201E'},
-      margeGesamt:{f:'margeGesamt',l:'Marge €',  c:'#9FE1E8'}
+      crTeilweise:{f:'crTeilweise',l:'CR TW %',  c:'#206A72'},
+      crYes:      {f:'crYes',      l:'CR Yes %', c:'#206A72'},
+      crSuperYes: {f:'crSuperYes', l:'CR SY %',  c:'#206A72'},
+      crMegaYes:  {f:'crMegaYes',  l:'CR MY %',  c:'#206A72'},
+      aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',c:'#206A72'},
+      optGesamt:  {f:'optGesamt',  l:'Opt. Gesamt',c:'#206A72'},
+      convOEM:    {f:'convOEM',    l:'Opt. OEM', c:'#206A72'},
+      upsells:    {f:'upsells',    l:'Opt. Upsell',c:'#206A72'},
+      wka:        {f:'wka',        l:'Opt. WKA', c:'#206A72'},
+      margeGesamt:{f:'margeGesamt',l:'Marge Gesamt €',  c:'#206A72'}
     };
     var m=mMap[metric]||mMap.crOEM;
     window._overviewChartData=null;
     if(!allRows||!allRows.length)return;
-    var sumMetrics=['aktivitaeten','margeGesamt','convOEM','upsells','wka'];
+    var sumMetrics=['aktivitaeten','margeGesamt','optGesamt','convOEM','upsells','wka'];
     var useSum=sumMetrics.indexOf(metric)>=0;
     // Stufe 1: pro Kalendertag zusammenfassen (bei "Alle" über Mitarbeiter kombiniert)
     var byDate={};
@@ -2508,6 +3622,7 @@ function buildOverviewTab(liste){
     var canvas=document.getElementById('overviewPerfChart');
     if(!canvas)return;
     if(canvas._ci){try{canvas._ci.destroy();}catch(e){}}
+    if(d.datasets[0])d.datasets[0].backgroundColor=vGradient(canvas,d.datasets[0].borderColor,0.55,0.05);
     canvas._ci=new Chart(canvas,{
       type:'line',
       data:{labels:d.labels,datasets:d.datasets},
@@ -2521,6 +3636,7 @@ function buildOverviewTab(liste){
         }
       }
     });
+    reapplyChartGradient(canvas._ci,canvas,0.55,0.05);
   });});
 
   return h;
@@ -2541,7 +3657,7 @@ function renderTeam(){
   }
   function teamGetPerf(id){return customActive?getPerfRange(id,fromBound,toBound):getPerf(id,days);}
   var HIDDEN=[];
-  var allVisible=activeEmployees().filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var allVisible=activeOrRecentlyEndedEmployees().filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
   var inactiveAll=employees.filter(function(e){return e.active===false&&HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
   var onboardingEmpsT=allVisible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
   var FDEFS=[
@@ -2750,18 +3866,10 @@ function renderTeam(){
   // ── RENDER ──
   var _prevContentEl=ma.querySelector('.content');
   var _prevScrollTop=_prevContentEl?_prevContentEl.scrollTop:0;
-  ma.innerHTML='<div class="topbar">'
-    +'<div class="tb-left"><div class="av" style="width:40px;height:40px;font-size:16px;background:var(--purple-bg);color:var(--purple-dark)"><i class="ti ti-layout-grid"></i></div>'
-    +'<div><div class="tb-name">SFP Wiegand</div>'
-    +'<div class="tb-meta">'+list.length+' Mitarbeiter · <span class="ftp-badge"><i class="ti ti-refresh" style="font-size:11px"></i> FTP sync aktiv</span></div></div></div>'
-    +'<button class="btn btn-primary" onclick="exportTeamReport()"><i class="ti ti-file-description"></i> Team-Report (PDF)</button>'
-    +'</div>'
-    +'<div class="tab-bar">'
-    +'<div class="tab'+(wiegandView==='overview'?' active':'')+'" onclick="setWiegandView(\'overview\')">Overview</div>'
-    +'<div class="tab'+(wiegandView==='team'?' active':'')+'" onclick="setWiegandView(\'team\')">Team</div>'
-    +'</div>'
+  ma.innerHTML=''
     +'<div class="content">'
     +(wiegandView==='team'?(''
+    +zielInfoBoxHtml()
     // KPI Kacheln (reiches Format wie Coaching Sessions: Trend-Pfeil + Sparkline)
     +(function(){
       var oemOk2=KPI_TARGETS.crOEM.dir==='lte'?(oemD!==null&&oemD<=KPI_TARGETS.crOEM.val):(oemD!==null&&oemD>=KPI_TARGETS.crOEM.val);var oemCol=oemD!==null&&oemOk2?'#206A72':'var(--amber-dark)';
@@ -2827,14 +3935,17 @@ function renderTeam(){
     // Team Performance Trend Chart (inkl. kombinierter Filter-Zeile)
     +(function(){
       var TMETRICS=[
-        {k:'aktivitaeten',l:'Aktivitäten',c:'#0F3D42'},
-        {k:'convOEM',    l:'Conv. OEM',  c:'#174C52'},
-        {k:'crOEM',      l:'CR OEM',     c:'#206A72'},
-        {k:'crTeilweise',l:'CR TW',      c:'#2A8792'},
-        {k:'crYes',      l:'CR Yes',     c:'#32A8B4'},
-        {k:'crSuperYes', l:'CR SY',      c:'#5FBAC4'},
-        {k:'crMegaYes',  l:'CR MY',      c:'#7ED2DB'},
-        {k:'margeGesamt',l:'Marge',      c:'#9FE1E8'},
+        {k:'margeGesamt',l:'Marge Gesamt',c:'#206A72'},
+        {k:'aktivitaeten',l:'Aktivitäten',c:'#206A72'},
+        {k:'optGesamt',  l:'Opt. Gesamt', c:'#206A72'},
+        {k:'convOEM',    l:'Opt. OEM',    c:'#206A72'},
+        {k:'upsells',    l:'Opt. Upsell', c:'#206A72'},
+        {k:'wka',        l:'Opt. WKA',    c:'#206A72'},
+        {k:'crOEM',      l:'CR OEM',      c:'#206A72'},
+        {k:'crTeilweise',l:'CR TW',       c:'#206A72'},
+        {k:'crYes',      l:'CR Yes',      c:'#206A72'},
+        {k:'crSuperYes', l:'CR SY',       c:'#206A72'},
+        {k:'crMegaYes',  l:'CR MY',       c:'#206A72'},
       ];
       var s='<div class="card" style="margin-bottom:22px">';
       s+='<div style="display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:16px">';
@@ -2867,13 +3978,12 @@ function renderTeam(){
       s+='</div>';
       s+='</div>';
       s+='</div>';
-      s+='<canvas id="teamPerfChart" height="80"></canvas></div>';
+      s+='<div style="height:280px;position:relative"><canvas id="teamPerfChart"></canvas></div></div>';
       return s;
     })()
     // ── Alert Banner + Coaching-Abdeckung + SFP Performance Tabelle (alles unter Team) ──
     // Alert Banner
     +(totalAlerts>0?'<div class="alert alert-warn" style="margin-bottom:18px"><i class="ti ti-alert-triangle" style="font-size:18px;color:var(--amber);flex-shrink:0"></i><div><div style="font-size:13px;font-weight:600;color:var(--amber-dark)">'+totalAlerts+' Performance-Alert'+(totalAlerts!==1?'s':'')+' im Team</div><div style="font-size:12px;color:var(--amber-dark)">'+list.filter(function(e){return checkAlerts(e.id).length>0;}).map(function(e){return e.name;}).join(', ')+'</div></div></div>':'')
-    +coverageHtml
     +'<div class="card">'
     +'<div class="card-title"><i class="ti ti-table"></i> SFP Performance <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· CR als % aller Gespräche · Gut ≥ '+CR_GOOD+'%'+(showTrend?' · Pfeil = Trend vs. 7-Tage-Ø':'')+'</span></div>'
     +'<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse"><thead><tr>'
@@ -2893,7 +4003,7 @@ function renderTeam(){
     +'<th style="background:var(--bg2);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--text2);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2)">Aktion</th>'
     +'</tr></thead><tbody>'+rows+'</tbody></table></div>'
     +'</div>'
-    ):(buildOverviewTab(allVisible)))
+    ):(wiegandView==='ziel'?zielvereinbarungHtml():buildOverviewTab(allVisible)))
     +'</div>';
   var _newContentEl=ma.querySelector('.content');
   if(_newContentEl&&_prevScrollTop)_newContentEl.scrollTop=_prevScrollTop;
@@ -2902,13 +4012,16 @@ function renderTeam(){
   (function(allRows,metric,days,kpiTargets){
     var mMap={
       crOEM:      {f:'crOEM',      l:'CR OEM %', c:'#206A72'},
-      crTeilweise:{f:'crTeilweise',l:'CR TW %',  c:'#2A8792'},
-      crYes:      {f:'crYes',      l:'CR Yes %', c:'#32A8B4'},
-      crSuperYes: {f:'crSuperYes', l:'CR SY %',  c:'#5FBAC4'},
-      crMegaYes:  {f:'crMegaYes',  l:'CR MY %',  c:'#7ED2DB'},
-      aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',c:'#0F3D42'},
-      convOEM:    {f:'convOEM',    l:'Conv. OEM',c:'#174C52'},
-      margeGesamt:{f:'margeGesamt',l:'Marge €',  c:'#9FE1E8'}
+      crTeilweise:{f:'crTeilweise',l:'CR TW %',  c:'#206A72'},
+      crYes:      {f:'crYes',      l:'CR Yes %', c:'#206A72'},
+      crSuperYes: {f:'crSuperYes', l:'CR SY %',  c:'#206A72'},
+      crMegaYes:  {f:'crMegaYes',  l:'CR MY %',  c:'#206A72'},
+      aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',c:'#206A72'},
+      optGesamt:  {f:'optGesamt',  l:'Opt. Gesamt',c:'#206A72'},
+      convOEM:    {f:'convOEM',    l:'Opt. OEM', c:'#206A72'},
+      upsells:    {f:'upsells',    l:'Opt. Upsell',c:'#206A72'},
+      wka:        {f:'wka',        l:'Opt. WKA', c:'#206A72'},
+      margeGesamt:{f:'margeGesamt',l:'Marge Gesamt €',  c:'#206A72'}
     };
     var m=mMap[metric]||mMap.crOEM;
     if(!allRows||!allRows.length){return;}
@@ -2933,7 +4046,9 @@ function renderTeam(){
       crOEM:{min:0,max:100,step:20},crTeilweise:{min:0,max:100,step:20},
       crYes:{min:0,max:100,step:20},crSuperYes:{min:0,max:100,step:20},
       crMegaYes:{min:0,max:100,step:20},aktivitaeten:{min:0,max:300,step:50},
-      convOEM:{min:0,max:50,step:10},margeGesamt:{min:0,max:5000,step:1000}
+      optGesamt:{min:0,max:50,step:10},convOEM:{min:0,max:50,step:10},
+      upsells:{min:0,max:30,step:5},wka:{min:0,max:15,step:5},
+      margeGesamt:{min:0,max:5000,step:1000}
     };
     var yS=yScales[metric]||{min:0,max:100,step:20};
     var datasets=[{
@@ -2958,11 +4073,13 @@ function renderTeam(){
     var canvas=document.getElementById('teamPerfChart');
     if(!canvas)return;
     if(canvas._ci){try{canvas._ci.destroy();}catch(e){}}
+    if(d.datasets[0])d.datasets[0].backgroundColor=vGradient(canvas,d.datasets[0].borderColor,0.55,0.05);
     canvas._ci=new Chart(canvas,{
       type:'line',
       data:{labels:d.labels,datasets:d.datasets},
       options:{
         responsive:true,
+        maintainAspectRatio:false,
         plugins:{legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:20,padding:12}}},
         scales:{
           x:{ticks:{font:{size:11},maxTicksLimit:12},grid:{display:false}},
@@ -2970,6 +4087,7 @@ function renderTeam(){
         }
       }
     });
+    reapplyChartGradient(canvas._ci,canvas,0.55,0.05);
   },150);
 }
 
@@ -3198,7 +4316,7 @@ function renderTab(){
       +'<div style="'+LBL+'">QA CALLS</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
       +'<div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:20px;font-weight:700;color:#7ED2DB">'+qaAll.length+'</div><div style="font-size:13px;font-weight:700;color:'+qaTrend.col+'">'+qaTrend.arrow+'</div></div>'
-      +sparkline(qaMonthCounts,'#7ED2DB',54,26)
+      +sparkline(qaMonthCounts,'#206A72',54,26)
       +'</div>'
       +'<div style="'+SUB+'">Ø/Monat '+(qaMonthCounts.length?(qaMonthCounts.reduce(function(a,b){return a+b;},0)/qaMonthCounts.length).toFixed(1):'—')+'</div>'
       +'<div style="'+SUB+';margin-top:2px">dies. Monat '+(qaMonthCounts.length?qaMonthCounts[qaMonthCounts.length-1]:0)+'</div>'
@@ -3267,7 +4385,7 @@ function renderTab(){
     var perfAll=(performance[emp.id]||[]).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
     var perfRangeData=empGetPerf(emp.id);
     function avgRange(key){if(!perfRangeData.length)return null;return perfRangeData.reduce(function(a,x){return a+(x[key]||0);},0)/perfRangeData.length;}
-    function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'var(--teal)':'var(--red)';}
+    function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'#206A72':'var(--red)';}
     var kpis=[
       {label:'CR OEM', key:'crOEM',      target:empT.crOEM.val,      dir:empT.crOEM.dir,      pct:true},
       {label:'CR TW',  key:'crTeilweise', target:empT.crTeilweise.val, dir:empT.crTeilweise.dir, pct:true},
@@ -3281,7 +4399,7 @@ function renderTab(){
       var prev=monthAvg(emp.id,k.key,1);
       var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
       var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
-      var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):'var(--text)'):'var(--text3)';
+      var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):noTargetKpiCol(cur,prev,k.dir)):'var(--text3)';
       var trend=(cur!==null&&prev!==null)?cur-prev:null;
       var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
       var trendCol=trend===null?'var(--text3)':(trend>0.5?'var(--teal-dark)':trend<-0.5?'var(--red)':'var(--text2)');
@@ -3299,7 +4417,7 @@ function renderTab(){
         +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
         +'</div>'
-        +sparkline(spark7K,'#7ED2DB',80,28)
+        +sparkline(spark7K,col,80,28)
         +'</div>'
         +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:10.5px;color:'+targetCol+';margin-top:2px;font-weight:600">'+targetTxt+'</div>'
@@ -3316,12 +4434,15 @@ function renderTab(){
     }
     // Chart
     var mMap={
-      calls:{f:'aktivitaeten',l:'Aktivitäten',c:'#534AB7'},
-      crTeilweise:{f:'crTeilweise',l:'CR TW %',c:'#888780'},
-      crYes:{f:'crYes',l:'CR Yes %',c:'#639922'},
-      crSuperYes:{f:'crSuperYes',l:'CR SY %',c:'#534AB7'},
-      crMegaYes:{f:'crMegaYes',l:'CR MY %',c:'#1D9E75'},
-      crOEM:{f:'crOEM',l:'CR OEM %',c:'#BA7517'}
+      calls:{f:'aktivitaeten',l:'Aktivitäten',c:'#206A72'},
+      convOEM:{f:'convOEM',l:'Conv. OEM',c:'#206A72'},
+      optGesamt:{f:'optGesamt',l:'Opt. Gesamt',c:'#206A72'},
+      crOEM:{f:'crOEM',l:'CR OEM %',c:'#206A72'},
+      crTeilweise:{f:'crTeilweise',l:'CR TW %',c:'#206A72'},
+      crYes:{f:'crYes',l:'CR Yes %',c:'#206A72'},
+      crSuperYes:{f:'crSuperYes',l:'CR SY %',c:'#206A72'},
+      crMegaYes:{f:'crMegaYes',l:'CR MY %',c:'#206A72'},
+      margeGesamt:{f:'margeGesamt',l:'Marge',c:'#206A72'}
     };
     html+='<div class="card" style="margin-bottom:22px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">'
@@ -3664,7 +4785,7 @@ function renderTab(){
         +'<div style="font-size:20px;font-weight:700">'+(cur!==null?Math.round(cur)+(d.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
         +'</div>'
-        +sparkline(spark7,'#7ED2DB',54,26)
+        +sparkline(spark7,'#206A72',54,26)
         +'</div>'
         +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(d.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:10.5px;color:'+vsRoleCol+';margin-top:2px;font-weight:600">'+vsRoleTxt+'</div>'
@@ -3930,7 +5051,7 @@ function renderTab(){
         +'<div style="font-size:20px;font-weight:700">'+(cur!==null?Math.round(cur)+(d.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
         +'</div>'
-        +sparkline(spark7,'#7ED2DB',54,26)
+        +sparkline(spark7,'#206A72',54,26)
         +'</div>'
         +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(d.pct?'%':''):'—')+'</div>'
         +'<div style="font-size:10.5px;color:'+vsRoleCol+';margin-top:2px;font-weight:600">'+vsRoleTxt+'</div>'
@@ -4216,7 +5337,7 @@ function renderTab(){
       +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">OPEN</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
       +'<div style="font-size:20px;font-weight:700;color:var(--purple)">'+openCount+'</div>'
-      +sparkline([],'#7ED2DB',54,26)
+      +sparkline([],'#206A72',54,26)
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--text3)">'+(openCount===0?'Alles erledigt':'zu erledigen')+'</div>'
       +'<div style="font-size:10.5px;color:var(--text3);margin-top:2px">&nbsp;</div>'
@@ -4225,7 +5346,7 @@ function renderTab(){
       +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">OVERDUE</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
       +'<div style="font-size:20px;font-weight:700;color:'+(overdueCount>0?'var(--red)':'var(--teal-dark)')+'">'+overdueCount+'</div>'
-      +sparkline([],'#7ED2DB',54,26)
+      +sparkline([],'#206A72',54,26)
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--text3)">'+(overdueCount>0?'Frist überschritten':'keine überfällig')+'</div>'
       +'<div style="font-size:10.5px;color:var(--text3);margin-top:2px">&nbsp;</div>'
@@ -4234,7 +5355,7 @@ function renderTab(){
       +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">IN PROGRESS</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
       +'<div style="font-size:20px;font-weight:700;color:#32A8B4">'+inProgressTasks.length+'</div>'
-      +sparkline([],'#7ED2DB',54,26)
+      +sparkline([],'#206A72',54,26)
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--text3)">in Bearbeitung</div>'
       +'<div style="font-size:10.5px;color:var(--text3);margin-top:2px">&nbsp;</div>'
@@ -4243,7 +5364,7 @@ function renderTab(){
       +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">COMPLETED</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
       +'<div style="font-size:20px;font-weight:700;color:var(--teal-dark)">'+doneTasks.length+'</div>'
-      +sparkline([],'#7ED2DB',54,26)
+      +sparkline([],'#206A72',54,26)
       +'</div>'
       +'<div style="font-size:10.5px;color:var(--text3)">'+(empTasks.length>0?Math.round(doneTasks.length/empTasks.length*100)+'% abgeschlossen':'noch keine Aufgaben')+'</div>'
       +'<div style="font-size:10.5px;color:var(--text3);margin-top:2px">&nbsp;</div>'
@@ -4494,17 +5615,17 @@ function renderTab(){
       var data=empGetPerf(selectedEmp);
       var labels=data.map(function(d){return fd(d.date);});
       var mMap={
-        aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',    c:'#534AB7'},
-        convOEM:     {f:'convOEM',     l:'Conv. OEM',      c:'#7C6FF7'},
-        optGesamt:   {f:'optGesamt',   l:'Opt. Gesamt',    c:'#378ADD'},
-        crOEM:       {f:'crOEM',       l:'CR OEM %',       c:'#BA7517'},
-        crTeilweise: {f:'crTeilweise', l:'CR TW %',        c:'#888780'},
-        crYes:       {f:'crYes',       l:'CR Yes %',       c:'#639922'},
-        crSuperYes:  {f:'crSuperYes',  l:'CR SY %',        c:'#534AB7'},
-        crMegaYes:   {f:'crMegaYes',   l:'CR MY %',        c:'#1D9E75'},
-        margeGesamt: {f:'margeGesamt', l:'Marge Gesamt €', c:'#0C447C'}
+        aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',    c:'#206A72'},
+        convOEM:     {f:'convOEM',     l:'Conv. OEM',      c:'#206A72'},
+        optGesamt:   {f:'optGesamt',   l:'Opt. Gesamt',    c:'#206A72'},
+        crOEM:       {f:'crOEM',       l:'CR OEM %',       c:'#206A72'},
+        crTeilweise: {f:'crTeilweise', l:'CR TW %',        c:'#206A72'},
+        crYes:       {f:'crYes',       l:'CR Yes %',       c:'#206A72'},
+        crSuperYes:  {f:'crSuperYes',  l:'CR SY %',        c:'#206A72'},
+        crMegaYes:   {f:'crMegaYes',   l:'CR MY %',        c:'#206A72'},
+        margeGesamt: {f:'margeGesamt', l:'Marge Gesamt €', c:'#206A72'}
       };
-      var m=mMap[perfMetric]||{f:perfMetric,l:perfMetric,c:'#534AB7'};
+      var m=mMap[perfMetric]||{f:perfMetric,l:perfMetric,c:'#206A72'};
       var vals=data.map(function(d){return d[m.f]||0;});
       var empObj=employees.find(function(x){return x.id===selectedEmp;});
       var empT=empTargets(empObj||{});
@@ -4640,6 +5761,7 @@ function renderTab(){
         }
       };
 
+      if(datasets[0])datasets[0].backgroundColor=vGradient(canvas,datasets[0].borderColor,0.55,0.05);
       activeChart=new Chart(canvas,{
         type:'line',
         data:{labels:labels,datasets:datasets},
@@ -4680,6 +5802,7 @@ function renderTab(){
           }
         }
       });
+      reapplyChartGradient(activeChart,canvas,0.55,0.05);
 
       // ── Impact Coaching: immer 3 Zeilen, unabhängig von KPI/Datenlage ──
       (function(){
@@ -4755,8 +5878,20 @@ var CATEGORY_META={
 function renderActivity(){
   var ma=document.getElementById('mainArea');if(!ma)return;
   var coachList=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var auditActionLabels={kpi_target_global:'Globale KPI-Ziele geändert',kpi_target_employee:'Individuelle KPI-Ziele geändert',employee_deactivated:'Mitarbeiter deaktiviert'};
+  var auditActionCategory={kpi_target_global:'kpi_target',kpi_target_employee:'kpi_target',employee_deactivated:'employee'};
+  var auditAsActivity=(adminAuditLog||[]).map(function(a){
+    return {
+      actorId:a.changedBy||null,
+      actorName:null,
+      category:auditActionCategory[a.action]||'kpi_target',
+      createdAt:a.changedAt,
+      description:(auditActionLabels[a.action]||a.action)+(a.details?': '+a.details:'')
+    };
+  });
+  var combinedLog=activityLog.concat(auditAsActivity).sort(function(x,y){return (y.createdAt||'').localeCompare(x.createdAt||'');});
   var cutoff=(function(){var d=new Date(today()+'T00:00:00Z');d.setUTCDate(d.getUTCDate()-activityFilterDays);return d.toISOString().slice(0,10);})();
-  var filtered=activityLog.filter(function(a){
+  var filtered=combinedLog.filter(function(a){
     if(activityFilterPerson!=='ALL'){
       if(activityFilterPerson.indexOf('NAME:')===0){
         if(a.actorId||a.actorName!==activityFilterPerson.slice(5))return false;
@@ -4778,11 +5913,38 @@ function renderActivity(){
   }
   var maxN=100;
 
-  var h='<div class="topbar"><div class="tb-left">'
-    +'<div style="width:40px;height:40px;border-radius:9px;background:var(--purple-bg);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ti ti-activity"></i></div>'
-    +'<div><div class="tb-name">Aktivität</div><div class="tb-meta">Änderungsprotokoll · alle Nutzer</div></div></div>'
-    +'</div>'
-    +'<div class="content">';
+  // ── Petrol-Infobox: immer letzte 30 Tage vs. die 30 Tage davor ──
+  var last30From=addDaysUTC(today(),-29),last30To=today();
+  var prev30From=addDaysUTC(today(),-59),prev30To=addDaysUTC(today(),-30);
+  function countInRange(cat,fromD,toD){
+    return combinedLog.filter(function(a){
+      var d=(a.createdAt||'').slice(0,10);
+      if(!d||d<fromD||d>toD)return false;
+      if(cat!=='all'&&a.category!==cat)return false;
+      return true;
+    }).length;
+  }
+  function trendBit(cur,prev){
+    var delta=cur-prev;
+    var arrow=delta===0?'→':(delta>0?'↑':'↓');
+    var col=delta===0?'#7ED2DB':(delta>0?'#7ED2DB':'#f0a5a3');
+    return '<span style="color:'+col+'">'+arrow+' '+(delta>=0?'+':'')+delta+'</span> vs. Vorperiode ('+prev+')';
+  }
+  var h='<div class="content">';
+  h+='<div class="month-bar" style="grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr">';
+  h+='<div class="mb-month"><div class="l">Zeitraum</div><div class="v">Letzte 30 Tage</div></div>';
+  [
+    {label:'Coaching Sessions',cat:'session'},
+    {label:'QA Bewertungen',cat:'qa'},
+    {label:'Mitarbeiterentwicklungen',cat:'eval'},
+    {label:'Tasks',cat:'task'},
+    {label:'Gesamtänderungen (Board)',cat:'all'}
+  ].forEach(function(m){
+    var cur=countInRange(m.cat,last30From,last30To);
+    var prev=countInRange(m.cat,prev30From,prev30To);
+    h+='<div class="mb-stat"><div class="l">'+m.label+'</div><div class="row"><span class="n">'+cur+'</span></div><div class="m">'+trendBit(cur,prev)+'</div></div>';
+  });
+  h+='</div>';
 
   // ── Chart-Karte mit Filter ──
   h+='<div class="card" style="margin-bottom:22px">';
@@ -4808,22 +5970,20 @@ function renderActivity(){
     days.forEach(function(d){
       var pct=Math.max(2,Math.round(d.n/maxN*100));
       h+='<div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%">'
-        +(activityFilterDays<=30?'<div style="font-size:10px;color:var(--text3);margin-bottom:3px">'+(d.n||'')+'</div>':'')
+        +'<div style="font-size:10px;color:var(--text3);margin-bottom:3px;line-height:1.2">'+(activityFilterDays<=30?(d.n||'\u00A0'):'\u00A0')+'</div>'
         +'<div style="width:100%;background:linear-gradient(180deg,#5FBAC4,#206A72);border-radius:3px 3px 0 0;height:'+pct+'%" title="'+fd(d.ds)+': '+d.n+'"></div>'
         +'</div>';
     });
     h+='</div>';
-    if(activityFilterDays<=30){
-      h+='<div style="display:flex;gap:6px;padding:0 4px;margin-top:6px">';
-      days.forEach(function(d){h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--text3)">'+d.wd+'</div>';});
-      h+='</div>';
-    }
+    h+='<div style="display:flex;gap:6px;padding:0 4px;margin-top:6px">';
+    days.forEach(function(d){h+='<div style="flex:1;text-align:center;font-size:10px;color:var(--text3)">'+(activityFilterDays<=30?d.wd:'\u00A0')+'</div>';});
+    h+='</div>';
   }
   h+='</div>';
 
   // ── Verlauf-Liste ──
   h+='<div class="card">';
-  h+='<div class="card-title" style="margin-bottom:12px">Verlauf <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+filtered.length+' von '+activityLog.length+')</span></div>';
+  h+='<div class="card-title" style="margin-bottom:12px">Verlauf <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+filtered.length+' von '+combinedLog.length+')</span></div>';
   if(!filtered.length){
     h+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-history-off" style="font-size:26px;display:block;margin-bottom:8px"></i>Keine Einträge</div>';
   } else {
@@ -4858,51 +6018,16 @@ function renderActivity(){
 
 function renderEinstellungen(){
   var ma=document.getElementById('mainArea');if(!ma)return;
-  function zRow(key,label,einheit,step){
-    var t=KPI_TARGETS[key];
-    return '<div style="display:flex;align-items:center;gap:12px;padding:13px 0;border-bottom:1px solid var(--border)">'
-      +'<div style="width:170px;font-size:13px;font-weight:500">'+label+'</div>'
-      +'<div style="display:flex;align-items:center;gap:8px">'
-      +'<select id="dir-'+key+'" style="width:64px;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
-      +'<option value="gte"'+(t.dir==='gte'?' selected':'')+'>≥</option>'
-      +'<option value="lte"'+(t.dir==='lte'?' selected':'')+'>≤</option>'
-      +'</select>'
-      +'<input type="number" id="val-'+key+'" value="'+t.val+'" step="'+(step||1)+'" min="0" max="100" style="width:80px;font-size:13px;padding:6px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
-      +(einheit?'<span style="font-size:12px;color:var(--text2)">'+einheit+'</span>':'')
-      +'</div>'
-      +'<div style="margin-left:auto;font-size:11px;color:var(--text3)">Aktuell: '+t.dir+' '+t.val+(einheit||'')+'</div>'
-      +'</div>';
-  }
 
   ma.innerHTML='<div class="topbar"><div class="tb-left">'
     +'<div style="width:40px;height:40px;border-radius:9px;background:var(--bg2);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ti ti-settings"></i></div>'
     +'<div><div class="tb-name">Einstellungen</div><div class="tb-meta">Integrationen · Daten · KPI-Konfiguration</div></div>'
     +'</div></div>'
-    +'<div class="tab-bar">'
-    +'<div class="tab'+(settingsView==='kpi'?' active':'')+'" onclick="setSettingsView(\'kpi\')">KPI-Ziele</div>'
-    +'<div class="tab'+(settingsView==='integrations'?' active':'')+'" onclick="setSettingsView(\'integrations\')">Integrationen</div>'
-    +'<div class="tab'+(settingsView==='data'?' active':'')+'" onclick="setSettingsView(\'data\')">Daten & Backup</div>'
-    +'<div class="tab'+(settingsView==='log'?' active':'')+'" onclick="setSettingsView(\'log\')">Protokoll</div>'
-    +'</div>'
     +'<div class="content" style="max-width:100%">'
 
-    // ══ KPI-ZIELE ══
-    +(settingsView==='kpi'?(
-    '<div class="card">'
-    +'<div class="card-title"><i class="ti ti-target"></i> Zielwerte & Richtung</div>'
-    +'<p style="font-size:12px;color:var(--text2);margin-bottom:6px;line-height:1.6">Lege fest ob ein Wert <strong>größer (≥)</strong> oder <strong>kleiner (≤)</strong> als der Zielwert sein soll. Gilt als globaler Standard für alle Mitarbeiter.</p>'
-    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:0 40px">'
-    +zRow('crOEM','CR OEM','%',1)
-    +zRow('crSuperYes','CR SY (Super Yes)','%',1)
-    +zRow('crTeilweise','CR TW (Teilweise)','%',1)
-    +zRow('crMegaYes','CR MY (Mega Yes)','%',1)
-    +zRow('optPerH','Opt./Stunde','',0.1)
-    +'</div>'
-    +'<div style="margin-top:16px;display:flex;align-items:center;gap:12px">'
-    +'<button class="btn btn-primary btn-sm" style="width:auto" onclick="zieleSpeichern()"><i class="ti ti-check"></i> Zielwerte speichern</button>'
-    +'<span id="ziele-status" style="font-size:12px;color:var(--teal)"></span>'
-    +'</div></div>'
-    ):'')
+    // ══ KPI-ZIELE (verschoben nach SFP Wiegand > Zielvereinbarung, siehe kpiZieleHtml()) ══
+
+    // ══ ZIELVEREINBARUNG (verschoben nach SFP Wiegand > Zielvereinbarung, siehe zielvereinbarungHtml()) ══
 
     // ══ INTEGRATIONEN ══
     +(settingsView==='integrations'?(
@@ -4974,31 +6099,12 @@ function renderEinstellungen(){
     +'</div>'
     ):'')
 
-    // ══ PROTOKOLL ══
-    +(settingsView==='log'?(
-    '<div class="card">'
-    +'<div class="card-title"><i class="ti ti-history"></i> Zuletzt geänderte KPI-Ziele & Admin-Aktionen</div>'
-    +(function(){
-      if(!adminAuditLog.length)return '<div style="font-size:12px;color:var(--text3);text-align:center;padding:14px">Noch keine Änderungen protokolliert</div>';
-      var actionLabels={kpi_target_global:'Globale KPI-Ziele',kpi_target_employee:'Individuelle KPI-Ziele',employee_deactivated:'Mitarbeiter deaktiviert'};
-      return '<div style="display:flex;flex-direction:column;gap:6px">'
-        +adminAuditLog.slice(0,20).map(function(a){
-          var who=a.changedBy?(employees.find(function(e){return e.id===a.changedBy;})||{}).name:null;
-          return '<div style="display:flex;align-items:flex-start;gap:10px;padding:8px 10px;background:var(--bg2);border-radius:var(--r-md);font-size:12px">'
-            +'<span style="font-weight:600;width:150px;flex-shrink:0">'+(actionLabels[a.action]||a.action)+'</span>'
-            +'<span style="color:var(--text2);flex:1">'+(a.details||'')+'</span>'
-            +'<span style="color:var(--text3);flex-shrink:0">'+(who?who+' · ':'')+fd(a.changedAt?a.changedAt.slice(0,10):'')+'</span>'
-            +'</div>';
-        }).join('')
-        +'</div>';
-    })()
-    +'</div>'
-    ):'')
+    // ══ PROTOKOLL (entfernt, siehe Aktivitäten > Verlauf) ══
 
     // ══ ÜBER (immer sichtbar, unabhängig vom Tab) ══
     +'<div style="margin-top:24px;padding:16px 20px;background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-lg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);display:flex;align-items:center;gap:16px">'
     +'<div style="width:44px;height:44px;border-radius:9px;background:var(--purple-bg);display:flex;align-items:center;justify-content:center;font-size:20px;color:var(--purple);flex-shrink:0"><i class="ti ti-chart-dots"></i></div>'
-    +'<div><div style="font-size:14px;font-weight:600">SFP Coaching Dashboard</div>'
+    +'<div><div style="font-size:14px;font-weight:600">Sales OS Dashboard</div>'
     +'<div style="font-size:12px;color:var(--text2);margin-top:2px">Wiegand &amp; Partner · v4.1 · Entwickelt für Peter Rode</div>'
     +'<div style="font-size:11px;color:var(--text3);margin-top:3px">localStorage aktiv · GitHub Pages · Single-File HTML</div>'
     +'</div>'
@@ -5572,6 +6678,7 @@ function loadSettingsFromSupabase(){
     if(res.error){console.warn('settings load failed:',res.error);return false;}
     res.data.forEach(function(r){
       if(r.key==='ftpUrl')settings.ftpUrl=r.value||'';
+      if(r.key.indexOf('ziel_nl_')===0)zielNlTargets[r.key.slice(8)]=parseFloat(r.value)||0;
     });
     return true;
   });
@@ -6352,7 +7459,7 @@ if(!hasData){
     banner.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.5);z-index:8000;display:flex;align-items:center;justify-content:center';
     var box='<div style="background:var(--bg);border-radius:16px;padding:32px 40px;max-width:480px;width:90%;box-shadow:0 20px 60px rgba(0,0,0,0.3);text-align:center">';
     box+='<div style="width:56px;height:56px;border-radius:50%;background:var(--purple-bg);color:var(--purple);display:flex;align-items:center;justify-content:center;font-size:24px;margin:0 auto 16px"><i class="ti ti-database-import"></i></div>';
-    box+='<div style="font-size:18px;font-weight:700;margin-bottom:8px">Willkommen im SFP Coaching Dashboard</div>';
+    box+='<div style="font-size:18px;font-weight:700;margin-bottom:8px">Willkommen im Sales OS Dashboard</div>';
     box+='<div style="font-size:13px;color:var(--text2);line-height:1.6;margin-bottom:20px">Noch keine Performance-Daten vorhanden. Lade deine CSV-Datei hoch um loszulegen.</div>';
     box+='<div style="display:flex;gap:10px;justify-content:center">';
     box+='<button class="btn btn-primary" id="fst-csv-btn"><i class="ti ti-upload"></i> CSV jetzt hochladen</button>';
@@ -6418,7 +7525,7 @@ function zieleSpeichern(){
     }
   });
   CR_GOOD=KPI_TARGETS.crOEM.val;
-  renderEinstellungen();
+  renderTeam();
   sb.from('kpi_targets').upsert(updates,{onConflict:'metric_key'}).then(function(res){
     if(res.error){alert('Fehler beim Speichern: '+res.error.message);return;}
     if(changes.length){logAdminAction('kpi_target_global',changes.join(' · '));logActivity('kpi_target','updated','Globale KPI-Ziele geändert: '+changes.join(' · '),null,null);}

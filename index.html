@@ -308,7 +308,7 @@ tr:hover td{background:var(--bg2);}
 <div class="sidebar">
   <div class="sb-header">
     <div class="sb-logo"><div class="sb-brand-badge">SO</div><span class="sb-title">Sales OS</span></div>
-    <div id="sbProfileRow" style="display:flex;align-items:center;gap:8px;margin-top:12px">
+    <div id="sbProfileRow" style="display:flex;align-items:center;gap:8px;margin-top:12px;padding-top:12px;border-top:1px solid var(--border)">
       <div class="av" id="sbProfileAvatar" style="width:30px;height:30px;font-size:12px;background:var(--purple-bg);color:var(--purple);flex-shrink:0">?</div>
       <div style="flex:1;min-width:0">
         <div id="sbProfileName" style="font-size:13px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">—</div>
@@ -2797,14 +2797,15 @@ function allTeams(){
 function activeEmployees(){
   return employees.filter(function(e){return e.active!==false;});
 }
-// Fuer die SFP Wiegand Overview: aktuell Aktive PLUS Mitarbeiter, deren Vertragsende innerhalb der
-// letzten 12 Monate liegt - damit sie in der Performance-Tabelle so lange sichtbar bleiben, wie ihr
-// Vertragsende es hergibt, statt sofort beim Deaktivieren zu verschwinden.
+// Fuer die SFP Wiegand Overview: aktuell Aktive PLUS ALLE ehemaligen Mitarbeiter, die jemals
+// Performance-Daten hatten - dauerhaft, nicht nur zeitlich begrenzt. Ein Mitarbeiter, der bis
+// 31.07.2026 gearbeitet hat, muss auch Jahre spaeter noch in der Performance-Tabelle fuer Juli 2026
+// auftauchen, weil seine Zahlen das damalige Gesamtergebnis mitgepraegt haben - unabhaengig vom
+// aktuellen Status oder davon, wie lange das Vertragsende her ist.
 function activeOrRecentlyEndedEmployees(){
-  var cutoff=monthBoundsUTC(today(),12).from;
   return employees.filter(function(e){
     if(e.active!==false)return true;
-    return e.endDate&&e.endDate>=cutoff;
+    return performance[e.id]&&performance[e.id].length>0;
   });
 }
 
@@ -2882,7 +2883,7 @@ function renderSidebar(){
     });
   }
   var HIDDEN=[];
-  var visible=activeOrRecentlyEndedEmployees().filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var visible=employees.filter(function(e){return e.active!==false&&HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
   // Mitarbeiter in Onboarding-Phase kommen alle in eine Gruppe -- AUSSER VLC (Valencia):
   // VLC wird immer als eigener Standort gefuehrt, unabhaengig vom Onboarding-Status
   var onboardingEmps=visible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
@@ -2913,10 +2914,11 @@ function renderSidebar(){
     var al=checkAlerts(emp.id);
     var d=document.createElement('div');
     d.className='emp-item'+(view==='emp'&&emp.id===selectedEmp?' active':'');
-    var alrt=al.length?('<i class="ti ti-alert-triangle" style="font-size:13px;color:var(--amber);flex-shrink:0"></i>'):'';
+    var alrt=al.length?('<div title="'+al.length+' Performance-Alert'+(al.length!==1?'s':'')+'" style="width:18px;height:18px;border-radius:50%;background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 2px 5px rgba(15,61,66,0.3)"><i class="ti ti-alert-triangle" style="font-size:10px;color:#fff"></i></div>'):'';
+    var missingEnd=(emp.active===false&&!emp.endDate)?('<i class="ti ti-calendar-exclamation" title="Vertragsende fehlt" style="font-size:13px;color:var(--red);flex-shrink:0"></i>'):'';
     d.innerHTML='<div class="av" style="width:38px;height:38px;font-size:14px;background:'+c.bg+';color:'+c.text+'">'+ini(emp.name)+'</div>'
       +'<div style="flex:1;min-width:0"><div class="emp-name">'+emp.name+'</div><div class="emp-role">'+emp.role+'</div></div>'
-      +alrt;
+      +alrt+missingEnd;
     d.onclick=(function(eid){return function(){selectedEmp=eid;view='emp';activeTab='performance';renderSidebar();renderMain();};})(emp.id);
     return d;
   }
@@ -3687,17 +3689,18 @@ function renderTeam(){
   function teamGetPerf(id){return customActive?getPerfRange(id,fromBound,toBound):getPerf(id,days);}
   var HIDDEN=[];
   var allVisible=activeOrRecentlyEndedEmployees().filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
+  var allVisibleActive=employees.filter(function(e){return e.active!==false&&HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
   var inactiveAll=employees.filter(function(e){return e.active===false&&HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
-  var onboardingEmpsT=allVisible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
+  var onboardingEmpsT=allVisibleActive.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
   var FDEFS=[
-    {key:'ALL',    label:'Alle',       n:allVisible.length},
-    {key:'SE',     label:'SE',         n:allVisible.filter(function(e){return e.role==='SE'&&e.phase!=='Onboarding';}).length},
-    {key:'SR',     label:'SR',         n:allVisible.filter(function(e){return e.role==='SR'&&e.phase!=='Onboarding';}).length},
-    {key:'VLC',    label:'VLC',        n:allVisible.filter(function(e){return e.role==='VLC';}).length},
+    {key:'ALL',    label:'Alle',       n:allVisibleActive.length},
+    {key:'SE',     label:'SE',         n:allVisibleActive.filter(function(e){return e.role==='SE'&&e.phase!=='Onboarding';}).length},
+    {key:'SR',     label:'SR',         n:allVisibleActive.filter(function(e){return e.role==='SR'&&e.phase!=='Onboarding';}).length},
+    {key:'VLC',    label:'VLC',        n:allVisibleActive.filter(function(e){return e.role==='VLC';}).length},
     {key:'OB',     label:'Onboarding', n:onboardingEmpsT.length},
     {key:'INAKTIV',label:'Inaktiv',    n:inactiveAll.length},
   ];
-  var list=teamFilter==='INAKTIV'?inactiveAll:teamFilter==='ALL'?allVisible:teamFilter==='OB'?allVisible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';}):teamFilter==='VLC'?allVisible.filter(function(e){return e.role==='VLC';}):allVisible.filter(function(e){return e.role===teamFilter&&e.phase!=='Onboarding';});
+  var list=teamFilter==='INAKTIV'?inactiveAll:teamFilter==='ALL'?allVisibleActive:teamFilter==='OB'?allVisibleActive.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';}):teamFilter==='VLC'?allVisibleActive.filter(function(e){return e.role==='VLC';}):allVisibleActive.filter(function(e){return e.role===teamFilter&&e.phase!=='Onboarding';});
   var allP=list.map(function(e){return teamGetPerf(e.id);}).reduce(function(a,b){return a.concat(b);},[]);
   function tAvg(key){if(!allP.length)return null;return allP.reduce(function(a,x){return a+x[key];},0)/allP.length;}
   var totalAlerts=list.reduce(function(a,e){return a+checkAlerts(e.id).length;},0);
@@ -4454,31 +4457,20 @@ function renderTab(){
     });
     html+='</div>';
     if(alerts.length){
-      html+='<div class="alert alert-danger" style="margin-bottom:16px">'
-        +'<i class="ti ti-alert-circle" style="font-size:18px;color:var(--red);flex-shrink:0"></i>'
-        +'<div><div style="font-size:13px;font-weight:600;color:var(--red)">'+alerts.length+' KPI'+(alerts.length!==1?'s':'')+' unter Zielwert</div>'
-        +'<div style="font-size:12px;color:var(--red)">'+alerts.map(function(a){return a.key+': '+a.val;}).join(' · ')+'</div>'
-        +'<div style="margin-top:8px"><button class="btn btn-sm btn-primary" onclick="openSessionModal(selectedEmp)"><i class="ti ti-calendar"></i> Session planen</button></div>'
+      html+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);border-radius:var(--r-lg);padding:14px 16px;margin-bottom:16px;display:flex;align-items:flex-start;gap:12px;box-shadow:0 12px 28px rgba(15,61,66,0.22)">'
+        +'<i class="ti ti-alert-circle" style="font-size:18px;color:#7ED2DB;flex-shrink:0"></i>'
+        +'<div><div style="font-size:13px;font-weight:600;color:#fff">'+alerts.length+' KPI'+(alerts.length!==1?'s':'')+' unter Zielwert</div>'
+        +'<div style="font-size:12px;color:rgba(255,255,255,0.75)">'+alerts.map(function(a){return a.key+': '+a.val;}).join(' · ')+'</div>'
+        +'<div style="margin-top:8px"><button class="btn btn-sm" style="background:#fff;color:#174C52;border:none" onclick="openSessionModal(selectedEmp)"><i class="ti ti-calendar"></i> Session planen</button></div>'
         +'</div></div>';
     }
     // Chart
-    var mMap={
-      calls:{f:'aktivitaeten',l:'Aktivitäten',c:'#206A72'},
-      convOEM:{f:'convOEM',l:'Conv. OEM',c:'#206A72'},
-      optGesamt:{f:'optGesamt',l:'Opt. Gesamt',c:'#206A72'},
-      crOEM:{f:'crOEM',l:'CR OEM %',c:'#206A72'},
-      crTeilweise:{f:'crTeilweise',l:'CR TW %',c:'#206A72'},
-      crYes:{f:'crYes',l:'CR Yes %',c:'#206A72'},
-      crSuperYes:{f:'crSuperYes',l:'CR SY %',c:'#206A72'},
-      crMegaYes:{f:'crMegaYes',l:'CR MY %',c:'#206A72'},
-      margeGesamt:{f:'margeGesamt',l:'Marge',c:'#206A72'}
-    };
     html+='<div class="card" style="margin-bottom:22px">'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">'
       +'<div class="card-title" style="margin:0">Performance Trend</div>'
       +'<div style="display:flex;gap:8px;flex-wrap:wrap">'
       +'<div class="chart-toggle">';
-    [{k:'aktivitaeten',l:'Aktivitäten'},{k:'convOEM',l:'Conv. OEM'},{k:'optGesamt',l:'Opt. Ges.'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSuperYes',l:'CR SY'},{k:'crMegaYes',l:'CR MY'},{k:'margeGesamt',l:'Marge'}].forEach(function(it){
+    [{k:'margeGesamt',l:'Marge Gesamt'},{k:'aktivitaeten',l:'Aktivitäten'},{k:'optGesamt',l:'Opt. Ges.'},{k:'convOEM',l:'Opt. OEM'},{k:'upsells',l:'Opt. Upsells'},{k:'wka',l:'Opt. WKA'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSuperYes',l:'CR SY'},{k:'crMegaYes',l:'CR MY'}].forEach(function(it){
       html+='<button class="'+(perfMetric===it.k?'active':'')+'" data-m="'+it.k+'" onclick="setMetric(this.dataset.m)">'+it.l+'</button>';
     });
     html+='</div><div class="chart-toggle">';
@@ -4493,7 +4485,7 @@ function renderTab(){
       +'<button class="btn btn-sm'+(perfCustomActive?' btn-primary':'')+'" style="padding:3px 8px" onclick="applyPerfCustomRange()"><i class="ti ti-check"></i></button>'
       +(perfCustomActive?'<button class="btn btn-sm" style="padding:3px 7px" onclick="clearPerfCustomRange()" title="Custom-Zeitraum zurücksetzen"><i class="ti ti-x"></i></button>':'')
       +'</div>'
-      +'</div></div><canvas id="perfChart" height="80"></canvas>'
+      +'</div></div><div style="height:280px;position:relative"><canvas id="perfChart"></canvas></div>'
       +'<div style="display:flex;gap:16px;margin-top:8px;font-size:10.5px;color:var(--text2)">'
       +'<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:1.5px dashed rgba(32,106,114,0.7);display:inline-block"></span>Coaching zu diesem KPI (Kürzel = Coach)</span>'
       +'<span style="display:flex;align-items:center;gap:5px"><span style="width:14px;height:0;border-top:1.5px dashed rgba(140,140,140,0.6);display:inline-block"></span>Coaching zu anderem Thema</span>'
@@ -5497,6 +5489,7 @@ function renderTab(){
     html+='<div><label>Phase</label><select id="es-phase">'
       +'<option'+(emp.phase==='Onboarding'?' selected':'')+'>Onboarding</option>'
       +'<option'+(emp.phase==='Aktiv'?' selected':'')+'>Aktiv</option>'
+      +'<option'+(emp.phase==='Inaktiv'?' selected':'')+'>Inaktiv</option>'
       +'</select></div>';
     html+='<div><label>Anstellung</label><select id="es-contract">'
       +'<option value="Vollzeit"'+(emp.contract==='Vollzeit'||emp.contract==='full'?' selected':'')+'>Vollzeit</option>'
@@ -5623,14 +5616,6 @@ function renderTab(){
       }
       html+='</div>';
     } // Ende historie
-
-    if(true){
-      html+='<div class="card" style="border-top:2px solid var(--amber)">'
-      html+='<div class="card-title" style="color:var(--amber-dark)"><i class="ti ti-user-off"></i> Mitarbeiter deaktivieren</div>'
-      html+='<p style="font-size:13px;color:var(--text2);margin-bottom:14px;line-height:1.6">Deaktivierte Mitarbeiter werden in der Sidebar und Teamübersicht ausgeblendet. Alle Daten bleiben vollständig erhalten und können jederzeit wiederhergestellt werden.</p>'
-      html+='<button class="btn btn-sm" style="background:var(--amber-bg);color:var(--amber-dark);border-color:var(--amber)" onclick="mitarbeiterDeaktivieren()"><i class="ti ti-user-off"></i> '+emp.name+' deaktivieren</button>'
-      html+='</div>';
-    } // Ende verwaltung
   }
 
   tc2.innerHTML=html;
@@ -5645,7 +5630,9 @@ function renderTab(){
       var labels=data.map(function(d){return fd(d.date);});
       var mMap={
         aktivitaeten:{f:'aktivitaeten',l:'Aktivitäten',    c:'#206A72'},
-        convOEM:     {f:'convOEM',     l:'Conv. OEM',      c:'#206A72'},
+        convOEM:     {f:'convOEM',     l:'Opt. OEM',       c:'#206A72'},
+        upsells:     {f:'upsells',     l:'Opt. Upsells',   c:'#206A72'},
+        wka:         {f:'wka',         l:'Opt. WKA',       c:'#206A72'},
         optGesamt:   {f:'optGesamt',   l:'Opt. Gesamt',    c:'#206A72'},
         crOEM:       {f:'crOEM',       l:'CR OEM %',       c:'#206A72'},
         crTeilweise: {f:'crTeilweise', l:'CR TW %',        c:'#206A72'},
@@ -5797,6 +5784,7 @@ function renderTab(){
         plugins:[coachLinePlugin],
         options:{
           responsive:true,
+          maintainAspectRatio:false,
           layout:{padding:{top:14}},
           plugins:{
             legend:{
@@ -6880,7 +6868,12 @@ function importCSV(file){
   var reader=new FileReader();
   reader.onload=function(e){
     try{
-      var lines=e.target.result.split(/\r?\n/).filter(function(l){return l.trim();});
+      // Excel exportiert deutsche CSVs meist in Windows-1252 (Umlaute werden sonst zu "?"/Mojibake).
+      // UTF-8-BOM pruefen; falls vorhanden UTF-8 nutzen, sonst Windows-1252 dekodieren.
+      var bytes=new Uint8Array(e.target.result);
+      var hasBom=bytes.length>=3&&bytes[0]===0xEF&&bytes[1]===0xBB&&bytes[2]===0xBF;
+      var text=new TextDecoder(hasBom?'utf-8':'windows-1252').decode(hasBom?bytes.subarray(3):bytes);
+      var lines=text.split(/\r?\n/).filter(function(l){return l.trim();});
       if(lines.length<2){if(statusEl)statusEl.textContent='Keine Datenzeilen gefunden.';return;}
       // Trennzeichen automatisch erkennen: deutsches Excel exportiert bei Komma-Dezimalzahlen oft mit Semikolon
       var delim=(lines[0].split(';').length>lines[0].split(',').length)?';':',';
@@ -6948,7 +6941,7 @@ function importCSV(file){
       if(statusEl){statusEl.style.color='#b91c1c';statusEl.textContent='Fehler beim Verarbeiten: '+ex.message;}
     }
   };
-  reader.readAsText(file);
+  reader.readAsArrayBuffer(file);
 }
 
 function saveFTP(){
@@ -7190,6 +7183,9 @@ function saveEmpEinstellungen(){
   emp.name=document.getElementById('es-name').value.trim()||emp.name;
   emp.role=document.getElementById('es-role').value;
   emp.phase=document.getElementById('es-phase').value;
+  var wasActive=oldSnapshot.phase!=='Inaktiv';
+  var nowActive=emp.phase!=='Inaktiv';
+  emp.active=nowActive;
   emp.team=teamVal||emp.team;
   var locEl=document.getElementById('es-location');
   if(locEl)emp.location=locEl.value.trim()||emp.team;
@@ -7201,7 +7197,7 @@ function saveEmpEinstellungen(){
   if(notesEl)emp.notes=notesEl.value;
   renderSidebar();renderEmpDetail();  lsSave();
   sb.from('employees').update({
-    name:emp.name,role:emp.role,phase:emp.phase,team:emp.team,
+    name:emp.name,role:emp.role,phase:emp.phase,team:emp.team,active:emp.active,
     start_date:emp.startDate||null,end_date:emp.endDate||null,
     contract:emp.contract,hours:emp.hours,notes:emp.notes||null,color_index:emp.color
   }).eq('id',emp.id).then(function(res){
@@ -7215,6 +7211,8 @@ function saveEmpEinstellungen(){
     if(oldSnapshot.startDate!==emp.startDate)stammChanges.push('Vertragsbeginn: '+(oldSnapshot.startDate||'—')+' → '+(emp.startDate||'—'));
     if(oldSnapshot.endDate!==emp.endDate)stammChanges.push('Vertragsende: '+(oldSnapshot.endDate||'—')+' → '+(emp.endDate||'—'));
     if(stammChanges.length)logActivity('stammdaten','updated','Stammdaten geändert: '+stammChanges.join(' · '),emp.id,emp.name);
+    if(wasActive&&!nowActive){logAdminAction('employee_deactivated','Mitarbeiter: '+emp.name);logActivity('employee','deleted','Mitarbeiter deaktiviert (Phase: Inaktiv): '+emp.name,emp.id,emp.role);}
+    else if(!wasActive&&nowActive){logActivity('employee','updated','Mitarbeiter reaktiviert (Phase: '+emp.phase+'): '+emp.name,emp.id,emp.role);}
   });
   // Team-/Rollenwechsel-Historie protokollieren
   var histRows=[];
@@ -7269,20 +7267,7 @@ function saveEmpZiele(){
     alert('Unerwarteter Fehler: '+err.message);
   });
 }
-function mitarbeiterDeaktivieren(){
-  var emp=employees.find(function(e){return e.id===selectedEmp;});
-  if(!emp)return;
-  if(!confirm('Mitarbeiter deaktivieren: '+emp.name+'?\n\nSie werden ausgeblendet. Alle Daten bleiben vollständig erhalten.'))return;
-  emp.active=false;
-  view='team';
-  renderSidebar();
-  renderMain();
-  sb.from('employees').update({active:false}).eq('id',emp.id).then(function(res){
-    if(res.error){alert('Fehler beim Deaktivieren: '+res.error.message+'\n\nDer Mitarbeiter ist lokal ausgeblendet, aber die Änderung wurde NICHT gespeichert.');return;}
-    logAdminAction('employee_deactivated','Mitarbeiter: '+emp.name);
-    logActivity('employee','deleted','Mitarbeiter deaktiviert: '+emp.name,emp.id,emp.role);
-  });
-}
+// (mitarbeiterDeaktivieren() entfernt - Deaktivierung/Reaktivierung laeuft jetzt sauber ueber die Phase im Stammdaten-Formular)
 
 
 

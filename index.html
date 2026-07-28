@@ -412,9 +412,11 @@ tr:hover td{background:var(--bg2);}
 
 <!-- SESSION PLANEN MODAL -->
 <div class="modal-ov hidden" id="sessionPlanenModal"><div class="modal" style="width:640px">
-  <div class="modal-title" style="display:flex;align-items:center;gap:8px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Session planen</div>
-  <div class="f2" style="margin-bottom:10px">
-    <div style="position:relative">
+  <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Session planen</div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Wer & wann</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div style="position:relative;margin-bottom:10px">
       <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere für Gruppencoaching)</span></label>
       <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between" onclick="toggleSessionEmpDropdown()">
         <span id="sessionEmpSelLabel">— Mitarbeiter wählen —</span>
@@ -428,42 +430,44 @@ tr:hover td{background:var(--bg2);}
       <div><label>Ende</label><input type="time" id="sessionEndUhrzeit"></div>
     </div>
   </div>
-  <div class="f2" style="margin-bottom:10px">
-    <div><label>Art des Coachings</label><select id="sessionTyp">
-      <option>Call Shadowing Aktiv</option>
-      <option>Call Shadowing Passiv</option>
-      <option>1:1 Coaching</option>
-      <option>Calls Review</option>
-      <option>Gruppencoaching</option>
-      <option>Quiz</option>
-      <option>SolidRoad</option>
-      <option>Bemerkung</option>
-      <option>Sonstiges</option>
-    </select></div>
-    <div><label>Inhalt des Coachings</label><select id="sessionThema">
-      <option value="">— Bitte wählen —</option>
-      <option>Einwandsbehandlung</option>
-      <option>Bedarfsanalyse</option>
-      <option>Produktwissen</option>
-      <option>Gesprächsführung</option>
-      <option>Motivation</option>
-      <option>Coachability</option>
-      <option>Zuverlässigkeit</option>
-      <option>Teamfähigkeit</option>
-      <option>CR OEM</option>
-      <option>TW</option>
-      <option>SY</option>
-      <option>MY</option>
-      <option>Sonstiges</option>
-    </select></div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">② Was für ein Coaching</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div class="f2" style="margin-bottom:10px">
+      <div><label>Kategorie</label><select id="sessionKategorie" onchange="onCoachingCategoryChange('sessionKategorie','sessionTyp')"></select></div>
+      <div><label>Art des Coachings</label><select id="sessionTyp"></select></div>
+    </div>
+    <div class="f2">
+      <div><label>Inhalt des Coachings</label><select id="sessionThema">
+        <option value="">— Bitte wählen —</option>
+        <option>Einwandsbehandlung</option>
+        <option>Bedarfsanalyse</option>
+        <option>Produktwissen</option>
+        <option>Gesprächsführung</option>
+        <option>Motivation</option>
+        <option>Coachability</option>
+        <option>Zuverlässigkeit</option>
+        <option>Teamfähigkeit</option>
+        <option>CR OEM</option>
+        <option>TW</option>
+        <option>SY</option>
+        <option>MY</option>
+        <option>Sonstiges</option>
+      </select></div>
+      <div><label>Ziel-KPI <span style="font-weight:400;color:var(--text3);font-size:11px">(worauf einzahlen?)</span></label>
+        <select id="sessionFocusMetric">
+          <option value="">— Kein spezifisches KPI —</option>
+        </select>
+      </div>
+    </div>
   </div>
-  <div style="margin-bottom:10px"><label>Ziel-KPI <span style="font-weight:400;color:var(--text3);font-size:11px">(worauf soll dieses Coaching einzahlen?)</span></label>
-    <select id="sessionFocusMetric">
-      <option value="">— Kein spezifisches KPI —</option>
-    </select>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">③ Kontext</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:14px">
+    <div id="lastContinueBox"></div>
+    <div><label>Anlass / Notiz für den Coach</label><textarea id="sessionNotiz" placeholder="Warum wird diese Session eingeplant? Was soll der Coach beachten..."></textarea></div>
   </div>
-  <div id="lastContinueBox"></div>
-  <div style="margin-bottom:14px"><label>Anlass / Notiz für den Coach</label><textarea id="sessionNotiz" placeholder="Warum wird diese Session eingeplant? Was soll der Coach beachten..."></textarea></div>
+
   <div class="modal-actions">
     <button class="btn" onclick="closeModal('sessionPlanenModal')">Abbrechen</button>
     <button class="btn btn-primary" onclick="sessionSpeichernNeu()"><i class="ti ti-check"></i> Session planen</button>
@@ -482,38 +486,54 @@ tr:hover td{background:var(--bg2);}
 
 <!-- NEUES COACHING ERFASSEN (ehem. "Neue Session erfassen", jetzt Pop-up) -->
 <div class="modal-ov hidden" id="neuesCoachingModal"><div class="modal" style="width:560px;max-width:95vw;max-height:88vh;overflow-y:auto">
-  <div class="modal-title" style="display:flex;align-items:center;gap:8px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Neue Session erfassen</div>
-  <div id="ncLastContinueBox"></div>
-  <div class="f3" style="gap:8px;margin-bottom:10px">
-    <div><label>Datum</label><input type="date" id="sess-date" value=""></div>
-    <div><label>Start</label><input type="time" id="sess-time" value=""></div>
-    <div><label>Ende</label><input type="time" id="sess-end-time" value=""></div>
-  </div>
-  <div class="f2" style="margin-bottom:10px">
-    <div><label>Art des Coachings</label><select id="sess-type"></select></div>
-    <div><label>Inhalt des Coachings</label><select id="sess-topic-sel" onchange="syncSessFocusMetric()"><option value="">— Bitte wählen —</option></select></div>
-  </div>
-  <div style="margin-bottom:10px"><label>Ziel-KPI <span style="font-weight:400;color:var(--text3);font-size:11px">(worauf soll dieses Coaching einzahlen?)</span></label>
-    <select id="sess-focus-metric"><option value="">— Kein spezifisches KPI —</option></select>
-  </div>
-  <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:14px">
-    <div style="border-radius:var(--r-md);overflow:hidden">
-      <div style="background:var(--teal-bg);padding:7px 12px;border-left:3px solid var(--teal-dark)"><span style="font-size:11px;font-weight:700;color:var(--teal-dark)">START</span> <span style="font-size:11px;color:var(--teal-dark);opacity:0.7">– Was soll neu begonnen werden?</span></div>
-      <textarea id="sess-start" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
-    </div>
-    <div style="border-radius:var(--r-md);overflow:hidden">
-      <div style="background:var(--red-bg);padding:7px 12px;border-left:3px solid var(--red)"><span style="font-size:11px;font-weight:700;color:var(--red)">STOP</span> <span style="font-size:11px;color:var(--red);opacity:0.7">– Was soll aufgehört werden?</span></div>
-      <textarea id="sess-stop" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
-    </div>
-    <div style="border-radius:var(--r-md);overflow:hidden">
-      <div style="background:var(--amber-bg);padding:7px 12px;border-left:3px solid var(--amber-dark)"><span style="font-size:11px;font-weight:700;color:var(--amber-dark)">CONTINUE</span> <span style="font-size:11px;color:var(--amber-dark);opacity:0.7">– Was soll beibehalten werden?</span></div>
-      <textarea id="sess-cont" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
-    </div>
-    <div style="border-radius:var(--r-md);overflow:hidden">
-      <div style="background:var(--bg2);padding:7px 12px;border-left:3px solid var(--text2)"><span style="font-size:11px;font-weight:700;color:var(--text2)">Notizen</span> <span style="font-size:11px;color:var(--text2);opacity:0.7">– Beobachtungen &amp; Vereinbarungen</span></div>
-      <textarea id="sess-note" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
+  <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Neue Session erfassen</div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Wann</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div class="f3" style="gap:8px">
+      <div><label>Datum</label><input type="date" id="sess-date" value=""></div>
+      <div><label>Start</label><input type="time" id="sess-time" value=""></div>
+      <div><label>Ende</label><input type="time" id="sess-end-time" value=""></div>
     </div>
   </div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">② Was für ein Coaching</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div class="f2" style="margin-bottom:10px">
+      <div><label>Kategorie</label><select id="sess-category" onchange="onCoachingCategoryChange('sess-category','sess-type')"></select></div>
+      <div><label>Art des Coachings</label><select id="sess-type"></select></div>
+    </div>
+    <div class="f2">
+      <div><label>Inhalt des Coachings</label><select id="sess-topic-sel" onchange="syncSessFocusMetric()"><option value="">— Bitte wählen —</option></select></div>
+      <div><label>Ziel-KPI <span style="font-weight:400;color:var(--text3);font-size:11px">(worauf einzahlen?)</span></label>
+        <select id="sess-focus-metric"><option value="">— Kein spezifisches KPI —</option></select>
+      </div>
+    </div>
+  </div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">③ Rückblick & Kontext</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:14px">
+    <div id="ncLastContinueBox"></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div style="border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--teal-bg);padding:7px 12px;border-left:3px solid var(--teal-dark)"><span style="font-size:11px;font-weight:700;color:var(--teal-dark)">START</span> <span style="font-size:11px;color:var(--teal-dark);opacity:0.7">– Was soll neu begonnen werden?</span></div>
+        <textarea id="sess-start" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
+      </div>
+      <div style="border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--red-bg);padding:7px 12px;border-left:3px solid var(--red)"><span style="font-size:11px;font-weight:700;color:var(--red)">STOP</span> <span style="font-size:11px;color:var(--red);opacity:0.7">– Was soll aufgehört werden?</span></div>
+        <textarea id="sess-stop" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
+      </div>
+      <div style="border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--amber-bg);padding:7px 12px;border-left:3px solid var(--amber-dark)"><span style="font-size:11px;font-weight:700;color:var(--amber-dark)">CONTINUE</span> <span style="font-size:11px;color:var(--amber-dark);opacity:0.7">– Was soll beibehalten werden?</span></div>
+        <textarea id="sess-cont" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
+      </div>
+      <div style="border-radius:var(--r-md);overflow:hidden">
+        <div style="background:var(--bg2);padding:7px 12px;border-left:3px solid var(--text2)"><span style="font-size:11px;font-weight:700;color:var(--text2)">Notizen</span> <span style="font-size:11px;color:var(--text2);opacity:0.7">– Beobachtungen &amp; Vereinbarungen</span></div>
+        <textarea id="sess-note" rows="2" style="width:100%;box-sizing:border-box;padding:8px 12px;font-size:12px;border:1px solid var(--border);border-top:none;border-radius:0 0 var(--r-md) var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea>
+      </div>
+    </div>
+  </div>
+
   <div class="modal-actions">
     <button class="btn" onclick="closeModal('neuesCoachingModal')">Abbrechen</button>
     <button class="btn btn-primary" data-eid="" id="ncSaveBtn" onclick="saveSession(document.getElementById('ncSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Session speichern</button>
@@ -522,31 +542,43 @@ tr:hover td{background:var(--bg2);}
 
 <!-- NEUEN CALL BEWERTEN -->
 <div class="modal-ov hidden" id="qaBewertungModal"><div class="modal" style="width:600px;max-width:95vw;max-height:88vh;overflow-y:auto">
-  <div class="modal-title" style="display:flex;align-items:center;gap:8px"><i class="ti ti-phone-plus" style="color:var(--purple)"></i> Neuen Call bewerten</div>
-  <div style="margin-bottom:10px"><label>Datum</label><input type="date" id="cb-date"></div>
-  <div class="f2" style="margin-bottom:10px">
-    <div><label>Auftragsnummer</label><input type="text" id="cb-auftrag" placeholder="z.B. 438043417"></div>
-    <div><label>Bewertet von</label><input type="text" id="cb-bewerter" placeholder="Name"></div>
+  <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-phone-plus" style="color:var(--purple)"></i> Neuen Call bewerten</div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Call-Details</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div style="margin-bottom:10px"><label>Datum</label><input type="date" id="cb-date"></div>
+    <div class="f2" style="margin-bottom:10px">
+      <div><label>Auftragsnummer</label><input type="text" id="cb-auftrag" placeholder="z.B. 438043417"></div>
+      <div><label>Bewertet von</label><input type="text" id="cb-bewerter" placeholder="Name"></div>
+    </div>
+    <div class="f2" style="margin-bottom:10px">
+      <div><label>Abschluss?</label><select id="cb-status"><option value="nein">Nein</option><option value="ja">Ja</option></select></div>
+      <div><label>B2B / B2C</label><select id="cb-b2b"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div>
+    </div>
+    <div style="margin-bottom:10px"><label>Optimierung</label>
+      <select id="cb-abschlussart">
+        <option value="">Keine Optimierung</option>
+        <option value="TW">Opt.: TW</option>
+        <option value="Yes">Opt.: Yes</option>
+        <option value="SY">Opt.: SY</option>
+        <option value="MY">Opt.: MY</option>
+        <option value="Upsell">Opt.: Upsell</option>
+        <option value="WKA">Opt.: WKA</option>
+      </select>
+    </div>
+    <div><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div>
   </div>
-  <div class="f2" style="margin-bottom:10px">
-    <div><label>Abschluss?</label><select id="cb-status"><option value="nein">Nein</option><option value="ja">Ja</option></select></div>
-    <div><label>B2B / B2C</label><select id="cb-b2b"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">② Bewertung (1–4 pro Kriterium)</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">
+    <div id="qaScoringSection" style="display:flex;flex-direction:column;gap:8px"></div>
   </div>
-  <div style="margin-bottom:10px"><label>Optimierung</label>
-    <select id="cb-abschlussart">
-      <option value="">Keine Optimierung</option>
-      <option value="TW">Opt.: TW</option>
-      <option value="Yes">Opt.: Yes</option>
-      <option value="SY">Opt.: SY</option>
-      <option value="MY">Opt.: MY</option>
-      <option value="Upsell">Opt.: Upsell</option>
-      <option value="WKA">Opt.: WKA</option>
-    </select>
+
+  <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">③ Notiz</div>
+  <div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:14px">
+    <div><label>Hinweis / Notiz</label><textarea id="cb-hinweis" rows="2" placeholder="Beobachtungen, Verbesserungspotenzial"></textarea></div>
   </div>
-  <div style="margin-bottom:12px"><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div>
-  <div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:8px">BEWERTUNG (1–4 pro Kriterium)</div>
-  <div id="qaScoringSection" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
-  <div style="margin-bottom:14px"><label>Hinweis / Notiz</label><textarea id="cb-hinweis" rows="2" placeholder="Beobachtungen, Verbesserungspotenzial"></textarea></div>
+
   <div class="modal-actions">
     <button class="btn" onclick="closeModal('qaBewertungModal')">Abbrechen</button>
     <button class="btn btn-primary" id="qaSaveBtn" data-eid="" onclick="saveInlineCallBewertung(document.getElementById('qaSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Bewertung speichern</button>
@@ -811,7 +843,54 @@ function setCoachCalMonth(delta){
   coachCalYear=d.getFullYear();coachCalMonthIdx=d.getMonth();
   renderCoachingAnsicht();
 }
-var SESSION_TYPES=['Call Shadowing Aktiv','Call Shadowing Passiv','1:1 Coaching','Calls Review','Gruppencoaching','Quiz','SolidRoad','Bemerkung','Sonstiges'];
+var COACHING_CATEGORIES={
+  'Coaching':['Einzelcoaching','Gruppencoaching','Call Shadowing (Aktiv)','Call Shadowing (Passiv)','Live Coaching','Call Review','Rollenspiel','Feedbackgespräch'],
+  'Training':['Produkttraining','Pitch-Training','Einwandtraining','Systemtraining','SolidRoad-Training','Wissens-Quiz','Nachschulung'],
+  'Performance':['KPI Review','Performance Review','Zielvereinbarung','Tagesziel','Wochenziel','Monatsziel'],
+  'Power Hour':['Call Blitz','Mega YES','Cross Selling','Neukunden','Bestandskunden','Follow-up','Angebotsnachverfolgung','Einwandtraining','Abschlusstraining','Lead-Abarbeitung','Fokuszeit'],
+  'Motivation & Organisation':['Motivation','Teammeeting','Daily','Weekly','Kick-off'],
+  'Entwicklung':['Onboarding','Mentoring','Karrieregespräch','Entwicklungsplan']
+};
+function findCoachingCategoryForType(typeValue){
+  var cats=Object.keys(COACHING_CATEGORIES);
+  for(var i=0;i<cats.length;i++){
+    if(COACHING_CATEGORIES[cats[i]].indexOf(typeValue)>=0)return cats[i];
+  }
+  return cats[0];
+}
+function populateCoachingCategorySelect(catSelId){
+  var catEl=document.getElementById(catSelId);
+  if(!catEl||catEl.options.length)return;
+  Object.keys(COACHING_CATEGORIES).forEach(function(cat){
+    var o=document.createElement('option');o.textContent=cat;catEl.appendChild(o);
+  });
+}
+function populateCoachingTypeSelect(catSelId,typeSelId,preselectType){
+  var catEl=document.getElementById(catSelId),typeEl=document.getElementById(typeSelId);
+  if(!catEl||!typeEl)return;
+  var cat=catEl.value||Object.keys(COACHING_CATEGORIES)[0];
+  typeEl.innerHTML='';
+  (COACHING_CATEGORIES[cat]||[]).forEach(function(t){
+    var o=document.createElement('option');o.textContent=t;typeEl.appendChild(o);
+  });
+  if(preselectType){
+    for(var i=0;i<typeEl.options.length;i++){
+      if(typeEl.options[i].value===preselectType||typeEl.options[i].text===preselectType){typeEl.selectedIndex=i;break;}
+    }
+  }
+}
+function onCoachingCategoryChange(catSelId,typeSelId){
+  populateCoachingTypeSelect(catSelId,typeSelId,null);
+}
+function setCoachingTypeSelection(catSelId,typeSelId,typeValue){
+  var catEl=document.getElementById(catSelId);
+  if(!catEl)return;
+  var cat=findCoachingCategoryForType(typeValue);
+  for(var i=0;i<catEl.options.length;i++){
+    if(catEl.options[i].text===cat){catEl.selectedIndex=i;break;}
+  }
+  populateCoachingTypeSelect(catSelId,typeSelId,typeValue);
+}
 var SESSION_TOPICS=['Einwandsbehandlung','Bedarfsanalyse','Produktwissen','Gesprächsführung','Motivation','Coachability','Zuverlässigkeit','Teamfähigkeit','CR OEM','CR TW','CR SY','CR MY','Sonstiges'];
 var FOCUS_METRICS=[
   {key:'aktivitaeten',label:'Aktivitäten'},
@@ -6215,17 +6294,17 @@ function openCoachingEval(empId){
     {key:'crSY',label:'SY',cat:'result'},
     {key:'crMY',label:'MY',cat:'result'}
   ];
-  var CC={skill:{col:'#534AB7',bg:'#EEEDFE',l:'Skill'},will:{col:'#BA7517',bg:'#FBEAE0',l:'Will'},result:{col:'#085041',bg:'#E1F5EE',l:'Result'}};
+  var CC={skill:{col:'#0c3b40',bg:'rgba(12,59,64,0.08)',l:'Skill'},will:{col:'#164e54',bg:'rgba(22,78,84,0.12)',l:'Will'},result:{col:'#1d6169',bg:'rgba(29,97,105,0.16)',l:'Result'}};
   var existing=(reviews[empId]||[]).filter(function(r){return r.einwand!==undefined;});
   var last=existing.length?existing.sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null;
 
   // Build modal via DOM API - no onclick strings needed
   var overlay=document.createElement('div');
   overlay.id='cevModal';
-  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,0.55);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
 
   var box=document.createElement('div');
-  box.style.cssText='background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:16px;padding:24px 28px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;box-shadow:0 24px 64px rgba(0,0,0,0.3)';
+  box.style.cssText='background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:14px;padding:24px 28px;width:100%;max-width:540px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18)';
 
   // Header
   var hdr=document.createElement('div');
@@ -6239,8 +6318,14 @@ function openCoachingEval(empId){
   box.appendChild(hdr);
 
   // Date input
+  var sec1=document.createElement('div');
+  sec1.style.cssText='font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec1.textContent='① Bewertungsdatum';
+  box.appendChild(sec1);
+  var sec1body=document.createElement('div');
+  sec1body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
   var dateWrap=document.createElement('div');
-  dateWrap.style.marginBottom='16px';
+  dateWrap.style.marginBottom='0';
   var dateLabel=document.createElement('label');
   dateLabel.style.cssText='font-size:12px;font-weight:600;color:var(--text2)';
   dateLabel.textContent='Bewertungsdatum';
@@ -6251,7 +6336,16 @@ function openCoachingEval(empId){
   dateInput.style.cssText='display:block;margin-top:4px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:180px';
   dateWrap.appendChild(dateLabel);
   dateWrap.appendChild(dateInput);
-  box.appendChild(dateWrap);
+  sec1body.appendChild(dateWrap);
+  box.appendChild(sec1body);
+
+  var sec2=document.createElement('div');
+  sec2.style.cssText='font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec2.textContent='② Bewertung (Skill / Will / Result)';
+  box.appendChild(sec2);
+  var sec2body=document.createElement('div');
+  sec2body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
+  box.appendChild(sec2body);
 
   // Sliders per category
   ['skill','will','result'].forEach(function(cat){
@@ -6281,12 +6375,18 @@ function openCoachingEval(empId){
       row.appendChild(lbl);row.appendChild(slider);row.appendChild(val);
       catDiv.appendChild(row);
     });
-    box.appendChild(catDiv);
+    sec2body.appendChild(catDiv);
   });
 
   // Note
+  var sec3=document.createElement('div');
+  sec3.style.cssText='font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec3.textContent='③ Notiz';
+  box.appendChild(sec3);
+  var sec3body=document.createElement('div');
+  sec3body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:14px';
   var noteWrap=document.createElement('div');
-  noteWrap.style.marginBottom='16px';
+  noteWrap.style.marginBottom='0';
   var noteLabel=document.createElement('label');
   noteLabel.style.cssText='font-size:12px;font-weight:600;color:var(--text2)';
   noteLabel.textContent='Notiz (optional)';
@@ -6297,7 +6397,8 @@ function openCoachingEval(empId){
   noteArea.style.cssText='display:block;margin-top:4px;width:100%;box-sizing:border-box;font-size:12px;padding:8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);resize:vertical';
   noteWrap.appendChild(noteLabel);
   noteWrap.appendChild(noteArea);
-  box.appendChild(noteWrap);
+  sec3body.appendChild(noteWrap);
+  box.appendChild(sec3body);
 
   // Buttons
   var btnRow=document.createElement('div');
@@ -7052,11 +7153,7 @@ function openPlannedSession(empId, sessionId, typ, fokus, datum, uhrzeit){
     if(dateEl&&datum) dateEl.value=datum;
     if(timeEl&&uhrzeit) timeEl.value=uhrzeit;
     if(endTimeEl&&proto&&proto.endUhrzeit) endTimeEl.value=proto.endUhrzeit;
-    if(typeEl&&typ){
-      for(var i=0;i<typeEl.options.length;i++){
-        if(typeEl.options[i].value===typ||typeEl.options[i].text===typ){typeEl.selectedIndex=i;break;}
-      }
-    }
+    if(typ)setCoachingTypeSelection('sess-category','sess-type',typ);
     if(topicEl&&fokus){
       for(var j=0;j<topicEl.options.length;j++){
         if(topicEl.options[j].value===fokus||topicEl.options[j].text===fokus){topicEl.selectedIndex=j;break;}
@@ -7489,6 +7586,8 @@ function openSessionModal(empId){
   sessionSelectedEmpIds=empId?[empId]:[];
   sessionEmpDropdownOpen=false;sessionEmpSearchQuery='';
   renderSessionEmpDropdown();
+  populateCoachingCategorySelect('sessionKategorie');
+  populateCoachingTypeSelect('sessionKategorie','sessionTyp',null);
   var fmSel=document.getElementById('sessionFocusMetric');
   if(fmSel&&fmSel.options.length<=1){
     FOCUS_METRICS.forEach(function(m){
@@ -7570,11 +7669,11 @@ function renderLastContinueBox(empId,boxId){
   if(!box)return;
   var last=(protocols[empId]||[]).filter(function(s){return s.status!=='geplant'&&s.cont&&s.cont.trim();}).sort(function(a,b){return b.date.localeCompare(a.date);})[0];
   if(!last){box.innerHTML='';return;}
-  box.innerHTML='<div class="alert alert-warn" style="margin-bottom:12px;padding:10px 12px">'
-    +'<i class="ti ti-repeat" style="font-size:16px;color:var(--amber-dark);flex-shrink:0"></i>'
-    +'<div><div style="font-size:12px;font-weight:700;color:var(--amber-dark)">Aus dem letzten Coaching ('+fd(last.date)+') – Continue</div>'
-    +'<div style="font-size:12px;color:var(--text);margin-top:2px">'+last.cont+'</div>'
-    +'<div style="font-size:11px;color:var(--text3);margin-top:3px">Wurde daran gearbeitet?</div></div></div>';
+  box.innerHTML='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%);border-radius:var(--r-md);padding:10px 12px;margin-bottom:12px;display:flex;gap:8px">'
+    +'<i class="ti ti-repeat" style="font-size:16px;color:#7ED2DB;flex-shrink:0;margin-top:1px"></i>'
+    +'<div><div style="font-size:12px;font-weight:700;color:#fff">Aus dem letzten Coaching ('+fd(last.date)+') – Continue</div>'
+    +'<div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px">'+last.cont+'</div>'
+    +'<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px">Wurde daran gearbeitet?</div></div></div>';
 }
 function openQaBewertungModal(empId){
   if(empId)selectedEmp=empId;
@@ -7616,10 +7715,8 @@ function openQaBewertungModal(empId){
 function openNeuesCoachingModal(empId){
   if(empId)selectedEmp=empId;
   _editingSessionId=null;
-  var typeEl=document.getElementById('sess-type');
-  if(typeEl&&!typeEl.options.length){
-    SESSION_TYPES.forEach(function(t){var o=document.createElement('option');o.textContent=t;typeEl.appendChild(o);});
-  }
+  populateCoachingCategorySelect('sess-category');
+  populateCoachingTypeSelect('sess-category','sess-type',null);
   var topicEl=document.getElementById('sess-topic-sel');
   if(topicEl&&topicEl.options.length<=1){
     SESSION_TOPICS.forEach(function(t){var o=document.createElement('option');o.value=t;o.textContent=t;topicEl.appendChild(o);});

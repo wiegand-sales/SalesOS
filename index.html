@@ -326,8 +326,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
   <div class="sb-nav">
     <div class="sb-item" id="nav-team" onclick="toggleWiegandNav()"><div class="sb-icon"><i class="ti ti-layout-grid"></i></div> SFP Wiegand <i class="ti ti-chevron-up" id="wiegandNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="wiegandSubNav" class="wiegand-subnav">
-      <div class="sb-item sb-navsub" id="nav-team-performance" onclick="selectWiegandSub('performance')">Performance</div>
-      <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Overview</div>
+      <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Performance</div>
       <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">KPIs</div>
     </div>
     <div class="sb-item" id="nav-coaching" onclick="toggleCoachingNav()"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching <i class="ti ti-chevron-down" id="coachingNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
@@ -836,7 +835,7 @@ function loadEmployeesFromSupabase(){
 var _appInitStarted = false;
 var currentCoach = null;      // {id,name,role} falls eingeloggter User ein Coach (SDM/SC) ist, sonst null (Admin/Overview)
 var coachFilterView = 'overview'; // 'overview' | employee-id des Coaches
-var wiegandView='performance'; // 'overview' | 'team' | 'performance' (SFP Wiegand Tab-Navigation) - Performance ist der Standard-Landing-Tab nach dem Login
+var wiegandView='overview'; // 'overview' | 'team' | 'performance' (SFP Wiegand Tab-Navigation) - Overview ist der Standard-Landing-Tab nach dem Login (Performance-Menue entfernt, per Banner-Umschalter in Overview weiterhin erreichbar)
 var overviewSelectedIds=null; // Array ausgewählter Mitarbeiter-IDs in SFP Wiegand > Overview (Mehrfachauswahl)
 var overviewEmpDropdownOpen=false;
 var overviewEmpSearchQuery='';
@@ -879,6 +878,8 @@ function setOverviewPerfSort(key){
 }
 var overviewFromDate=null; // Von-Datum (Overview Performance-Tabelle), null = Standard (Monatsanfang)
 var overviewChartMetric='margeGesamt';
+var overviewChartEmpId=null; // null = Team (alle aktiven Mitarbeiter), sonst employee-id
+var bannerViewMode=null; // null = Standard je Reiter, sonst 'performance'|'overview' explizit ueberschrieben
 var settingsView='integrations'; // 'integrations' | 'data'
 var activityFilterPerson='ALL'; // 'ALL' | employee-id (Coach)
 var activityFilterDays=7;
@@ -981,6 +982,8 @@ function deleteAppUser(uid,name){
 }
 function selectSettingsSub(v){settingsView=v;view='settings';renderSidebar();renderMain();}
 function setOverviewChartMetric(m){overviewChartMetric=m;renderTeam();}
+function setOverviewChartEmp(v){overviewChartEmpId=v||null;renderTeam();}
+function setBannerViewMode(m){bannerViewMode=m;renderTeam();}
 var overviewToDate=null;   // Bis-Datum (Overview Performance-Tabelle), null = Standard (Monatsende/heute)
 function setOverviewDateRange(from,to){overviewFromDate=from||null;overviewToDate=to||null;renderTeam();}
 function setOverviewQuickRange(type){
@@ -2328,6 +2331,52 @@ function isoWeekOf(d){
   var week=1+Math.round(((dt-firstThursday)/86400000-3+((firstThursday.getUTCDay()+6)%7))/7);
   return {year:dt.getUTCFullYear(),week:week};
 }
+// Alle ISO-Kalenderwochen eines Jahres (Mo-So), inkl. korrekter Randbehandlung an Jahresgrenzen
+function buildYearWeeksForChart(year){
+  var jan4=new Date(Date.UTC(year,0,4)); // 4. Januar liegt laut ISO 8601 immer in KW1
+  var dow=jan4.getUTCDay()||7;
+  var monday=new Date(jan4);monday.setUTCDate(jan4.getUTCDate()-(dow-1));
+  var weeks=[];
+  var cur=new Date(monday);
+  for(var i=0;i<54;i++){
+    var iw=isoWeekOf(cur);
+    if(iw.year!==year)break;
+    var sunday=new Date(cur);sunday.setUTCDate(cur.getUTCDate()+6);
+    weeks.push({kw:iw.week,from:cur.toISOString().slice(0,10),to:sunday.toISOString().slice(0,10)});
+    cur.setUTCDate(cur.getUTCDate()+7);
+  }
+  return weeks;
+}
+// Rohzahlen-Summen (ueber eine Mitarbeiterliste) fuer einen Datumsbereich - Basis fuer den Jahres-Trendchart
+function chartSumsForRange(liste,from,to){
+  var s={akt:0,ne:0,nm:0,nerr:0,oem:0,ups:0,wka:0,margeOEM:0,margeUps:0,margeWka:0,margeGes:0,
+         tw:0,yes:0,sy:0,my:0,nerrOem:0};
+  liste.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if(!x.date||x.date<from||x.date>to)return;
+      s.akt+=x.gesamtAktivitaeten!=null?x.gesamtAktivitaeten:0;
+      s.ne+=x.gesamtNichtErreicht!=null?x.gesamtNichtErreicht:0;
+      s.nm+=x.gesamtNichtMoeglich!=null?x.gesamtNichtMoeglich:0;
+      s.nerr+=x.gesamtNichtErfolgreich!=null?x.gesamtNichtErfolgreich:0;
+      s.oem+=x.convOEM||0; s.ups+=x.ups_yes||0; s.wka+=x.wka_gesamt_yes||0;
+      s.margeOEM+=x.margeOEM||0; s.margeUps+=x.margeUpsell||0; s.margeWka+=x.margeWKA||0;
+      s.margeGes+=x.margeGesamt||x.margin||0;
+      s.tw+=x.convTW||0; s.yes+=x.convYes||0; s.sy+=x.convSY||0; s.my+=x.convMY||0;
+      s.nerrOem+=x.notSuccessful||0;
+    });
+  });
+  return s;
+}
+function chartCrFromSums(kind,s){
+  var denomOEM=s.oem+s.nerrOem, denomRest=s.yes+s.sy+s.my;
+  if(kind==='crOEM')return denomOEM>0?s.oem/denomOEM*100:null;
+  if(kind==='crTeilweise')return (s.tw+denomRest)>0?s.tw/(s.tw+denomRest)*100:null;
+  if(kind==='crYes')return denomRest>0?s.yes/denomRest*100:null;
+  if(kind==='crSyMy')return denomRest>0?(s.sy+s.my)/denomRest*100:null;
+  if(kind==='crSuperYes')return denomRest>0?s.sy/denomRest*100:null;
+  if(kind==='crMegaYes')return denomRest>0?s.my/denomRest*100:null;
+  return null;
+}
 function groupPerfRows(rows,mode){
   if(mode==='day')return rows.map(function(r){return {label:fd(r.date),key:r.date,count:1,row:r};});
   var groups={},order=[];
@@ -3603,7 +3652,8 @@ function sparklineFilled(values,color,w,h){
 }
 // Marge (Ist) und Ziel fuer die aktuelle Kalenderwoche - gleiche Berechnung wie die Wochenziel-Kacheln in der Zielvereinbarung
 // Berechnet fuer einen Mitarbeiterkreis das Wochenziel-Tagekontingent eines bestimmten Monats-Anteils einer KW
-function weekTargetPortion(mk,curKw){
+function weekTargetPortion(mk,curKw,withMarge){
+  if(withMarge===undefined)withMarge=true;
   var weeks=getMonthWeeksZiel(mk);
   var wi=-1,wm=null;
   weeks.forEach(function(w,i){if(w.kw===curKw){wm=w;wi=i;}});
@@ -3616,11 +3666,13 @@ function weekTargetPortion(mk,curKw){
     var days=(r.weeks&&r.weeks[wi]!=null)?r.weeks[wi]:wm.defaultDays;
     var optTag=r.optTag!=null?r.optTag:0;
     var margeOpt=r.margeOpt!=null?r.margeOpt:0;
-    target+=days*optTag*margeOpt;
+    target+=withMarge?days*optTag*margeOpt:days*optTag;
   });
   return target;
 }
-function currentWeekMargin(){
+function currentWeekStat(kind){
+  // kind: 'marge' oder 'opt'
+  var withMarge=(kind==='marge');
   var mk=today().slice(0,7);
   var weeks=getMonthWeeksZiel(mk);
   var todayStr=today();
@@ -3633,14 +3685,46 @@ function currentWeekMargin(){
   // daher ist "ist" (Performance-Daten) automatisch korrekt. Das Wochenziel wird jedoch pro
   // Monat separat in der Zielvereinbarung gepflegt - daher hier die Anteile aus beiden Monaten
   // zusammenzaehlen, falls die Woche ueber eine Monatsgrenze reicht.
-  var target=weekTargetPortion(mk,curKw);
+  var target=weekTargetPortion(mk,curKw,withMarge);
   var fromMk=wm.from.slice(0,7),toMk=wm.to.slice(0,7);
-  if(fromMk!==mk)target+=weekTargetPortion(fromMk,curKw);
-  if(toMk!==mk)target+=weekTargetPortion(toMk,curKw);
+  if(fromMk!==mk)target+=weekTargetPortion(fromMk,curKw,withMarge);
+  if(toMk!==mk)target+=weekTargetPortion(toMk,curKw,withMarge);
   var visible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
   var ist=0;
-  visible.forEach(function(e){ist+=istForEmpWeek(e.id,wm.from,wm.to);});
+  visible.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if(!x.date||x.date<wm.from||x.date>wm.to)return;
+      ist+=withMarge?(x.margeGesamt||x.margin||0):((x.convOEM||0)+(x.ups_yes||0)+(x.wka_gesamt_yes||0));
+    });
+  });
   return {ist:ist,target:target,kw:curKw,from:wm.from,to:wm.to};
+}
+function currentWeekMargin(){ return currentWeekStat('marge'); }
+// Tagesziel (heute): Summe optTag bzw. optTag*margeOpt ueber alle heute aktiven Mitarbeiter
+function todayTargetStat(kind){
+  var withMarge=(kind==='marge');
+  var mk=today().slice(0,7);
+  var rec=zielStore[mk]||{};
+  var visible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
+  var target=0;
+  visible.forEach(function(e){
+    var r=rec[e.id]||{};
+    var optTag=r.optTag!=null?r.optTag:0;
+    var margeOpt=r.margeOpt!=null?r.margeOpt:0;
+    target+=withMarge?optTag*margeOpt:optTag;
+  });
+  return target;
+}
+function todayActualStat(kind,liste){
+  var t=today();
+  var sum=0;
+  liste.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if(x.date!==t)return;
+      sum+=(kind==='marge')?(x.margeGesamt||x.margin||0):((x.convOEM||0)+(x.ups_yes||0)+(x.wka_gesamt_yes||0));
+    });
+  });
+  return sum;
 }
 function buildMonthBar(liste){
   var mk=today().slice(0,7);
@@ -3715,7 +3799,8 @@ function buildOverviewTab(liste,section){
   }
   var optOemZiel=avgOptTagZielvereinbarung();
   var h='';
-  if(section==='performance'){
+
+  if((bannerViewMode||section)==='performance'){
   var mk=today().slice(0,7);
   var heroSums={optGesamt:0,margeGesamt:0};
   visible.forEach(function(e){
@@ -3799,15 +3884,15 @@ function buildOverviewTab(liste,section){
     var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
     var colLight=cur===null?'#9fc9cd':(k.target!==null?(hit?'#fff':'#e57373'):'#fff');
     var trend=(cur!==null&&prev!==null)?cur-prev:null;
-    var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
-    var targetTxt=k.target!==null?('Ziel '+(k.dir==='gte'?'≥':'≤')+k.target+(k.pct?'%':'')):(k.fallbackLabel||'Team-Durchschnitt');
+    var trendArrow=trend===null?'':(trend>0.5?'\u2191':trend<-0.5?'\u2193':'\u2192');
+    var targetTxt=k.target!==null?('Ziel '+(k.dir==='gte'?'\u2265':'\u2264')+k.target+(k.pct?'%':'')):(k.fallbackLabel||'Team-Durchschnitt');
     return '<div style="padding:4px 14px;position:relative">'
       +'<div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">'+k.label.toUpperCase()+'</div>'
       +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:4px">'
-      +'<div style="font-size:19px;font-weight:700;color:'+colLight+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+' '+trendArrow+'</div>'
+      +'<div style="font-size:19px;font-weight:700;color:'+colLight+'">'+(vR!==null?vR+(k.pct?'%':''):'\u2014')+' '+trendArrow+'</div>'
       +sparkline(spark7K,colLight,90,18)
       +'</div>'
-      +'<div style="font-size:10px;color:#8fb5b9;margin-top:3px">Vormonat '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+' · '+targetTxt+'</div>'
+      +'<div style="font-size:10px;color:#8fb5b9;margin-top:3px">Vormonat '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'\u2014')+' \u00b7 '+targetTxt+'</div>'
       +'</div>';
   }
   if(section==='performance'||isAll){
@@ -3889,239 +3974,310 @@ function buildOverviewTab(liste,section){
     });
   }
   h+='</div>'; // Ende KPI-Zeile
+  h+='<div style="display:flex;justify-content:center;gap:8px;margin-top:18px">'
+    +'<div onclick="setBannerViewMode(\'performance\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Performance"></div>'
+    +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
+    +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } else {
-  // ── Alte Darstellung (Overview): Banner + 5 weisse Kacheln, unveraendert ──
-  h+=buildMonthBar(visible);
-
-  if(isAll){
-    function teamMonthAvg(key,monthsAgo){
-      var ym=monthBoundsUTC(today(),monthsAgo).ym;
-      var vals=[];
-      selectedEmps.forEach(function(e){
-        (performance[e.id]||[]).forEach(function(x){
-          if(x.date.slice(0,7)===ym&&x[key]!==undefined&&x[key]!==null)vals.push(x[key]);
-        });
+  // ── NEUE, eigenstaendige Overview-Hero-Panel-Version (gleiche Optik wie Performance, andere Kennzahlen) ──
+  var ovMk=today().slice(0,7);
+  function ovMonthSums(kind){
+    // kind: 'oem' | 'ups' | 'wka'
+    var count=0,marge=0;
+    visible.forEach(function(e){
+      (performance[e.id]||[]).forEach(function(x){
+        if((x.date||'').slice(0,7)!==ovMk)return;
+        if(kind==='oem'){count+=x.convOEM||0;marge+=x.margeOEM||0;}
+        else if(kind==='ups'){count+=x.ups_yes||0;marge+=x.margeUpsell||0;}
+        else if(kind==='wka'){count+=x.wka_gesamt_yes||0;marge+=x.margeWKA||0;}
       });
-      return vals.length?vals.reduce(function(a,b){return a+b;},0)/vals.length:null;
-    }
-    function teamDailySeries(key,n){
-      var byDate={};
-      selectedEmps.forEach(function(e){
-        (performance[e.id]||[]).forEach(function(x){
-          if(x[key]===undefined||x[key]===null)return;
-          if(!byDate[x.date])byDate[x.date]=[];
-          byDate[x.date].push(x[key]);
-        });
-      });
-      var dates=Object.keys(byDate).sort();
-      var series=dates.map(function(d){var arr=byDate[d];return arr.reduce(function(a,b){return a+b;},0)/arr.length;});
-      return series.slice(-(n||7));
-    }
-    var kpisAll=[
-      {label:'CR OEM', key:'crOEM',      target:CR_GOOD, dir:'gte', pct:true},
-      {label:'CR TW',  key:'crTeilweise', target:KPI_TARGETS.crTeilweise.val, dir:KPI_TARGETS.crTeilweise.dir, pct:true},
-      {label:'CR SY',  key:'crSuperYes',  target:KPI_TARGETS.crSuperYes.val,  dir:KPI_TARGETS.crSuperYes.dir,  pct:true},
-      {label:'CR MY',  key:'crMegaYes',   target:KPI_TARGETS.crMegaYes.val,   dir:KPI_TARGETS.crMegaYes.dir,   pct:true},
-      {label:'Opt. OEM',key:'convOEM',   target:optOemZiel!=null?Math.round(optOemZiel*10)/10:null, dir:'gte', pct:false},
-    ];
-    h+='<div class="g5" style="margin-bottom:22px">';
-    kpisAll.forEach(function(k){
-      var cur=teamMonthAvg(k.key,0);
-      var prev=teamMonthAvg(k.key,1);
-      var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
-      var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
-      var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):noTargetKpiCol(cur,prev,k.dir)):'var(--text3)';
-      var trend=(cur!==null&&prev!==null)?cur-prev:null;
-      var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
-      var trendCol=trend===null?'var(--text3)':(trend>0.5?'var(--teal-dark)':trend<-0.5?'var(--red)':'var(--text2)');
-      var spark7K=teamDailySeries(k.key,7);
-      var targetTxt=k.target!==null?('Ziel '+(k.dir==='gte'?'≥':'≤')+k.target+(k.pct?'%':'')+' '+(cur!==null?(hit?'✓':'↓'):'')):'Team-Durchschnitt';
-      var targetCol=k.target!==null?(cur!==null?(hit?'var(--teal-dark)':'var(--red)'):'var(--text3)'):'var(--text3)';
-      h+='<div class="card" style="padding:12px 14px;margin-bottom:0">'
-        +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">AUSWAHL '+k.label.toUpperCase()+'</div>'
-        +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
-        +'<div style="display:flex;align-items:baseline;gap:6px">'
-        +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+'</div>'
-        +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
-        +'</div>'
-        +sparkline(spark7K,col,54,26)
-        +'</div>'
-        +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+'</div>'
-        +'<div style="font-size:10.5px;color:'+targetCol+';margin-top:2px;font-weight:600">'+targetTxt+'</div>'
-        +'</div>';
     });
-    h+='</div>';
-  } else {
-  var kpis=[
-    {label:'CR OEM', key:'crOEM',      target:empT.crOEM.val,      dir:empT.crOEM.dir,      pct:true},
-    {label:'CR TW',  key:'crTeilweise', target:empT.crTeilweise.val, dir:empT.crTeilweise.dir, pct:true},
-    {label:'CR SY',  key:'crSuperYes',  target:empT.crSuperYes.val,  dir:empT.crSuperYes.dir,  pct:true},
-    {label:'CR MY',  key:'crMegaYes',   target:empT.crMegaYes.val,   dir:empT.crMegaYes.dir,   pct:true},
-    {label:'Opt. OEM',key:'convOEM',   target:optOemZiel!=null?Math.round(optOemZiel*10)/10:null, dir:'gte', pct:false},
-  ];
-  h+='<div class="g5" style="margin-bottom:22px">';
-  kpis.forEach(function(k){
-    var cur=monthAvg(emp.id,k.key,0);
-    var prev=monthAvg(emp.id,k.key,1);
-    var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
-    var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
-    var col=cur!==null?(k.target!==null?kpiCol(cur,k.target,k.dir):noTargetKpiCol(cur,prev,k.dir)):'var(--text3)';
-    var trend=(cur!==null&&prev!==null)?cur-prev:null;
-    var trendArrow=trend===null?'':(trend>0.5?'↑':trend<-0.5?'↓':'→');
-    var trendCol=trend===null?'var(--text3)':(trend>0.5?'var(--teal-dark)':trend<-0.5?'var(--red)':'var(--text2)');
-    var _perfAllK=(performance[emp.id]||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-    var _cutoff7K=addDaysUTC(today(),-7);
-    var _spark7srcK=_perfAllK.filter(function(x){return x.date>=_cutoff7K;});
-    if(_spark7srcK.length<2)_spark7srcK=_perfAllK.slice(-7);
-    var spark7K=_spark7srcK.map(function(x){return x[k.key];});
-    var targetTxt=k.target!==null?('Ziel '+(k.dir==='gte'?'≥':'≤')+k.target+(k.pct?'%':'')+' '+(cur!==null?(hit?'✓':'↓'):'')):'kein Zielwert';
-    var targetCol=k.target!==null?(cur!==null?(hit?'var(--teal-dark)':'var(--red)'):'var(--text3)'):'var(--text3)';
-    h+='<div class="card" style="padding:12px 14px;margin-bottom:0">'
-      +'<div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.04em;margin-bottom:4px">'+k.label.toUpperCase()+'</div>'
-      +'<div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px">'
-      +'<div style="display:flex;align-items:baseline;gap:6px">'
-      +'<div style="font-size:20px;font-weight:700;color:'+col+'">'+(vR!==null?vR+(k.pct?'%':''):'—')+'</div>'
-      +'<div style="font-size:13px;font-weight:700;color:'+trendCol+'">'+trendArrow+'</div>'
-      +'</div>'
-      +sparkline(spark7K,col,54,26)
-      +'</div>'
-      +'<div style="font-size:10.5px;color:var(--text3)">Vormonat: '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'—')+'</div>'
-      +'<div style="font-size:10.5px;color:'+targetCol+';margin-top:2px;font-weight:600">'+targetTxt+'</div>'
-      +'</div>';
-  });
-  h+='</div>';
+    return {count:count,marge:marge};
   }
-  } // Ende else (Overview)
+  function ovLastNWorkdayDates(n){
+    var dates=[],feiertageCache={};
+    var d=new Date(today()+'T00:00:00Z');
+    while(dates.length<n){
+      var dow=d.getUTCDay();
+      var y=d.getUTCFullYear();
+      if(!feiertageCache[y])feiertageCache[y]=bayernFeiertage(y);
+      var ds=d.toISOString().slice(0,10);
+      if(dow!==0&&dow!==6&&!feiertageCache[y][ds])dates.unshift(ds);
+      d.setUTCDate(d.getUTCDate()-1);
+    }
+    return dates;
+  }
+  var ovLast14WD=ovLastNWorkdayDates(14);
+  var ovLast7WD=ovLastNWorkdayDates(7);
+  function ovCountsForDate(dateStr,kind){
+    var count=0;
+    visible.forEach(function(e){
+      (performance[e.id]||[]).forEach(function(x){
+        if(x.date!==dateStr)return;
+        if(kind==='oem')count+=x.convOEM||0;
+        else if(kind==='ups')count+=x.ups_yes||0;
+        else if(kind==='wka')count+=x.wka_gesamt_yes||0;
+      });
+    });
+    return count;
+  }
+  h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:56px">';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14)">';
+  [['oem','OEM'],['ups','UPSELLS'],['wka','WKA']].forEach(function(kk){
+    var kind=kk[0],label=kk[1];
+    var s=ovMonthSums(kind);
+    var proLead=s.count>0?s.marge/s.count:0;
+    var series=ovLast14WD.map(function(d){return ovCountsForDate(d,kind);});
+    h+='<div style="grid-column:span 1;padding-left:14px">'
+      +'<div style="font-size:10.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em;margin-bottom:4px">'+label+'</div>'
+      +'<div style="font-size:30px;font-weight:700;line-height:1">'+s.count+' <span style="font-size:15px;font-weight:500;color:#bcdadd">Stk.</span></div>'
+      +'<div style="font-size:11px;color:#8fb5b9;margin-top:4px">Margenerhöhung '+Math.round(s.marge).toLocaleString('de-DE')+' EUR</div>'
+      +'<div style="font-size:11px;color:#8fb5b9">Ø '+Math.round(proLead).toLocaleString('de-DE')+' EUR/Lead</div>'
+      +'</div>'
+      +'<div style="grid-column:span 1;display:flex;align-items:center;height:100%;padding:4px 14px">'+barsHighlightLast(series,'#7ED2DB',300,34,ovLast14WD,function(v){return Math.round(v).toLocaleString('de-DE')+' Stk.';})+'</div>';
+  });
+  h+='</div>'; // Ende Hero-Zeile
 
-  var selLabel=selectedEmps.length===visible.length?'Alle Mitarbeiter':(isAll?selectedEmps.length+' Mitarbeiter ausgewählt':emp.name);
-  if(showRest){
-  // ── Performance Trend Chart (gleiches Design/Höhe wie Team-Tab, Daten aus den Tabellen-Filtern unten) ──
+  var ovOptGesamtNeu=0, ovMargeGesamtNeu=0;
+  visible.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if((x.date||'').slice(0,7)!==ovMk)return;
+      ovOptGesamtNeu+=(x.convOEM||0)+(x.ups_yes||0)+(x.wka_gesamt_yes||0);
+      ovMargeGesamtNeu+=x.margeGesamt||x.margin||0;
+    });
+  });
+  var ovOptZielMonatNeu=teamMonthZiel(visible,ovMk,false);
+  var ovMargeZielMonatNeu=teamMonthZiel(visible,ovMk,true);
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">';
+  // Ring-Kachel: Ist/Ziel als Donut-Ring, optional mit weissem "Soll heute"-Strich (Woche/Monat)
+  function ovRingTile(label,ist,ziel,sollFrac,unitSuffix,fmtFn){
+    var fmt=fmtFn||function(v){return Math.round(v).toLocaleString('de-DE');};
+    var pct=ziel>0?ist/ziel:(ist>0?1:0);
+    var pctShown=Math.round(pct*100);
+    var circumference=94.2;
+    var offset=circumference*(1-Math.min(pct,1));
+    var color=(ziel>0&&pct>=1)?'#7ED2DB':(ziel>0&&pct<1&&sollFrac!=null&&pct<sollFrac?'#e57373':'#7ED2DB');
+    var diff=ist-(ziel*(sollFrac!=null?sollFrac:1));
+    var diffTxt=(diff>=0?'+':'')+fmt(diff);
+    var restTxt=fmt(Math.max(0,ziel-ist));
+    var sollMarker='';
+    if(sollFrac!=null){
+      var angle=230+sollFrac*360*0.766; // grober Bogenversatz passend zur dasharray-Geometrie (siehe Entwurf)
+      sollMarker='<line x1="19" y1="4" x2="19" y2="7.5" stroke="#fff" stroke-width="1.6" transform="rotate('+(sollFrac*288)+' 19 19)"/>';
+    }
+    return '<div style="padding:4px 14px;display:flex;justify-content:space-between;align-items:center">'
+      +'<div>'
+      +'<div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">'+label.toUpperCase()+'</div>'
+      +'<div style="font-size:18px;font-weight:700;margin-top:4px">'+fmt(ist)+' <span style="font-size:10.5px;font-weight:400;color:#9fc9cd">/ '+fmt(ziel)+(unitSuffix?' '+unitSuffix:'')+'</span></div>'
+      +'<div style="font-size:9.5px;color:#8fb5b9;margin-top:3px">'+(sollFrac!=null?('Abw. <span style="color:'+(diff<0?'#e57373':'#7ED2DB')+';font-weight:600">'+diffTxt+'</span> · Rest '+restTxt):('Abw. <span style="color:'+(diff<0?'#e57373':'#7ED2DB')+';font-weight:600">'+diffTxt+'</span>'))+'</div>'
+      +'</div>'
+      +'<svg width="38" height="38" viewBox="0 0 38 38" style="flex-shrink:0">'
+      +'<circle cx="19" cy="19" r="15" fill="none" stroke="rgba(0,0,0,0.12)" stroke-width="5"/>'
+      +'<circle cx="19" cy="19" r="15" fill="none" stroke="'+color+'" stroke-width="5" stroke-linecap="round" stroke-dasharray="'+circumference+'" stroke-dashoffset="'+offset.toFixed(1)+'" transform="rotate(-90 19 19)"/>'
+      +sollMarker
+      +'</svg>'
+      +'</div>';
+  }
+  var todayWD=elapsedWorkDaysInRange(today(),today())>0; // ist heute ein Arbeitstag?
+  var optHeuteIst=todayActualStat('opt',visible), optHeuteZiel=todayTargetStat('opt');
+  var margeHeuteIst=todayActualStat('marge',visible), margeHeuteZiel=todayTargetStat('marge');
+  h+=ovRingTile('Opt. Ges. (Heute)',optHeuteIst,optHeuteZiel,null,'Stk.');
+  h+=ovRingTile('Margenerhöhung (Heute)',margeHeuteIst,margeHeuteZiel,null,'€',function(v){return Math.round(v).toLocaleString('de-DE');});
+  var woOpt=currentWeekStat('opt'), woMarge=currentWeekStat('marge');
+  var woElapsedWD=woOpt.from?elapsedWorkDaysInRange(woOpt.from,today()):0;
+  var woTotalWD=woOpt.from?elapsedWorkDaysInRange(woOpt.from,woOpt.to):1;
+  var woSollFrac=woTotalWD>0?woElapsedWD/woTotalWD:null;
+  h+=ovRingTile('Opt. Ges. (Woche)',woOpt.ist,woOpt.target,woSollFrac,'Stk.');
+  h+=ovRingTile('Margenerhöhung (Woche)',woMarge.ist,woMarge.target,woSollFrac,'€');
+  var moElapsedWD=elapsedWorkDaysThisMonth();
+  var moTotalWD=elapsedWorkDaysInRange(ovMk+'-01',monthBoundsUTC(today(),0).to);
+  var moSollFrac=moTotalWD>0?moElapsedWD/moTotalWD:null;
+  h+=ovRingTile('Opt. Ges. (Monat)',ovOptGesamtNeu,ovOptZielMonatNeu,moSollFrac,'Stk.');
+  h+=ovRingTile('Margenerhöhung (Monat)',ovMargeGesamtNeu,ovMargeZielMonatNeu,moSollFrac,'€');
+  h+='</div>'; // Ende KPI-Zeile
+  h+='<div style="display:flex;justify-content:center;gap:8px;margin-top:18px">'
+    +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
+    +'<div onclick="setBannerViewMode(\'overview\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Overview"></div>'
+    +'</div>';
+  h+='</div>'; // Ende Hero-Panel
+  // ── Performance Trend Chart (unter dem Banner) ──
   var chartRows=isAll
     ? selectedEmps.reduce(function(acc,e){return acc.concat((performance[e.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;}));},[])
     : (performance[emp.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;});
   h+='<div class="card" style="margin-bottom:22px">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
-  h+='<div class="card-title" style="margin:0">Performance Trend <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+selLabel+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:16px;flex-wrap:wrap">';
+  h+='<div class="card-title" style="margin:0">Performance <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+today().slice(0,4)+'</span></div>';
+  h+='<div id="overviewChartLegend" style="display:flex;align-items:center;gap:14px;flex-wrap:wrap"></div>';
+  h+='</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px">';
+  h+='<select onchange="setOverviewChartEmp(this.value)" style="width:auto;height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;accent-color:#206A72">';
+  h+='<option value=""'+(!overviewChartEmpId?' selected':'')+'>Team (alle)</option>';
+  h+='<optgroup label="Teams">';
+  [['group:Onboarding','Onboarding'],['group:VLC','VLC'],['group:SR','SR'],['group:SE','SE']].forEach(function(g){
+    h+='<option value="'+g[0]+'"'+(overviewChartEmpId===g[0]?' selected':'')+'>'+g[1]+'</option>';
+  });
+  h+='</optgroup>';
+  h+='<optgroup label="Mitarbeiter">';
+  visible.filter(function(e){return e.active;}).forEach(function(e){
+    h+='<option value="'+e.id+'"'+(overviewChartEmpId===e.id?' selected':'')+'>'+e.name+'</option>';
+  });
+  h+='</optgroup>';
+  h+='</select>';
   h+='<select onchange="setOverviewChartMetric(this.value)" style="width:auto;height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;accent-color:#206A72">';
-  [{k:'margeGesamt',l:'Marge Gesamt'},{k:'oem_aktivitaeten',l:'Aktivitäten'},{k:'optGesamt',l:'Opt. Gesamt'},{k:'convOEM',l:'Opt. OEM'},{k:'ups_yes',l:'Opt. Upsell'},{k:'wka_gesamt_yes',l:'Opt. WKA'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSuperYes',l:'CR SY'},{k:'crMegaYes',l:'CR MY'}].forEach(function(it){
+  [{k:'akt',l:'Aktivitäten'},{k:'optGesamt',l:'Opt. Ges. (Anzahl)'},{k:'crOEM',l:'CR OEM'},{k:'crTeilweise',l:'CR TW'},{k:'crYes',l:'CR Yes'},{k:'crSyMy',l:'CR SY/MY'},{k:'margeGesamt',l:'Margenerhöhung (Gesamt)'}].forEach(function(it){
     h+='<option value="'+it.k+'"'+(overviewChartMetric===it.k?' selected':'')+'>'+it.l+'</option>';
   });
   h+='</select>';
   h+='</div>';
+  h+='</div>';
   h+='<div style="height:280px;position:relative"><canvas id="overviewPerfChart"></canvas></div>';
   h+='</div>';
 
-  // ── Conversion-Mix (OEM/Upsells/WKA) & CR-Verteilung (TW/Yes/SY/MY) — SVG-Donut analog "Wo/Warum wir Kunden verlieren" (SalesOS) ──
-  (function(){
-    var oemSum=0,upsSum=0,wkaSum=0,crTWs=[],crYess=[],crSYs=[],crMYs=[];
-    chartRows.forEach(function(x){
-      oemSum+=x.convOEM||0; upsSum+=x.ups_yes||0; wkaSum+=x.wka_gesamt_yes||0;
-      if(x.crTeilweise!=null)crTWs.push(x.crTeilweise);
-      if(x.crYes!=null)crYess.push(x.crYes);
-      if(x.crSuperYes!=null)crSYs.push(x.crSuperYes);
-      if(x.crMegaYes!=null)crMYs.push(x.crMegaYes);
+  // Chart.js Init - immer aktuelles Jahr, X-Achse = alle 52/53 KWs, Zukunft = offene Punkte (null)
+  (function(metric){
+    window._overviewChartData=null;
+    var year=+today().slice(0,4);
+    var weeks=buildYearWeeksForChart(year);
+    var todayStr=today();
+    var liste;
+    if(!overviewChartEmpId){
+      liste=visible.filter(function(e){return e.active;});
+    } else if(overviewChartEmpId.indexOf('group:')===0){
+      var grp=overviewChartEmpId.slice(6);
+      liste=visible.filter(function(e){return e.active&&(e.role===grp||e.phase===grp);});
+    } else {
+      liste=visible.filter(function(e){return e.id===overviewChartEmpId;});
+    }
+    var labels=weeks.map(function(w){return 'KW '+w.kw;});
+    var colors={gesamt:'#206A72',oem:'#7ED2DB',ups:'#e0a13a',wka:'#8a6fd4'};
+
+    function seriesFor(valFn,color,label,fillOrder){
+      var data=weeks.map(function(w){
+        if(w.from>todayStr)return null; // Zukunft: offener Punkt
+        return valFn(chartSumsForRange(liste,w.from,w.to));
+      });
+      return {label:label,data:data,borderColor:color,backgroundColor:color+'22',
+        fill:!!fillOrder,tension:0.35,pointRadius:labels.length<=16?3:0,
+        pointBackgroundColor:color,borderWidth:2,spanGaps:false,order:fillOrder||2};
+    }
+
+    var datasets=[];
+    var tk=null;
+    if(metric==='akt'){
+      datasets=[
+        seriesFor(function(s){return s.akt;},colors.gesamt,'Aktivitäten (Gesamt)',1),
+        seriesFor(function(s){return s.ne;},colors.oem,'Nicht Erreicht (Gesamt)'),
+        seriesFor(function(s){return s.nm;},colors.ups,'Nicht Möglich (Gesamt)'),
+        seriesFor(function(s){return s.nerr;},colors.wka,'Nicht Erfolgreich (Gesamt)')
+      ];
+    }
+    else if(metric==='optGesamt'){
+      datasets=[
+        seriesFor(function(s){return s.oem+s.ups+s.wka;},colors.gesamt,'Opt. Ges. (Gesamt)',1),
+        seriesFor(function(s){return s.oem;},colors.oem,'OEM (Anzahl)'),
+        seriesFor(function(s){return s.ups;},colors.ups,'Upsells (Anzahl)'),
+        seriesFor(function(s){return s.wka;},colors.wka,'WKA (Anzahl)')
+      ];
+    }
+    else if(metric==='margeGesamt'){
+      datasets=[
+        seriesFor(function(s){return s.margeGes;},colors.gesamt,'Margenerhöhung (Gesamt)',1),
+        seriesFor(function(s){return s.margeOEM;},colors.oem,'OEM (Summe)'),
+        seriesFor(function(s){return s.margeUps;},colors.ups,'Upsells (Summe)'),
+        seriesFor(function(s){return s.margeWka;},colors.wka,'WKA (Summe)')
+      ];
+    }
+    else if(metric==='crSyMy'){
+      datasets=[
+        seriesFor(function(s){return chartCrFromSums('crSyMy',s);},colors.gesamt,'CR SY/MY',1),
+        seriesFor(function(s){return chartCrFromSums('crSuperYes',s);},colors.oem,'CR SY'),
+        seriesFor(function(s){return chartCrFromSums('crMegaYes',s);},colors.ups,'CR MY')
+      ];
+    }
+    else if(['crOEM','crTeilweise','crYes'].indexOf(metric)>=0){
+      var crLabels={crOEM:'CR OEM',crTeilweise:'CR TW',crYes:'CR Yes'};
+      datasets=[seriesFor(function(s){return chartCrFromSums(metric,s);},colors.gesamt,crLabels[metric],1)];
+      var tKeys={crOEM:'crOEM',crTeilweise:'crTeilweise',crYes:'crYes'};
+      tk=tKeys[metric];
+    }
+
+    var allVals=[];
+    datasets.forEach(function(ds){ds.data.forEach(function(v){if(v!==null&&v!==undefined)allVals.push(v);});});
+    var target=(tk&&KPI_TARGETS[tk])?KPI_TARGETS[tk].val:null;
+    var yS;
+    if(!allVals.length){
+      yS={min:0};
+    } else {
+      var dataMin=Math.min.apply(null,allVals),dataMax=Math.max.apply(null,allVals);
+      var range=dataMax-dataMin;
+      if(range<=0)range=dataMax>0?dataMax:1;
+      var pad=range*0.4;
+      yS={min:Math.max(0,dataMin-pad),max:dataMax+pad};
+    }
+    if(target!==null){
+      datasets.push({
+        label:'Ziel ('+target+')',
+        data:labels.map(function(){return target;}),
+        borderColor:'#BD2D29',borderDash:[5,4],borderWidth:2,
+        pointRadius:0,fill:false,order:99
+      });
+    }
+    window._overviewChartData={labels:labels,datasets:datasets,yS:yS};
+  })(overviewChartMetric);
+
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    if(!window._overviewChartData)return;
+    var d=window._overviewChartData;
+    var canvas=document.getElementById('overviewPerfChart');
+    if(!canvas)return;
+    if(canvas._ci){try{canvas._ci.destroy();}catch(e){}}
+    if(d.datasets[0])d.datasets[0].backgroundColor=vGradient(canvas,d.datasets[0].borderColor,0.55,0.05);
+    canvas._ci=new Chart(canvas,{
+      type:'line',
+      data:{labels:d.labels,datasets:d.datasets},
+      options:{
+        responsive:true,
+        resizeDelay:200,
+        maintainAspectRatio:false,
+        animation:CHART_DRAWIN_ANIMATION,
+        interaction:{mode:'index',intersect:false},
+        plugins:{
+          legend:{display:false},
+          tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+formatMetricValue(overviewChartMetric,ctx.parsed.y);}}}
+        },
+        scales:{
+          x:{ticks:{font:{size:11},maxTicksLimit:12},grid:{display:false}},
+          y:{min:d.yS.min,max:d.yS.max,ticks:{font:{size:11},stepSize:d.yS.step},grid:{color:'rgba(0,0,0,0.05)'}}
+        }
+      }
     });
-    function avg(arr){return arr.length?Math.round(arr.reduce(function(a,b){return a+b;},0)/arr.length):0;}
-    var mixEntries=[{label:'OEM',count:oemSum},{label:'Upsells',count:upsSum},{label:'WKA',count:wkaSum}].filter(function(e){return e.count>0;});
-    var mixTotal=oemSum+upsSum+wkaSum;
-    var crRaw=[{label:'TW',count:avg(crTWs)},{label:'Yes',count:avg(crYess)},{label:'SY',count:avg(crSYs)},{label:'MY',count:avg(crMYs)}].filter(function(e){return e.count>0;});
-    var crSumRaw=crRaw.reduce(function(a,b){return a+b.count;},0);
-
-    h+='<div class="g2" style="margin-bottom:22px">';
-    h+='<div class="card" style="margin-bottom:0">';
-    h+='<div class="card-title" style="margin:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-donut" style="color:var(--purple)"></i> Conversion-Mix</span> <span style="font-weight:400;color:var(--text3);font-size:11px">'+selLabel+'</span></div>';
-    h+='<div class="funnel-wrap">'+donutSvg(mixEntries,mixTotal,'Gesamt')+'</div>';
-    h+='</div>';
-    h+='<div class="card" style="margin-bottom:0">';
-    h+='<div class="card-title" style="margin:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-chart-donut" style="color:var(--purple)"></i> CR-Verteilung</span> <span style="font-weight:400;color:var(--text3);font-size:11px">'+selLabel+'</span></div>';
-    h+='<div class="funnel-wrap">'+donutSvg(crRaw,crSumRaw,'Ø Verteilung')+'</div>';
-    h+='</div>';
-    h+='</div>';
-  })();
-
-  // ── Zielvereinbarung — Jahresverlauf (Entwurf C: Ziel NL als gestrichelte Referenzlinie, Ziel/Erzielt als Balken mit Farbverlauf) ──
-  h+=zielverlaufJahrChartHtml();
-
-  // ── Top 3 (höchste Margenerhöhung) & Worst 3 (schwächste CR OEM/CR MY) im aktuellen Kalendermonat ──
-  (function(){
-    var mk=today().slice(0,7);
-    var wMeta=getMonthWeeksZiel(mk);
-    var mRec=zielStore[mk]||{};
-    var pool=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
-
-    var topRows=pool.map(function(e){
-      var total=0;
-      (performance[e.id]||[]).forEach(function(x){
-        if((x.date||'').slice(0,7)!==mk)return;
-        total+=x.margeGesamt||x.margin||0;
-      });
-      var r=mRec[e.id]||{};
-      var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
-      var einsatztage=weeks.reduce(function(a,b){return a+b;},0);
-      var optTag=r.optTag!=null?r.optTag:0;
-      var margeOpt=r.margeOpt!=null?r.margeOpt:0;
-      var zielMonat=einsatztage*optTag*margeOpt;
-      var zielTag=einsatztage>0?zielMonat/einsatztage:0;
-      var proTag=einsatztage>0?total/einsatztage:0;
-      return {e:e,total:total,proTag:proTag,pctMonat:zielMonat>0?Math.min(100,Math.round(total/zielMonat*100)):(total>0?100:0),pctTag:zielTag>0?Math.min(100,Math.round(proTag/zielTag*100)):(proTag>0?100:0)};
-    }).filter(function(r){return r.total>0;}).sort(function(a,b){return b.total-a.total;}).slice(0,3);
-
-    var worstRows=pool.map(function(e){
-      var crOEM=monthAvg(e.id,'crOEM',0);
-      var crMY=monthAvg(e.id,'crMegaYes',0);
-      return {e:e,crOEM:crOEM,crMY:crMY,score:(crOEM!=null&&crMY!=null)?(crOEM+crMY):null};
-    }).filter(function(r){return r.score!=null;}).sort(function(a,b){return a.score-b.score;}).slice(0,3);
-
-    function initials(nm){return nm.split(' ').map(function(x){return x[0];}).join('').toUpperCase().slice(0,2);}
-    function metricRow(label,pct,valTxt,cls){
-      return '<div style="display:flex;align-items:center;gap:6px;font-size:10px;color:var(--text2)">'
-        +'<span style="width:52px;flex-shrink:0">'+label+'</span>'
-        +'<div style="flex:1;height:5px;border-radius:3px;overflow:hidden;background:'+(cls==='p'?'rgba(32,106,114,0.12)':'rgba(189,45,41,0.12)')+'"><div style="height:100%;border-radius:3px;width:'+Math.max(2,pct)+'%;background:'+(cls==='p'?'var(--purple)':'var(--red)')+'"></div></div>'
-        +'<span style="width:52px;text-align:right;font-weight:700;color:'+(cls==='p'?'var(--purple-dark)':'var(--red)')+'">'+valTxt+'</span>'
-        +'</div>';
-    }
-
-    h+='<div class="g2" style="margin-bottom:22px">';
-
-    h+='<div class="card" style="margin-bottom:0">';
-    h+='<div class="card-title" style="margin:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-trophy" style="color:var(--purple)"></i> Top 3</span></div>';
-    if(!topRows.length){
-      h+='<div style="font-size:12px;color:var(--text3);padding:8px 0">Noch keine Performance-Daten in diesem Monat.</div>';
-    } else {
-      topRows.forEach(function(r,idx){
-        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;'+(idx<topRows.length-1?'border-bottom:1px solid var(--border);':'')+'">'
-          +'<div style="width:30px;height:30px;border-radius:9px;background:var(--purple-bg);color:var(--purple-dark);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+initials(r.e.name)+'</div>'
-          +'<div><div style="font-weight:600;font-size:12.5px">'+esc(r.e.name)+'</div><div style="font-size:10px;color:var(--text3)">'+r.e.role+'</div></div>'
-          +'<div style="margin-left:auto;display:flex;flex-direction:column;gap:3px;width:150px">'
-          +metricRow('Gesamt',r.pctMonat,'€ '+Math.round(r.total).toLocaleString('de-DE'),'p')
-          +metricRow('Ø/Tag',r.pctTag,'€ '+Math.round(r.proTag).toLocaleString('de-DE'),'p')
-          +'</div>'
-          +'</div>';
+    reapplyChartGradient(canvas._ci,canvas,0.55,0.05);
+    // Eigene, linksbuendige klickbare Legende direkt neben dem Titel statt der nativen Chart.js-Legende
+    var legendEl=document.getElementById('overviewChartLegend');
+    if(legendEl){
+      legendEl.innerHTML='';
+      canvas._ci.data.datasets.forEach(function(ds,i){
+        var item=document.createElement('span');
+        var meta=canvas._ci.getDatasetMeta(i);
+        item.style.cssText='display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:500;cursor:pointer;user-select:none;color:'+(meta.hidden?'var(--text3)':'var(--text2)')+';opacity:'+(meta.hidden?'0.5':'1');
+        item.innerHTML='<span style="width:9px;height:9px;border-radius:2px;background:'+ds.borderColor+';display:inline-block"></span>'+ds.label;
+        item.onclick=function(){
+          meta.hidden=meta.hidden===null?!canvas._ci.data.datasets[i].hidden:!meta.hidden;
+          canvas._ci.update();
+          item.style.opacity=meta.hidden?'0.5':'1';
+          item.style.color=meta.hidden?'var(--text3)':'var(--text2)';
+        };
+        legendEl.appendChild(item);
       });
     }
-    h+='</div>';
+  });});
 
-    h+='<div class="card" style="margin-bottom:0">';
-    h+='<div class="card-title" style="margin:0"><span style="display:flex;align-items:center;gap:6px"><i class="ti ti-alert-triangle" style="color:var(--red)"></i> Worst 3</span></div>';
-    if(!worstRows.length){
-      h+='<div style="font-size:12px;color:var(--text3);padding:8px 0">Noch keine Performance-Daten in diesem Monat.</div>';
-    } else {
-      worstRows.forEach(function(r,idx){
-        h+='<div style="display:flex;align-items:center;gap:10px;padding:10px 0;'+(idx<worstRows.length-1?'border-bottom:1px solid var(--border);':'')+'">'
-          +'<div style="width:30px;height:30px;border-radius:9px;background:var(--red-bg);color:var(--red);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex-shrink:0">'+initials(r.e.name)+'</div>'
-          +'<div><div style="font-weight:600;font-size:12.5px">'+esc(r.e.name)+'</div><div style="font-size:10px;color:var(--text3)">'+r.e.role+'</div></div>'
-          +'<div style="margin-left:auto;display:flex;flex-direction:column;gap:3px;width:150px">'
-          +metricRow('CR OEM',Math.round(r.crOEM),Math.round(r.crOEM)+'%','r')
-          +metricRow('CR MY',Math.round(r.crMY),Math.round(r.crMY)+'%','r')
-          +'</div>'
-          +'</div>';
-      });
-    }
-    h+='</div>';
+  } // Ende else (Overview)
 
-    h+='</div>';
-  })();
+  var selLabel=selectedEmps.length===visible.length?'Alle Mitarbeiter':(isAll?selectedEmps.length+' Mitarbeiter ausgewählt':emp.name);
+  if(showRest){
   } // Ende if(showRest)
 
   // Performance-Tabelle (Tag/Woche/Monat) für den gewählten Mitarbeiter
@@ -4300,7 +4456,7 @@ function buildOverviewTab(liste,section){
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600">'+stackCell(aktPerHour.toFixed(1),akt)+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;'+(akt>0?fc(Math.round(notR/akt*100),rowEmpT.notReached.val,rowEmpT.notReached.dir):'color:var(--text2)')+'">'+stackCell((akt>0?Math.round(notR/akt*100)+'%':'—'),(akt>0?notR:'—'))+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;'+(akt>0?fc(Math.round(notP/akt*100),rowEmpT.notPossible.val,rowEmpT.notPossible.dir):'color:var(--text2)')+'">'+stackCell((akt>0?Math.round(notP/akt*100)+'%':'—'),(akt>0?notP:'—'))+'</td>'
-        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;'+(akt>0?fc(Math.round(notS/akt*100),rowEmpT.notSuccessful.val,rowEmpT.notSuccessful.dir):'color:var(--text2)')+'">'+stackCell((akt>0?Math.round(notS/akt*100)+'%':'—'),(akt>0?notS:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;'+((notS+optGes)>0?fc(Math.round(notS/(notS+optGes)*100),rowEmpT.notSuccessful.val,rowEmpT.notSuccessful.dir):'color:var(--text2)')+'">'+stackCell(((notS+optGes)>0?Math.round(notS/(notS+optGes)*100)+'%':'—'),((notS+optGes)>0?notS:'—'))+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(convOEM/optGes*100)+'%':'—'),(optGes>0?convOEM:'—'))+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(ups/optGes*100)+'%':'—'),(optGes>0?ups:'—'))+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(wka_gesamt_yes/optGes*100)+'%':'—'),(optGes>0?wka_gesamt_yes:'—'))+'</td>'
@@ -4345,7 +4501,7 @@ function buildOverviewTab(liste,section){
       var anteilOEMcalc=divSafe(sumConvOEM,sumConvOEM+sumUps+sumWka);
       var anteilUpsCalc=divSafe(sumUps,sumConvOEM+sumUps+sumWka);
       var anteilWkaCalc=divSafe(sumWka,sumConvOEM+sumUps+sumWka);
-      var notRpct=divSafe(sumNotR,sumAkt),notPpct=divSafe(sumNotP,sumAkt),notSpct=divSafe(sumNotS,sumAkt);
+      var notRpct=divSafe(sumNotR,sumAkt),notPpct=divSafe(sumNotP,sumAkt),notSpct=divSafe(sumNotS,sumNotS+sumOptGes);
       var margeDurchCalc=sumOptGes>0?sumMarge/sumOptGes:0;
       var aktPerHourCalc=sumTotalHours>0?sumAkt/sumTotalHours:0;
       var optPerHourCalc=sumTotalHours>0?sumOptGes/sumTotalHours:0;
@@ -4378,130 +4534,6 @@ function buildOverviewTab(liste,section){
     h+='</tbody></table></div>';
   }
   h+='</div>'; // Ende Performance-Karte
-
-  // Chart.js Init (gleiches Muster wie Team Performance Trend)
-  (function(allRows,metric,groupMode){
-    var mMap={
-      crOEM:      {f:'crOEM',      l:'CR OEM %', c:'#206A72'},
-      crTeilweise:{f:'crTeilweise',l:'CR TW %',  c:'#206A72'},
-      crYes:      {f:'crYes',      l:'CR Yes %', c:'#206A72'},
-      crSuperYes: {f:'crSuperYes', l:'CR SY %',  c:'#206A72'},
-      crMegaYes:  {f:'crMegaYes',  l:'CR MY %',  c:'#206A72'},
-      oem_aktivitaeten:{f:'oem_aktivitaeten',l:'Aktivitäten',c:'#206A72'},
-      optGesamt:  {f:'optGesamt',  l:'Opt. Gesamt',c:'#206A72'},
-      convOEM:    {f:'convOEM',    l:'Opt. OEM', c:'#206A72'},
-      ups_yes:    {f:'ups_yes',    l:'Opt. Upsell',c:'#206A72'},
-      wka_gesamt_yes:        {f:'wka_gesamt_yes',        l:'Opt. WKA', c:'#206A72'},
-      margeGesamt:{f:'margeGesamt',l:'Marge Gesamt €',  c:'#206A72'}
-    };
-    var m=mMap[metric]||mMap.crOEM;
-    window._overviewChartData=null;
-    if(!allRows||!allRows.length)return;
-    var sumMetrics=['oem_aktivitaeten','margeGesamt','optGesamt','convOEM','ups_yes','wka_gesamt_yes'];
-    var useSum=sumMetrics.indexOf(metric)>=0;
-    // Stufe 1: pro Kalendertag zusammenfassen (bei "Alle" über Mitarbeiter kombiniert)
-    var byDate={};
-    allRows.forEach(function(row){
-      if(!byDate[row.date])byDate[row.date]=[];
-      var v=row[m.f];
-      if(v!==undefined&&v!==null)byDate[row.date].push(v);
-    });
-    var dates=Object.keys(byDate).sort();
-    if(!dates.length)return;
-    var dailyVals=dates.map(function(d){
-      var arr=byDate[d];
-      if(!arr.length)return null;
-      var total=arr.reduce(function(a,b){return a+b;},0);
-      return useSum?total:total/arr.length;
-    });
-    // Stufe 2: je nach Tabellen-Gruppierung (Tag/Woche/Monat) weiter zusammenfassen
-    var labels,vals;
-    if(groupMode==='day'){
-      labels=dates.map(function(d){return fd(d);});
-      vals=dailyVals.map(function(v){return v===null?null:+v.toFixed(1);});
-    } else {
-      var monthNamesShort=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
-      var buckets={},order=[];
-      dates.forEach(function(d,i){
-        var dt=new Date(d+'T00:00:00'),key,label;
-        if(groupMode==='week'){
-          var iw=isoWeekOf(dt);
-          key=iw.year+'-W'+iw.week;label='KW '+iw.week;
-        } else {
-          key=d.slice(0,7);label=monthNamesShort[dt.getMonth()]+' '+dt.getFullYear();
-        }
-        if(!buckets[key]){buckets[key]={label:label,vals:[]};order.push(key);}
-        if(dailyVals[i]!==null)buckets[key].vals.push(dailyVals[i]);
-      });
-      var keys=order.sort();
-      labels=keys.map(function(k){return buckets[k].label;});
-      vals=keys.map(function(k){
-        var arr=buckets[k].vals;
-        if(!arr.length)return null;
-        var total=arr.reduce(function(a,b){return a+b;},0);
-        return +(useSum?total:total/arr.length).toFixed(1);
-      });
-    }
-    var tKeys={crOEM:'crOEM',crTeilweise:'crTeilweise',crYes:'crYes',crSuperYes:'crSuperYes',crMegaYes:'crMegaYes'};
-    var tk=tKeys[metric];
-    var target=(tk&&KPI_TARGETS[tk])?KPI_TARGETS[tk].val:null;
-    var validVals=vals.filter(function(v){return v!==null&&v!==undefined;});
-    var yS;
-    if(!validVals.length){
-      yS={min:0};
-    } else {
-      var dataMin=Math.min.apply(null,validVals),dataMax=Math.max.apply(null,validVals);
-      var range=dataMax-dataMin;
-      if(range<=0)range=dataMax>0?dataMax:1; // flache Linie: künstliche Spanne, damit Polsterung greift
-      var pad=range*0.6;
-      var yMin=Math.max(0,dataMin-pad);
-      var yMax=dataMax+pad;
-      yS={min:yMin,max:yMax};
-    }
-    var datasets=[{
-      label:m.l,data:vals,borderColor:m.c,backgroundColor:m.c+'22',
-      fill:true,tension:0.35,pointRadius:labels.length<=10?4:2,
-      pointBackgroundColor:m.c,borderWidth:2,order:1
-    }];
-    if(target!==null){
-      datasets.push({
-        label:'Ziel ('+target+')',
-        data:labels.map(function(){return target;}),
-        borderColor:'#BD2D29',borderDash:[5,4],borderWidth:2,
-        pointRadius:0,fill:false,order:2
-      });
-    }
-    window._overviewChartData={labels:labels,datasets:datasets,yS:yS};
-  })(chartRows,overviewChartMetric,overviewPerfGroup);
-
-  requestAnimationFrame(function(){requestAnimationFrame(function(){
-    if(!window._overviewChartData)return;
-    var d=window._overviewChartData;
-    var canvas=document.getElementById('overviewPerfChart');
-    if(!canvas)return;
-    if(canvas._ci){try{canvas._ci.destroy();}catch(e){}}
-    if(d.datasets[0])d.datasets[0].backgroundColor=vGradient(canvas,d.datasets[0].borderColor,0.55,0.05);
-    canvas._ci=new Chart(canvas,{
-      type:'line',
-      data:{labels:d.labels,datasets:d.datasets},
-      options:{
-        responsive:true,
-        resizeDelay:200,
-        maintainAspectRatio:false,
-        animation:CHART_DRAWIN_ANIMATION,
-        interaction:{mode:'index',intersect:false},
-        plugins:{
-          legend:{display:true,position:'top',labels:{font:{size:11},boxWidth:20,padding:12}},
-          tooltip:{callbacks:{label:function(ctx){return ctx.dataset.label+': '+formatMetricValue(overviewChartMetric,ctx.parsed.y);}}}
-        },
-        scales:{
-          x:{ticks:{font:{size:11},maxTicksLimit:12},grid:{display:false}},
-          y:{min:d.yS.min,max:d.yS.max,ticks:{font:{size:11},stepSize:d.yS.step},grid:{color:'rgba(0,0,0,0.05)'}}
-        }
-      }
-    });
-    reapplyChartGradient(canvas._ci,canvas,0.55,0.05);
-  });});
 
   return h;
 }
@@ -6894,7 +6926,7 @@ function renderActivity(){
 
 function renderEinstellungen(){
   var ma=document.getElementById('mainArea');if(!ma)return;
-  if(currentUserRole!=='admin'){ view='team'; wiegandView='performance'; renderSidebar(); renderTeam(); return; }
+  if(currentUserRole!=='admin'){ view='team'; wiegandView='overview'; renderSidebar(); renderTeam(); return; }
 
   ma.innerHTML='<div class="topbar"><div class="tb-left">'
     +'<div style="width:40px;height:40px;border-radius:9px;background:var(--bg2);color:var(--text2);display:flex;align-items:center;justify-content:center;font-size:16px"><i class="ti ti-settings"></i></div>'

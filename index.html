@@ -209,7 +209,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 /* MODAL */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:center;justify-content:center;}
 .modal-ov.hidden{display:none;}
-.modal{background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--r-lg);padding:24px;width:480px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18);}
+.modal{background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:var(--r-lg);padding:24px;width:640px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18);}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:16px;}
 .modal-actions{display:flex;gap:10px;margin-top:6px;}
 /* CHART */
@@ -328,13 +328,8 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
     <div id="wiegandSubNav" class="wiegand-subnav">
       <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Performance</div>
       <div class="sb-item sb-navsub" id="nav-team-coaching" onclick="bannerViewMode='coaching';setCoachFilterView('overview')">Coaching</div>
-      <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">Zielvereinbarung</div>
-    </div>
-    <div class="sb-item" id="nav-coaching" onclick="toggleCoachingNav()"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching <i class="ti ti-chevron-down" id="coachingNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
-    <div id="coachingSubNav" class="wiegand-subnav hidden">
-      <div class="sb-item sb-navsub" id="nav-coaching-team" onclick="selectCoachingTeam()">Overview KPIs</div>
       <div class="sb-item sb-navsub" id="nav-coaching-activity" onclick="selectCoachingActivity()">Aktivitäten</div>
-      <div id="coachingCoachSubItems"></div>
+      <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">Zielvereinbarung</div>
     </div>
     <div class="sb-item" id="nav-settings" style="display:none" onclick="toggleSettingsNav()"><div class="sb-icon"><i class="ti ti-settings"></i></div> Settings <i class="ti ti-chevron-up" id="settingsNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="settingsSubNav" class="wiegand-subnav">
@@ -424,7 +419,10 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 
 
 <!-- SESSION PLANEN MODAL -->
-<div class="modal-ov hidden" id="sessionPlanenModal"><div class="modal" style="width:640px">
+<div class="modal-ov hidden" id="coachingInfoModal"><div class="modal" style="max-height:80vh;overflow-y:auto">
+  <div id="coachingInfoModalBody"></div>
+</div></div>
+<div class="modal-ov hidden" id="sessionPlanenModal"><div class="modal">
   <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Session planen</div>
 
   <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Wer & wann</div>
@@ -489,7 +487,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 </div></div>
 
 <!-- GRUPPENSESSION ABARBEITEN MODAL -->
-<div class="modal-ov hidden" id="groupSessionModal"><div class="modal" style="width:520px">
+<div class="modal-ov hidden" id="groupSessionModal"><div class="modal">
   <div class="modal-title" style="display:flex;align-items:center;gap:8px"><i class="ti ti-users-group" style="color:var(--purple)"></i> Gruppensession abarbeiten</div>
   <div id="groupSessionModalBody"></div>
   <div class="modal-actions">
@@ -499,7 +497,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 </div></div>
 
 <!-- NEUES COACHING ERFASSEN (ehem. "Neue Session erfassen", jetzt Pop-up) -->
-<div class="modal-ov hidden" id="neuesCoachingModal"><div class="modal" style="width:640px;max-width:95vw;max-height:88vh;overflow-y:auto">
+<div class="modal-ov hidden" id="neuesCoachingModal"><div class="modal" style="max-height:88vh;overflow-y:auto">
   <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-calendar-plus" style="color:var(--purple)"></i> Neue Session erfassen</div>
 
   <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Wer & wann</div>
@@ -563,7 +561,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 </div></div>
 
 <!-- NEUEN CALL BEWERTEN -->
-<div class="modal-ov hidden" id="qaBewertungModal"><div class="modal" style="width:640px;max-width:95vw;max-height:88vh;overflow-y:auto">
+<div class="modal-ov hidden" id="qaBewertungModal"><div class="modal" style="max-height:88vh;overflow-y:auto">
   <div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-phone-plus" style="color:var(--purple)"></i> Neuen Call bewerten</div>
 
   <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Call-Details</div>
@@ -608,7 +606,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 </div></div>
 
 <!-- NEUES ZIEL -->
-<div class="modal-ov hidden" id="goalModal"><div class="modal" style="width:520px;max-width:95vw">
+<div class="modal-ov hidden" id="goalModal"><div class="modal">
   <div class="modal-title" style="display:flex;align-items:center;gap:8px"><i class="ti ti-flag" style="color:var(--purple)"></i> Neues Ziel</div>
   <div style="margin-bottom:10px"><label>Zielbeschreibung</label><textarea id="goal-desc" rows="2" placeholder="z. B. Super Yes Rate auf 18% steigern bis Jahresende" style="width:100%;box-sizing:border-box;padding:7px 10px;font-size:13px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);resize:vertical"></textarea></div>
   <div class="f2" style="margin-bottom:10px">
@@ -1007,9 +1005,6 @@ function resetBannerRotation(){
 function setBannerViewMode(m){
   bannerViewMode=m;
   resetBannerRotation();
-  if(m==='coaching'){ view='coaching'; coachFilterView='overview'; }
-  else { view='team'; wiegandView=m; }
-  renderSidebar();
   renderMain();
 }
 var overviewToDate=null;   // Bis-Datum (Overview Performance-Tabelle), null = Standard (Monatsende/heute)
@@ -1053,7 +1048,7 @@ function applyOverviewMonth(){
 }
 function setOverviewPerfGroup(g){overviewPerfGroup=g;renderTeam();}
 var coachCalYear=null, coachCalMonthIdx=null; // Kalender-Monatsnavigation SFP Coaching (init. beim ersten Rendern auf aktuellen Monat)
-var coachCalViewMode='month'; // 'month' | 'week'
+var coachCalViewMode='week'; // 'month' | 'week'
 var coachCalWeekStart=null; // Montag der aktuell angezeigten Woche (YYYY-MM-DD), init. beim ersten Rendern auf aktuelle Woche
 var coachCalMiniPickerOpen=false;
 var coachCalMiniPickerYear=null; // im Mini-Picker angezeigtes Jahr (kann vom eigentlich aktiven Jahr abweichen, waehrend man blaettert)
@@ -2088,8 +2083,8 @@ function renderCoachingAnsicht(){
   h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">';
   h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
   h+='<div style="display:flex;gap:6px">'
-    +'<button style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;'+(coachCalViewMode==='month'?'background:#164e54;color:#fff;border-color:#164e54':'')+'" onclick="setCoachCalViewMode(\'month\')">Monat</button>'
     +'<button style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;'+(coachCalViewMode==='week'?'background:#164e54;color:#fff;border-color:#164e54':'')+'" onclick="setCoachCalViewMode(\'week\')">Woche</button>'
+    +'<button style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;'+(coachCalViewMode==='month'?'background:#164e54;color:#fff;border-color:#164e54':'')+'" onclick="setCoachCalViewMode(\'month\')">Monat</button>'
     +'</div>';
   h+=buildCalNavControls();
   h+='</div>';
@@ -2126,14 +2121,18 @@ function renderCoachingAnsicht(){
     h+='</div>';
   }
 
+  // ══ Performance-Tabelle (dieselbe Tabelle wie im Performance-Reiter, ohne Banner und ohne Diagramm) ══
+  h+=buildOverviewTab(liste,'performance',true,true);
+
   // ══ Geplante Sessions (volle Breite, weiße Box) ══
+  var gep10=gep.slice(0,10);
   h+='<div class="card" style="margin-bottom:22px">';
-  h+='<div class="card-title"><i class="ti ti-calendar-event"></i> Geplante Sessions'+(gep.length?' <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+gep.length+')</span>':'')+'</div>';
+  h+='<div class="card-title"><i class="ti ti-calendar-event"></i> Geplante Sessions'+(gep.length?' <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+gep10.length+(gep.length>10?' von '+gep.length:'')+')</span>':'')+'</div>';
   if(!gep.length){
     h+='<div style="text-align:center;color:var(--text3);padding:28px"><i class="ti ti-calendar-off" style="font-size:28px;display:block;margin-bottom:8px"></i>Keine Sessions geplant<div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="openSessionModal(0)"><i class="ti ti-plus"></i> Jetzt planen</button></div></div>';
   } else {
     h+='<div style="display:flex;flex-direction:column;gap:8px">';
-    gep.forEach(function(x){
+    gep10.forEach(function(x){
       var c=ec(x.eid),dt2=new Date(x.d+'T00:00:00'),df=Math.round((dt2-hD)/86400000);
       var pTyp=(x.t||'').replace(/[<>"']/g,'');
       var pFok=(x.f||'').replace(/[<>"']/g,'');
@@ -2150,8 +2149,8 @@ function renderCoachingAnsicht(){
 
   // ══ Letzte Sessions (volle Breite, weiße Box, gleiches Tabellenformat wie Coaching-Historie) ══
   var let7=abg.slice(0,10);
-  h+='<div class="card">';
-  h+='<div class="card-title"><i class="ti ti-history"></i> Letzte Sessions <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+let7.length+')</span></div>';
+  h+='<div class="card" style="margin-bottom:22px">';
+  h+='<div class="card-title"><i class="ti ti-history"></i> Letzte Sessions <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+let7.length+(abg.length>10?' von '+abg.length:'')+')</span></div>';
   if(!let7.length){
     h+='<div style="text-align:center;color:var(--text3);padding:28px"><i class="ti ti-history" style="font-size:28px;display:block;margin-bottom:8px"></i>Noch keine Sessions</div>';
   } else {
@@ -3871,7 +3870,7 @@ function showView(v){
   if(v!=='coaching'&&v!=='team'&&v!=='activity')closeCoachingSubnav();
   renderSidebar();renderMain();
 }
-function selectCoachingActivity(){view='activity';coachingNavOpen=true;renderSidebar();renderMain();}
+function selectCoachingActivity(){view='activity';wiegandNavOpen=true;renderSidebar();renderMain();}
 function closeWiegandSubnav(){
   wiegandNavOpen=false;
   var sub=document.getElementById('wiegandSubNav');if(sub)sub.classList.add('hidden');
@@ -4370,11 +4369,18 @@ function buildGlobalBannerHtml(visible){
     function _xP(idx){return Math.round(idx/(_nD-1)*_CW);}
     function _yP(n){return _CHh-Math.round(n/_maxN*_CHh);}
     // Weiche Bezier-Kurve statt eckiger Linie (gleiche Technik wie beim Performance-Diagramm)
-    var _linePath='M '+_xP(0)+' '+_yP(_coachDays[0]);
-    for(var _pi=1;_pi<_coachDays.length;_pi++){
-      var _px=_xP(_pi-1),_py=_yP(_coachDays[_pi-1]),_cx=_xP(_pi),_cy=_yP(_coachDays[_pi]),_mx=_px+(_cx-_px)*0.5;
-      _linePath+=' C '+_mx+' '+_py+','+_mx+' '+_cy+','+_cx+' '+_cy;
+    // Aufgeteilt in Vergangenheit (durchgezogen, bis inkl. Heute) und Zukunft (gestrichelt)
+    function _buildSmoothPath(vals,startIdx,endIdx){
+      var p='M '+_xP(startIdx)+' '+_yP(vals[startIdx]);
+      for(var i=startIdx+1;i<=endIdx;i++){
+        var px=_xP(i-1),py=_yP(vals[i-1]),cx=_xP(i),cy=_yP(vals[i]),mx=px+(cx-px)*0.5;
+        p+=' C '+mx+' '+py+','+mx+' '+cy+','+cx+' '+cy;
+      }
+      return p;
     }
+    var _pastPath=_buildSmoothPath(_coachDays,0,_hIdx);
+    var _futurePath=_buildSmoothPath(_coachDays,_hIdx,_nD-1);
+    var _linePath=_buildSmoothPath(_coachDays,0,_nD-1);
     var _areaPath=_linePath+' L '+_xP(_nD-1)+' '+_CHh+' L '+_xP(0)+' '+_CHh+' Z';
     var _hX=_xP(_hIdx);
     h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:56px;height:278px;box-sizing:border-box;position:relative;overflow:hidden">';
@@ -4393,9 +4399,10 @@ function buildGlobalBannerHtml(visible){
       +'<svg width="100%" height="195" viewBox="0 0 '+_CW+' '+_CHh+'" preserveAspectRatio="none">'
       +'<line x1="'+_hX+'" y1="0" x2="'+_hX+'" y2="'+_CHh+'" stroke="#e0a13a" stroke-width="1.5" stroke-dasharray="4,3"/>'
       +'<path d="'+_areaPath+'" fill="#7ED2DB" opacity="0.12"/>'
-      +'<path d="'+_linePath+'" fill="none" stroke="#7ED2DB" stroke-width="2.5" stroke-linecap="round"/>'
+      +'<path d="'+_pastPath+'" fill="none" stroke="#7ED2DB" stroke-width="2.5" stroke-linecap="round"/>'
+      +'<path d="'+_futurePath+'" fill="none" stroke="#7ED2DB" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="6,5" opacity="0.75"/>'
       +'</svg>'
-      +'<div style="position:absolute;top:0;left:calc('+(_hX/_CW*100)+'% + 4px);font-size:10px;font-weight:700;color:#e0a13a;white-space:nowrap">HEUTE</div>'
+      +'<div style="position:absolute;top:0;left:'+(_hX/_CW*100)+'%;transform:translateX(-50%);font-size:10px;font-weight:700;color:#e0a13a;white-space:nowrap">HEUTE</div>'
       +'</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
@@ -4700,7 +4707,7 @@ function buildGlobalBannerHtml(visible){
 }
 
 // ── SFP Wiegand > Overview: 5 Kacheln + Performance-Tabelle für einen wählbaren Mitarbeiter ──
-function buildOverviewTab(liste,section){
+function buildOverviewTab(liste,section,skipBanner,skipChart){
   // section: undefined = komplettes Overview wie bisher, UNVERAENDERT (Banner+Kacheln+Rest+Tabelle).
   // 'performance' = nur Banner + Kacheln + Performance-Tabelle (fuer den neuen Performance-Reiter, zeigt dieselben Daten 1:1, keine Aufteilung von Overview).
   var showRest=(section!=='performance');
@@ -4736,9 +4743,10 @@ function buildOverviewTab(liste,section){
   var optOemZiel=avgOptTagZielvereinbarung();
   var h='';
 
-  h+=buildGlobalBannerHtml(visible);
+  if(!skipBanner)h+=buildGlobalBannerHtml(visible);
 
   // ── Performance Trend Chart (unter dem Banner) ──
+  if(!skipChart){
   var chartRows=isAll
     ? selectedEmps.reduce(function(acc,e){return acc.concat((performance[e.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;}));},[])
     : (performance[emp.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;});
@@ -4910,6 +4918,7 @@ function buildOverviewTab(liste,section){
       });
     }
   });});
+  } // Ende if(!skipChart)
 
 
   var selLabel=selectedEmps.length===visible.length?'Alle Mitarbeiter':(isAll?selectedEmps.length+' Mitarbeiter ausgewählt':emp.name);
@@ -5057,6 +5066,7 @@ function buildOverviewTab(liste,section){
       +[['Akt./Std.','akt'],['NE','notR'],['NM','notP'],['NErr','notS'],['OEM','convOEM'],['Upsells','ups'],['WKA','wka_gesamt_yes'],['Opt. Ges.','optGes'],['Opt./Std.','optPerH2'],['CR OEM','crOEM'],['CR TW','crTW'],['CR Yes','crYes'],['CR SY/MY','crSyMy'],['CR SY','crSY'],['CR MY','crMY'],['Anteil OEM','anteilOEM']].map(function(cc){
         return sortTh(cc[0],cc[1],';text-align:right;width:92px;min-width:92px');
       }).join('')
+      +'<th style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%);padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap">Aktion</th>'
       +[['Marge Ges.','marge']].map(function(cc){
         return sortTh(cc[0],cc[1],';text-align:right');
       }).join('')
@@ -5109,6 +5119,7 @@ function buildOverviewTab(liste,section){
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crSY,rowEmpT.crSuperYes.val,rowEmpT.crSuperYes.dir)+'">'+stackCell(crSY+'%',sy)+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crMY,rowEmpT.crMegaYes.val,rowEmpT.crMegaYes.dir)+'">'+stackCell(crMY+'%',my)+'</td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:rgba(32,106,114,0.05);text-align:right;'+fc(Math.round(convOEM+ups+wka_gesamt_yes>0?convOEM/(convOEM+ups+wka_gesamt_yes)*100:0),rowEmpT.anteilOEM.val,rowEmpT.anteilOEM.dir)+'">'+stackCell((convOEM+ups+wka_gesamt_yes>0?Math.round(convOEM/(convOEM+ups+wka_gesamt_yes)*100):0)+'%',null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);white-space:nowrap"><div style="display:flex;gap:6px"><button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openSessionModal(\''+rowEmp.id+'\')"><i class="ti ti-calendar-plus"></i> Planen</button><button class="btn btn-sm" onclick="event.stopPropagation();openCoachingInfoModal(\''+rowEmp.id+'\')"><i class="ti ti-info-circle"></i> Info</button></div></td>'
         +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text)">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+Math.round(marge/optGes).toLocaleString('de-DE'):'—'))+'</td>'
         +'</tr>';
       sumAkt+=akt;sumNotR+=notR;sumNotP+=notP;sumNotS+=notS;sumNotROem+=notROem;sumNotPOem+=notPOem;sumNotSOem+=notSOem;sumConvOEM+=convOEM;sumTw+=tw;sumYes+=yes;sumSy+=sy;sumMy+=my;sumTotalHours+=rowTotalHours;
@@ -5148,14 +5159,16 @@ function buildOverviewTab(liste,section){
       function sumTdH(v,fmt,align,edge){return '<td style="padding:13px 14px;text-align:'+(align||'right')+';font-weight:700;color:#fff;background:rgba(255,255,255,0.06)'+(edge==='l'?';border-left:2px solid rgba(255,255,255,0.3)':'')+(edge==='r'?';border-right:2px solid rgba(255,255,255,0.3)':'')+'">'+(fmt?fmt(v):v)+'</td>';}
       function avgTdH(v,fmt,align,edge){return '<td style="padding:13px 14px;text-align:'+(align||'right')+';font-weight:700;color:#0c3b40;background:rgba(32,106,114,0.1)'+(edge==='l'?';border-left:2px solid var(--border2)':'')+(edge==='r'?';border-right:2px solid var(--border2)':'')+'">'+(fmt?fmt(v):v)+'</td>';}
       // Trennzeile: kleiner visueller Abstand zwischen Mitarbeiter-Zeilen und Summe/Durchschnitt
-      h+='<tr><td colspan="19" style="padding:0;border:none;height:8px;background:var(--bg)"></td></tr>';
+      h+='<tr><td colspan="20" style="padding:0;border:none;height:8px;background:var(--bg)"></td></tr>';
       h+='<tr class="perf-sum-row" style="background:#0c3b40">'
         +'<td style="padding:13px 14px;font-weight:700;color:#fff" colspan="2">Σ Summe</td>'
         +sumTd(decCnt(aktPerHourCalc,sumAkt))+sumTd(cntPct(sumNotR,notRpct))+sumTd(cntPct(sumNotP,notPpct))+sumTd(cntPct(sumNotS,notSpct))+sumTd(cntPct(sumConvOEM,anteilOEMcalc))
         +sumTd(cntPct(sumUps,anteilUpsCalc))+sumTd(cntPct(sumWka,anteilWkaCalc))+sumTd(stackCell(sumOptGes,null))
         +sumTdH(stackCell(optPerHourCalc.toFixed(1),null),null,'right','l')
         +sumTdH(crOEMcalc,pctStack)+sumTdH(cntPct(sumTw,crTWcalc))+sumTdH(cntPct(sumYes,crYescalc))+sumTdH(cntPct(sumSy+sumMy,crSyMycalc))+sumTdH(cntPct(sumSy,crSYcalc))+sumTdH(cntPct(sumMy,crMYcalc))
-        +sumTdH(anteilOEMcalc,pctStack,'right','r')+sumTd(stackCell(eur(sumMarge),'€'+Math.round(margeDurchCalc).toLocaleString('de-DE'),'opacity:.75'),null,'right')
+        +sumTdH(anteilOEMcalc,pctStack,'right','r')
+        +'<td style="padding:13px 14px;background:#0c3b40"></td>'
+        +sumTd(stackCell(eur(sumMarge),'€'+Math.round(margeDurchCalc).toLocaleString('de-DE'),'opacity:.75'),null,'right')
         +'</tr>';
       h+='<tr class="perf-avg-row" style="background:rgba(32,106,114,0.14)">'
         +'<td style="padding:13px 14px;font-weight:700;color:#0c3b40" colspan="2">Ø Durchschnitt</td>'
@@ -5164,7 +5177,9 @@ function buildOverviewTab(liste,section){
         +avgTd(cntPct(rnd1(sumUps/rowCount),anteilUpsCalc))+avgTd(cntPct(rnd1(sumWka/rowCount),anteilWkaCalc))+avgTd(stackCell(rnd1(sumOptGes/rowCount),null))
         +avgTdH(stackCell(optPerHourCalc.toFixed(1),null),null,'right','l')
         +avgTdH(crOEMcalc,pctStack)+avgTdH(cntPct(rnd1(sumTw/rowCount),crTWcalc))+avgTdH(cntPct(rnd1(sumYes/rowCount),crYescalc))+avgTdH(cntPct(rnd1((sumSy+sumMy)/rowCount),crSyMycalc))+avgTdH(cntPct(rnd1(sumSy/rowCount),crSYcalc))+avgTdH(cntPct(rnd1(sumMy/rowCount),crMYcalc))
-        +avgTdH(anteilOEMcalc,pctStack,'right','r')+avgTd(stackCell(eur(sumMarge/rowCount),'€'+Math.round(margeDurchCalc).toLocaleString('de-DE'),'opacity:.75'),null,'right')
+        +avgTdH(anteilOEMcalc,pctStack,'right','r')
+        +'<td style="padding:13px 14px;background:rgba(32,106,114,0.14)"></td>'
+        +avgTd(stackCell(eur(sumMarge/rowCount),'€'+Math.round(margeDurchCalc).toLocaleString('de-DE'),'opacity:.75'),null,'right')
         +'</tr>';
     }
     h+='</tbody></table></div>';
@@ -7475,6 +7490,7 @@ function renderActivity(){
     return '<span style="color:'+col+'">'+arrow+' '+(delta>=0?'+':'')+delta+'</span> vs. Vorperiode ('+prev+')';
   }
   var h='<div class="content">';
+  h+=buildGlobalBannerHtml(employees.filter(function(e){return !e.isPureCoach;}));
   h+='<div class="month-bar" style="grid-template-columns:auto 1fr 1fr 1fr 1fr 1fr">';
   h+='<div class="mb-month"><div class="l">Zeitraum</div><div class="v">Letzte 30 Tage</div></div>';
   [
@@ -9119,6 +9135,175 @@ function saveInlineCallBewertung(empId){
 }
 
 
+var _savingCoachingInfoNotiz=false;
+function saveCoachingInfoNotiz(empId){
+  if(_savingCoachingInfoNotiz)return;
+  var field=document.getElementById('coachingInfoNotizField');
+  var statusEl=document.getElementById('coachingInfoNotizStatus');
+  if(!field)return;
+  var notiz=field.value;
+  _savingCoachingInfoNotiz=true;
+  if(statusEl)statusEl.textContent='Speichert…';
+  sb.from('employees').update({notes:notiz}).eq('id',empId).then(function(res){
+    _savingCoachingInfoNotiz=false;
+    if(res.error){ if(statusEl)statusEl.textContent='Fehler beim Speichern'; alert('Fehler beim Speichern: '+res.error.message); return; }
+    var emp=employees.find(function(e){return e.id===empId;});
+    if(emp)emp.notes=notiz;
+    if(statusEl){statusEl.textContent='✓ Gespeichert';setTimeout(function(){if(statusEl)statusEl.textContent='';},2500);}
+  }).catch(function(err){
+    _savingCoachingInfoNotiz=false;
+    if(statusEl)statusEl.textContent='Fehler beim Speichern';
+    alert('Unerwarteter Fehler: '+err.message);
+  });
+}
+function openCoachingInfoModal(empId){
+  var emp=employees.find(function(e){return e.id===empId;});
+  if(!emp)return;
+  var all=(protocols[empId]||[]).slice();
+  var abgeschlossen=all.filter(function(p){return (p.status||'abgeschlossen')!=='geplant';});
+  var geplant=all.filter(function(p){return p.status==='geplant';});
+  var heute=today();
+  // Chronologisch absteigend (neueste zuerst), geplante UND abgeschlossene gemeinsam
+  var timeline=all.slice().sort(function(a,b){return b.date.localeCompare(a.date)||( (b.uhrzeit||'').localeCompare(a.uhrzeit||''));});
+  var bestEvents=personalBestEvents(empId);
+  // Kennzahlen
+  var total=abgeschlossen.length;
+  var lastDone=abgeschlossen.slice().sort(function(a,b){return b.date.localeCompare(a.date);})[0];
+  var daysSinceLast=lastDone?Math.round((new Date(heute+'T00:00:00')-new Date(lastDone.date+'T00:00:00'))/86400000):null;
+  var firstDone=abgeschlossen.slice().sort(function(a,b){return a.date.localeCompare(b.date);})[0];
+  var avgPerMonth=null;
+  if(firstDone&&total>1){
+    var monthsSpan=Math.max(1,(new Date(heute+'T00:00:00')-new Date(firstDone.date+'T00:00:00'))/(86400000*30.44));
+    avgPerMonth=(total/monthsSpan).toFixed(1);
+  }
+  // Haupt-Coach (haeufigster coachId unter abgeschlossenen Sessions)
+  var coachCounts={};
+  abgeschlossen.forEach(function(p){if(p.coachId)coachCounts[p.coachId]=(coachCounts[p.coachId]||0)+1;});
+  var mainCoachId=Object.keys(coachCounts).sort(function(a,b){return coachCounts[b]-coachCounts[a];})[0];
+  var mainCoach=mainCoachId?employees.find(function(e){return e.id===mainCoachId;}):null;
+
+  var c=COLORS[emp.color%COLORS.length];
+  var mNamesShort=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+  var dowShort=['So','Mo','Di','Mi','Do','Fr','Sa'];
+
+  // ── Effekt je Session: Ø-Veraenderung des hinterlegten Ziel-KPI 14 Tage vor vs. nach der Session
+  // (gleiche Methodik wie bei "Coach-Wirksamkeit"), normalisiert auf Zielrichtung
+  var empT=empTargets(emp);
+  var fullPerf=(performance[empId]||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+  var FOCUS_METRIC_LABELS={};
+  (typeof FOCUS_METRICS!=='undefined'?FOCUS_METRICS:[]).forEach(function(m){FOCUS_METRIC_LABELS[m.key]=m.label;});
+  function avgWindow(centerDate,daysBefore,daysAfter,metricKey){
+    var fromS=addDaysUTC(centerDate,-daysBefore);
+    var toS=addDaysUTC(centerDate,daysAfter);
+    var rows=fullPerf.filter(function(p){return p.date>=fromS&&p.date<toS;});
+    var vals=rows.map(function(p){return p[metricKey];}).filter(function(v){return v!==undefined&&v!==null;});
+    return vals.length?(vals.reduce(function(a,b){return a+b;},0)/vals.length):null;
+  }
+  function sessionEffekt(p){
+    if(p.status==='geplant'||!p.focusMetric||!fullPerf.length)return null;
+    var before=avgWindow(p.date,14,0,p.focusMetric);
+    var after=avgWindow(p.date,0,14,p.focusMetric);
+    if(before===null||after===null)return null;
+    var dir=(empT[p.focusMetric]&&empT[p.focusMetric].dir)||'gte';
+    var signedDelta=(after-before)*(dir==='lte'?-1:1);
+    return {delta:signedDelta,raw:after-before,metric:p.focusMetric,label:FOCUS_METRIC_LABELS[p.focusMetric]||p.focusMetric};
+  }
+  var alleEffekte=abgeschlossen.map(sessionEffekt).filter(function(e){return e!==null;});
+  var effektPaare=abgeschlossen.map(function(p){return {p:p,eff:sessionEffekt(p)};}).filter(function(x){return x.eff!==null;});
+  var besteSession=effektPaare.length?effektPaare.slice().sort(function(a,b){return b.eff.delta-a.eff.delta;})[0]:null;
+  var avgEffekt=alleEffekte.length?(alleEffekte.reduce(function(a,b){return a+b.delta;},0)/alleEffekte.length):null;
+
+  var h='<div class="modal-title" style="display:flex;align-items:center;gap:8px;margin-bottom:16px"><i class="ti ti-history" style="color:var(--purple)"></i> Coaching-Historie · '+esc(emp.name)+'</div>';
+
+  h+='<div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">① Übersicht</div>';
+  h+='<div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">';
+  h+='<div style="display:flex;gap:10px;margin-bottom:10px">'
+    +'<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:#0c3b40">'+total+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">Gesamt</div></div>'
+    +'<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(daysSinceLast!==null&&daysSinceLast>30?'#B23A3A':'#0c3b40')+'">'+(daysSinceLast===null?'—':daysSinceLast+'d')+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">Letzte</div></div>'
+    +'<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:#0c3b40">'+(avgPerMonth||'—')+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">Ø/Monat</div></div>'
+    +'<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:#0c3b40">'+geplant.length+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">Geplant</div></div>'
+    +'<div style="flex:1;text-align:center;background:var(--bg);border-radius:8px;padding:10px 6px"><div style="font-size:18px;font-weight:700;color:'+(avgEffekt===null?'#94a4a4':avgEffekt>=0?'#2f8f66':'#B23A3A')+'">'+(avgEffekt===null?'—':(avgEffekt>=0?'+':'')+avgEffekt.toFixed(1))+'</div><div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">Ø Effekt</div></div>'
+    +'</div>';
+  if(mainCoach){
+    h+='<div style="font-size:11.5px;color:var(--text2)">Haupt-Coach: <b style="color:#0c3b40">'+esc(mainCoach.name)+'</b> ('+coachCounts[mainCoachId]+'× von '+total+')</div>';
+  }
+  if(alleEffekte.length){
+    h+='<div style="font-size:10.5px;color:var(--text3);margin-top:4px">Effekt = Ø-Veränderung des hinterlegten Ziel-KPI 14 Tage vor/nach der Session, in Zielrichtung normalisiert (basiert auf '+alleEffekte.length+' von '+total+' Sessions mit Ziel-KPI)</div>';
+  }
+  if(besteSession&&besteSession.eff.delta>0){
+    var bd=new Date(besteSession.p.date+'T00:00:00');
+    h+='<div style="background:#eafaf3;border-left:3px solid #2f8f66;border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11.5px;color:#1f5e42">'
+      +'🏆 <b>Beste Session:</b> '+esc(besteSession.p.type||besteSession.p.art||'Coaching')+' am '+bd.getDate()+'. '+mNamesShort[bd.getMonth()]+' <span style="font-weight:700">(+'+besteSession.eff.delta.toFixed(1)+' '+esc(besteSession.eff.label)+')</span>'
+      +'</div>';
+  }
+  // QA-Fälligkeit: letzte Call-Bewertung dieses Mitarbeiters, gleiche 60-Tage-Schwelle wie bei "QA fällig" in der Coaching-Uebersicht
+  var sortedRatings=(callRatings[empId]||[]).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+  var lastQa=sortedRatings[0]||null;
+  var daysSinceQa=lastQa?Math.round((new Date(heute+'T00:00:00')-new Date(lastQa.date+'T00:00:00'))/86400000):null;
+  if(daysSinceQa===null||daysSinceQa>60){
+    var qaTxt=daysSinceQa===null?'Noch keine QA-Bewertung (Telefonat) vorhanden':Math.round(daysSinceQa/7)+' Wochen seit letzter QA-Bewertung (Telefonat)';
+    h+='<div style="background:rgba(32,106,114,0.08);border-left:3px solid #206A72;border-radius:6px;padding:8px 12px;margin-top:8px;font-size:11.5px;color:#164e54;font-weight:600">⚠ '+qaTxt+'</div>';
+  }
+  h+='</div>';
+
+  h+='<div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">② Notiz</div>';
+  h+='<div style="border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px">';
+  h+='<textarea id="coachingInfoNotizField" placeholder="Notiz zu diesem Mitarbeiter..." style="width:100%;min-height:70px;padding:9px 11px;border:1px solid var(--border2);border-radius:var(--r-md);font-family:inherit;font-size:13px;resize:vertical;box-sizing:border-box">'+esc(emp.notes||'')+'</textarea>';
+  h+='<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><button class="btn btn-sm" onclick="saveCoachingInfoNotiz(\''+empId+'\')"><i class="ti ti-device-floppy"></i> Notiz speichern</button><span id="coachingInfoNotizStatus" style="font-size:11px;color:var(--text3)"></span></div>';
+  h+='</div>';
+
+  h+='<div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">③ Verlauf</div>';
+  h+='<div style="border-left:2px solid var(--border2);padding-left:14px">';
+  // Sessions und persoenliche Bestwerte zu einer gemeinsamen, chronologisch sortierten Zeitleiste zusammenfuehren
+  var combinedTl=timeline.map(function(p){return {kind:'session',date:p.date,p:p};})
+    .concat(bestEvents.map(function(ev){return {kind:'record',date:ev.date,label:ev.label};}))
+    .sort(function(a,b){return b.date.localeCompare(a.date);});
+  if(!combinedTl.length){
+    h+='<div style="text-align:center;color:var(--text3);padding:20px 0"><i class="ti ti-history" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Sessions vorhanden</div>';
+  } else {
+    h+='<div style="position:relative;padding-left:22px">';
+    h+='<div style="position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--border)"></div>';
+    combinedTl.forEach(function(item,idx){
+      var dt=new Date(item.date+'T00:00:00');
+      if(item.kind==='record'){
+        h+='<div style="position:relative;padding-bottom:18px">';
+        h+='<div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);background:#174C52;display:flex;align-items:center;justify-content:center"></div>';
+        h+='<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase">'+dowShort[dt.getDay()]+', '+dt.getDate()+'. '+mNamesShort[dt.getMonth()]+'</div>';
+        h+='<div style="font-weight:600;font-size:13.5px;margin-top:2px;color:#174C52">🎉 '+esc(item.label)+'</div>';
+        h+='</div>';
+        return;
+      }
+      var p=item.p;
+      var planned=p.status==='geplant';
+      var coach=p.coachId?employees.find(function(e){return e.id===p.coachId;}):null;
+      h+='<div style="position:relative;padding-bottom:18px">';
+      h+='<div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);background:'+(planned?'#e8ecfb':'#164e54')+'"></div>';
+      h+='<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase">'+dowShort[dt.getDay()]+', '+dt.getDate()+'. '+mNamesShort[dt.getMonth()]+(planned?' · Geplant':'')+'</div>';
+      h+='<div style="font-weight:600;font-size:13.5px;margin-top:2px">'+esc(p.type||p.art||'Coaching')+(besteSession&&besteSession.p===p?' 🏆':'')+'</div>';
+      h+='<div style="font-size:11.5px;color:var(--text2);margin-top:1px">'+(coach?'Coach: '+esc(coach.name):'')+(p.focus?(coach?' · ':'')+esc(p.focus):'')+'</div>';
+      var eff=sessionEffekt(p);
+      if(eff){
+        h+='<div style="margin-top:4px"><span style="font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:10px;background:'+(eff.delta>=0?'#eafaf3':'#fdeeee')+';color:'+(eff.delta>=0?'#2f8f66':'#B23A3A')+'">'+(eff.delta>=0?'+':'')+eff.delta.toFixed(1)+' '+esc(eff.label)+'</span></div>';
+      }
+      h+='</div>';
+      // Luecken-Hervorhebung: zur naechsten (aelteren) SESSION (Bestwerte dazwischen werden uebersprungen)
+      var nextSession=null;
+      for(var ni=idx+1;ni<combinedTl.length;ni++){if(combinedTl[ni].kind==='session'){nextSession=combinedTl[ni].p;break;}}
+      if(nextSession){
+        var gapDays=Math.round((new Date(p.date+'T00:00:00')-new Date(nextSession.date+'T00:00:00'))/86400000);
+        if(gapDays>=14){
+          var gapWeeks=Math.round(gapDays/7);
+          h+='<div style="background:rgba(32,106,114,0.08);border-left:3px solid #206A72;border-radius:6px;padding:8px 12px;margin:4px 0 14px 0;font-size:11.5px;color:#164e54;font-weight:600">⚠ '+gapWeeks+' Wochen Pause seit dieser Session</div>';
+        }
+      }
+    });
+    h+='</div>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;justify-content:flex-end;gap:10px;margin-top:20px"><button class="btn" onclick="closeModal(\'coachingInfoModal\')">Schließen</button></div>';
+  document.getElementById('coachingInfoModalBody').innerHTML=h;
+  openModal('coachingInfoModal');
+}
 function openSessionModalWithFocus(empId,focusText){
   openSessionModal(empId);
   var notizEl=document.getElementById('sessionNotiz');

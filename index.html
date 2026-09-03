@@ -327,7 +327,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
     <div class="sb-item" id="nav-team" onclick="toggleWiegandNav()"><div class="sb-icon"><i class="ti ti-layout-grid"></i></div> SFP Wiegand <i class="ti ti-chevron-up" id="wiegandNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="wiegandSubNav" class="wiegand-subnav">
       <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Performance</div>
-      <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">KPIs</div>
+      <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">Zielvereinbarung</div>
     </div>
     <div class="sb-item" id="nav-coaching" onclick="toggleCoachingNav()"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching <i class="ti ti-chevron-down" id="coachingNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="coachingSubNav" class="wiegand-subnav hidden">
@@ -696,8 +696,8 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 
 <script>
 // ══ SUPABASE SETUP ══
-var SUPABASE_URL = 'https://kjlkneodyvfqgaukdjvb.supabase.co';
-var SUPABASE_ANON_KEY = 'sb_publishable_6C8m6s4zxS2lQKFGEMd_yw_fnEBGN8k';
+var SUPABASE_URL = 'https://nhudrbulfyampyyxhosv.supabase.co';
+var SUPABASE_ANON_KEY = 'sb_publishable_n_xBRUG-Yk_MXgbUDO3oiw_aXuchC2g';
 var _sbRaw = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 var currentUserRole = null; // 'coach' | 'admin' | 'viewer' | null (unbekannt/nicht eingeloggt)
 
@@ -3007,7 +3007,8 @@ function zielvereinbarungHtml(){
     +'<div style="font-weight:800;color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:flex-end">€ '+Math.round(yearIstSum).toLocaleString('de-DE')+'</div>'
     +'<div style="font-weight:800;color:#7ED2DB;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">'+(yearTargetSum>0?Math.round(yearIstSum/yearTargetSum*100):(yearIstSum>0?100:0))+'%</div>'
     +'</div>';
-  return zielInfoBoxHtml()
+  return buildGlobalBannerHtml(employees.filter(function(e){return !e.isPureCoach;}))
+    +zielInfoBoxHtml()
     +zielverlaufJahrChartHtml()
     +wochenzielKachelnHtml()
     +'<div class="card card-static">'
@@ -3763,30 +3764,34 @@ function buildMonthBar(liste){
     +'<div class="mb-stat mb-margin"><div class="l">Margenerhöhung</div><div class="row"><span class="n">'+eur(sums.margeGesamt)+'</span></div><div class="m">Ziel: '+eur(zielMargeSum)+'/Mon.</div></div>'
     +'</div>';
 }
-// ── SFP Wiegand > Overview: 5 Kacheln + Performance-Tabelle für einen wählbaren Mitarbeiter ──
-function buildOverviewTab(liste,section){
-  // section: undefined = komplettes Overview wie bisher, UNVERAENDERT (Banner+Kacheln+Rest+Tabelle).
-  // 'performance' = nur Banner + Kacheln + Performance-Tabelle (fuer den neuen Performance-Reiter, zeigt dieselben Daten 1:1, keine Aufteilung von Overview).
-  var showRest=(section!=='performance');
-  var HIDDEN=[];
-  var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;}).slice().sort(function(a,b){return a.name.localeCompare(b.name);});
-  if(!visible.length)return '<div class="card" style="text-align:center;color:var(--text3);padding:40px">Keine Mitarbeiter vorhanden</div>';
-  if(!overviewSelectedIds){overviewSelectedIds=visible.map(function(e){return e.id;});}
-  overviewSelectedIds=overviewSelectedIds.filter(function(id){return visible.some(function(e){return e.id===id;});});
-  var selectedEmps=visible.filter(function(e){return overviewSelectedIds.indexOf(e.id)>=0;});
-  var isAll=selectedEmps.length!==1;
-  var emp=isAll?null:selectedEmps[0];
-  var empT=isAll?null:empTargets(emp);
-  var currentMonthKey=today().slice(0,7); // z.B. "2026-07"
-  var monthStart=currentMonthKey+'-01';
-  var monthEnd=monthBoundsUTC(today(),0).to;
-  var effFrom=overviewFromDate||monthStart;
-  var effTo=overviewToDate||monthEnd;
-  var perfAll=isAll?[]:(performance[emp.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
-
-  function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'#206A72':'var(--red)';}
-  // Ziel fuer Opt. OEM-Kachel: Durchschnitt aller eingetragenen "Opt./Tag"-Werte aus der Zielvereinbarung (aktueller Monat)
-  function avgOptTagZielvereinbarung(){
+// Wiederverwendbare Kachel: OEM (Anzahl, Margenerhoehung, Oe EUR/Lead) - identischer Code fuer Slide 2 und Slide 3
+function renderOemTileHtml(visible){
+  var _mk=today().slice(0,7);
+  var count=0,marge=0;
+  visible.forEach(function(e){
+    (performance[e.id]||[]).forEach(function(x){
+      if((x.date||'').slice(0,7)!==_mk)return;
+      count+=x.convOEM||0;marge+=x.margeOEM||0;
+    });
+  });
+  var proLead=count>0?marge/count:0;
+  return '<div><div style="font-size:10.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em;margin-bottom:4px">OEM</div>'
+    +'<div style="font-size:30px;font-weight:700;line-height:1">'+count+' <span style="font-size:15px;font-weight:500;color:#bcdadd">Stk.</span></div>'
+    +'<div style="font-size:11px;color:#8fb5b9;margin-top:4px">Margenerhöhung '+Math.round(marge).toLocaleString('de-DE')+' EUR</div>'
+    +'<div style="font-size:11px;color:#8fb5b9">Ø '+Math.round(proLead).toLocaleString('de-DE')+' EUR/Lead</div>'
+    +'</div>';
+}
+// Wiederverwendbare Kachel: Opt. Ges. (Heute) Ist/Ziel/Abweichung - identischer Code fuer Slide 2 und Slide 3
+function renderOptGesHeuteTileHtml(visible){
+  var ist=todayActualStat('opt',visible), ziel=todayTargetStat('opt');
+  var diff=ist-ziel;
+  return '<div><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">OPT. GES. (HEUTE)</div>'
+    +'<div style="font-size:18px;font-weight:700;margin-top:4px">'+ist+' <span style="font-size:10.5px;font-weight:400;color:#9fc9cd">/ '+ziel+' Stk.</span></div>'
+    +'<div style="font-size:9.5px;color:#8fb5b9;margin-top:3px">Abw. <span style="color:'+(diff<0?'#e57373':'#7ED2DB')+';font-weight:600">'+(diff>=0?'+':'')+diff+'</span></div>'
+    +'</div>';
+}
+function buildGlobalBannerHtml(visible){
+  function avgOptTagZielvereinbarungLocal(){
     var zmk=today().slice(0,7);
     var zRec=zielStore[zmk]||{};
     var zVisible=visible.filter(function(e){return empActiveInZielMonth(e,zmk);});
@@ -3797,10 +3802,84 @@ function buildOverviewTab(liste,section){
     });
     return zVals.length?zVals.reduce(function(a,b){return a+b;},0)/zVals.length:null;
   }
-  var optOemZiel=avgOptTagZielvereinbarung();
+  var optOemZiel=avgOptTagZielvereinbarungLocal();
   var h='';
-
-  if((bannerViewMode||section)==='performance'){
+  var _bvMode=bannerViewMode||'overview';
+  if(_bvMode==='ziel'){
+    var yr=today().slice(0,4);
+    var MONTH_SHORT_DE=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    var zielNlArr=[],zielMargeArr=[],erzieltArr=[];
+    for(var m=1;m<=12;m++){
+      var zmk2=yr+'-'+(m<10?'0'+m:m);
+      var wMeta2=getMonthWeeksZiel(zmk2);
+      var mRec2=zielStore[zmk2]||{};
+      var mVisible2=visible.filter(function(e){return empActiveInZielMonth(e,zmk2);});
+      var mTargetSum2=0;
+      mVisible2.forEach(function(e){
+        var r=mRec2[e.id]||{};
+        var weeks2=wMeta2.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+        var monthSum2=weeks2.reduce(function(a,b){return a+b;},0);
+        var optTag2=r.optTag!=null?r.optTag:0;
+        var margeOpt2=r.margeOpt!=null?r.margeOpt:0;
+        mTargetSum2+=monthSum2*optTag2*margeOpt2;
+      });
+      var erzieltSum2=0,hasData2=false;
+      mVisible2.forEach(function(e){
+        (performance[e.id]||[]).forEach(function(x){
+          if((x.date||'').slice(0,7)!==zmk2)return;
+          erzieltSum2+=x.margeGesamt||x.margin||0; hasData2=true;
+        });
+      });
+      zielNlArr.push(zielNlTargets[zmk2]!=null?zielNlTargets[zmk2]:0);
+      zielMargeArr.push(Math.round(mTargetSum2));
+      erzieltArr.push(hasData2?Math.round(erzieltSum2):null);
+    }
+    var maxV2=Math.max.apply(null,zielNlArr.concat(zielMargeArr).concat(erzieltArr.filter(function(v){return v!=null;})).concat([1]));
+    var CH2=195;
+    function pct2(v){return v==null?0:Math.max(v>0?2:0,Math.round(v/maxV2*100));}
+    h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:56px;height:278px;box-sizing:border-box;position:relative;overflow:hidden">';
+    h+='<div style="display:flex;height:'+CH2+'px">';
+    h+='<div style="width:16.6667%;flex-shrink:0;display:flex;flex-direction:column">';
+    h+='<div style="min-height:118px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;padding-left:14px">'
+      +renderOemTileHtml(visible)
+      +'</div>';
+    h+='<div style="min-height:60px;display:flex;align-items:center;padding-top:8px">'
+      +'<div style="padding:4px 14px;display:flex;justify-content:space-between;align-items:center;width:100%">'
+      +renderOptGesHeuteTileHtml(visible)
+      +'</div>'
+      +'</div>';
+    h+='</div>'; // Ende linke Spalte
+    h+='<div style="flex:1;display:flex;align-items:flex-end;gap:10px;padding:0 4px 0 18px">';
+    for(var i=0;i<12;i++){
+      var pctNl2=pct2(zielNlArr[i]),pctZiel2=pct2(zielMargeArr[i]),pctErz2=erzieltArr[i]!=null?pct2(erzieltArr[i]):null;
+      var tipTxt2='Ziel NL Marge/Mon.: €'+zielNlArr[i].toLocaleString('de-DE')
+        +'\nZiel DE Marge/Mon.: €'+zielMargeArr[i].toLocaleString('de-DE')
+        +'\nErzielte Marge: '+(erzieltArr[i]!=null?'€'+erzieltArr[i].toLocaleString('de-DE'):'—');
+      h+='<div style="flex:1;position:relative;height:'+CH2+'px;display:flex;align-items:flex-end;justify-content:center;cursor:default" title="'+tipTxt2+'">'
+        +'<div style="position:absolute;left:14px;right:14px;bottom:'+pctNl2+'%;border-top:2px dashed #e0a13a"></div>'
+        +'<div style="display:flex;align-items:flex-end;gap:4px;height:100%">'
+        +'<div style="width:24px;height:'+pctZiel2+'%;background:#7ED2DB;opacity:0.4;border-radius:3px 3px 0 0"></div>'
+        +(pctErz2!=null?'<div style="width:24px;height:'+pctErz2+'%;background:#7ED2DB;border-radius:3px 3px 0 0"></div>':'<div style="width:24px"></div>')
+        +'</div>'
+        +'</div>';
+    }
+    h+='</div>';
+    h+='</div>'; // Ende Flex-Zeile (linke Spalte + Diagramm)
+    h+='<div style="display:flex;margin-top:8px">';
+    h+='<div style="width:16.6667%;flex-shrink:0"></div>';
+    h+='<div style="flex:1;display:flex;gap:10px;padding:0 4px 0 18px">';
+    for(var i=0;i<12;i++){h+='<div style="flex:1;text-align:center;font-size:10px;color:#8fb5b9">'+MONTH_SHORT_DE[i]+'</div>';}
+    h+='</div>';
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
+      +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
+      +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
+      +'<div onclick="setBannerViewMode(\'ziel\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Zielvereinbarung"></div>'
+      +'</div>';
+    h+='</div>';
+    return h;
+  }
+  if(_bvMode==='performance'){
   var mk=today().slice(0,7);
   var heroSums={optGesamt:0,margeGesamt:0};
   visible.forEach(function(e){
@@ -3849,8 +3928,8 @@ function buildOverviewTab(liste,section){
   var optZielMonat=teamMonthZiel(visible,mk,false);
   var margeZielMonat=teamMonthZiel(visible,mk,true);
 
-  h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:56px">';
-  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14)">';
+  h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:56px;height:278px;box-sizing:border-box;position:relative;overflow:hidden">';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);min-height:118px;align-items:center">';
   h+='<div style="grid-column:span 1;padding-left:14px">'
     +'<div style="font-size:10.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em;margin-bottom:4px">OPT. GESAMT</div>'
     +'<div style="font-size:30px;font-weight:700;line-height:1">'+heroSums.optGesamt+' <span style="font-size:15px;font-weight:500;color:#bcdadd">Stk.</span></div>'
@@ -3878,7 +3957,7 @@ function buildOverviewTab(liste,section){
     +'<div style="grid-column:span 1;display:flex;align-items:center;height:100%;padding:4px 14px">'+barsHighlightLast(margeSeries,'#7ED2DB',300,34,_last14WD,function(v){return '€ '+Math.round(v).toLocaleString('de-DE');})+'</div>';
   h+='</div>'; // Ende Hero-Zeile
 
-  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-height:60px;align-items:center">';
   function heroKpiCell(k,cur,prev,spark7K){
     var vR=cur!==null?(k.pct?Math.round(cur):+cur.toFixed(1)):null;
     var hit=cur!==null&&k.target!==null&&(k.dir==='lte'?cur<=k.target:cur>=k.target);
@@ -3895,7 +3974,6 @@ function buildOverviewTab(liste,section){
       +'<div style="font-size:10px;color:#8fb5b9;margin-top:3px">Vormonat '+(prev!==null?Math.round(prev)+(k.pct?'%':''):'\u2014')+' \u00b7 '+targetTxt+'</div>'
       +'</div>';
   }
-  if(section==='performance'||isAll){
     function teamMonthAvg(key,monthsAgo){
       var ym=monthBoundsUTC(today(),monthsAgo).ym;
       var vals=[];
@@ -3954,29 +4032,11 @@ function buildOverviewTab(liste,section){
       var spark=k.cr?weightedCRSeries(k.key):teamSumSeries(function(s){return s.oem+s.ups+s.wka;});
       h+=heroKpiCell(k,cur,prev,spark);
     });
-  } else {
-    var kpis=[
-      {label:'CR OEM', key:'crOEM',      target:empT.crOEM.val,      dir:empT.crOEM.dir,      pct:true},
-      {label:'CR TW',  key:'crTeilweise', target:empT.crTeilweise.val, dir:empT.crTeilweise.dir, pct:true},
-      {label:'CR SY',  key:'crSuperYes',  target:empT.crSuperYes.val,  dir:empT.crSuperYes.dir,  pct:true},
-      {label:'CR MY',  key:'crMegaYes',   target:empT.crMegaYes.val,   dir:empT.crMegaYes.dir,   pct:true},
-      {label:'Opt. OEM',key:'convOEM',   target:optOemZiel!=null?Math.round(optOemZiel*10)/10:null, dir:'gte', pct:false, fallbackLabel:'kein Zielwert'},
-    ];
-    kpis.forEach(function(k){
-      var cur=monthAvg(emp.id,k.key,0);
-      var prev=monthAvg(emp.id,k.key,1);
-      var _perfAllK=(performance[emp.id]||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
-      var _cutoff7K=addDaysUTC(today(),-7);
-      var _spark7srcK=_perfAllK.filter(function(x){return x.date>=_cutoff7K;});
-      if(_spark7srcK.length<2)_spark7srcK=_perfAllK.slice(-7);
-      var spark7K=_spark7srcK.map(function(x){return x[k.key];});
-      h+=heroKpiCell(k,cur,prev,spark7K);
-    });
-  }
   h+='</div>'; // Ende KPI-Zeile
-  h+='<div style="display:flex;justify-content:center;gap:8px;margin-top:18px">'
+  h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
     +'<div onclick="setBannerViewMode(\'performance\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Performance"></div>'
     +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
+    +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
     +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } else {
@@ -4022,9 +4082,11 @@ function buildOverviewTab(liste,section){
     });
     return count;
   }
-  h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:56px">';
-  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14)">';
-  [['oem','OEM'],['ups','UPSELLS'],['wka','WKA']].forEach(function(kk){
+  h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:56px;height:278px;box-sizing:border-box;position:relative;overflow:hidden">';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);min-height:118px;align-items:center">';
+  h+='<div style="grid-column:span 1;padding-left:14px">'+renderOemTileHtml(visible)+'</div>'
+    +'<div style="grid-column:span 1;display:flex;align-items:center;height:100%;padding:4px 14px">'+barsHighlightLast(ovLast14WD.map(function(d){return ovCountsForDate(d,'oem');}),'#7ED2DB',300,34,ovLast14WD,function(v){return Math.round(v).toLocaleString('de-DE')+' Stk.';})+'</div>';
+  [['ups','UPSELLS'],['wka','WKA']].forEach(function(kk){
     var kind=kk[0],label=kk[1];
     var s=ovMonthSums(kind);
     var proLead=s.count>0?s.marge/s.count:0;
@@ -4049,7 +4111,7 @@ function buildOverviewTab(liste,section){
   });
   var ovOptZielMonatNeu=teamMonthZiel(visible,ovMk,false);
   var ovMargeZielMonatNeu=teamMonthZiel(visible,ovMk,true);
-  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">';
+  h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-height:60px;align-items:center">';
   // Ring-Kachel: Ist/Ziel als Donut-Ring, optional mit weissem "Soll heute"-Strich (Woche/Monat)
   function ovRingTile(label,ist,ziel,sollFrac,unitSuffix,fmtFn){
     var fmt=fmtFn||function(v){return Math.round(v).toLocaleString('de-DE');};
@@ -4096,12 +4158,55 @@ function buildOverviewTab(liste,section){
   h+=ovRingTile('Opt. Ges. (Monat)',ovOptGesamtNeu,ovOptZielMonatNeu,moSollFrac,'Stk.');
   h+=ovRingTile('Margenerhöhung (Monat)',ovMargeGesamtNeu,ovMargeZielMonatNeu,moSollFrac,'€');
   h+='</div>'; // Ende KPI-Zeile
-  h+='<div style="display:flex;justify-content:center;gap:8px;margin-top:18px">'
+  h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
     +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
     +'<div onclick="setBannerViewMode(\'overview\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Overview"></div>'
+    +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
     +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } // Ende else (Overview)
+  return h;
+
+}
+
+// ── SFP Wiegand > Overview: 5 Kacheln + Performance-Tabelle für einen wählbaren Mitarbeiter ──
+function buildOverviewTab(liste,section){
+  // section: undefined = komplettes Overview wie bisher, UNVERAENDERT (Banner+Kacheln+Rest+Tabelle).
+  // 'performance' = nur Banner + Kacheln + Performance-Tabelle (fuer den neuen Performance-Reiter, zeigt dieselben Daten 1:1, keine Aufteilung von Overview).
+  var showRest=(section!=='performance');
+  var HIDDEN=[];
+  var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;}).slice().sort(function(a,b){return a.name.localeCompare(b.name);});
+  if(!visible.length)return '<div class="card" style="text-align:center;color:var(--text3);padding:40px">Keine Mitarbeiter vorhanden</div>';
+  if(!overviewSelectedIds){overviewSelectedIds=visible.map(function(e){return e.id;});}
+  overviewSelectedIds=overviewSelectedIds.filter(function(id){return visible.some(function(e){return e.id===id;});});
+  var selectedEmps=visible.filter(function(e){return overviewSelectedIds.indexOf(e.id)>=0;});
+  var isAll=selectedEmps.length!==1;
+  var emp=isAll?null:selectedEmps[0];
+  var empT=isAll?null:empTargets(emp);
+  var currentMonthKey=today().slice(0,7); // z.B. "2026-07"
+  var monthStart=currentMonthKey+'-01';
+  var monthEnd=monthBoundsUTC(today(),0).to;
+  var effFrom=overviewFromDate||monthStart;
+  var effTo=overviewToDate||monthEnd;
+  var perfAll=isAll?[]:(performance[emp.id]||[]).filter(function(x){return x.date>=effFrom&&x.date<=effTo;}).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
+
+  function kpiCol(v,t,dir){if(v===null)return 'var(--text3)';return(dir==='lte'?v<=t:v>=t)?'#206A72':'var(--red)';}
+  // Ziel fuer Opt. OEM-Kachel: Durchschnitt aller eingetragenen "Opt./Tag"-Werte aus der Zielvereinbarung (aktueller Monat)
+  function avgOptTagZielvereinbarung(){
+    var zmk=today().slice(0,7);
+    var zRec=zielStore[zmk]||{};
+    var zVisible=visible.filter(function(e){return empActiveInZielMonth(e,zmk);});
+    var zVals=[];
+    zVisible.forEach(function(e){
+      var r=zRec[e.id]||{};
+      if(r.optTag!=null)zVals.push(r.optTag);
+    });
+    return zVals.length?zVals.reduce(function(a,b){return a+b;},0)/zVals.length:null;
+  }
+  var optOemZiel=avgOptTagZielvereinbarung();
+  var h='';
+
+  h+=buildGlobalBannerHtml(visible);
 
   // ── Performance Trend Chart (unter dem Banner) ──
   var chartRows=isAll

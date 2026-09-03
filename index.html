@@ -327,12 +327,12 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
     <div class="sb-item" id="nav-team" onclick="toggleWiegandNav()"><div class="sb-icon"><i class="ti ti-layout-grid"></i></div> SFP Wiegand <i class="ti ti-chevron-up" id="wiegandNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="wiegandSubNav" class="wiegand-subnav">
       <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Performance</div>
+      <div class="sb-item sb-navsub" id="nav-team-coaching" onclick="bannerViewMode='coaching';setCoachFilterView('overview')">Coaching</div>
       <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">Zielvereinbarung</div>
     </div>
     <div class="sb-item" id="nav-coaching" onclick="toggleCoachingNav()"><div class="sb-icon"><i class="ti ti-calendar-event"></i></div> SFP Coaching <i class="ti ti-chevron-down" id="coachingNavChevron" style="margin-left:auto;font-size:13px;color:var(--text3)"></i></div>
     <div id="coachingSubNav" class="wiegand-subnav hidden">
       <div class="sb-item sb-navsub" id="nav-coaching-team" onclick="selectCoachingTeam()">Overview KPIs</div>
-      <div class="sb-item sb-navsub" id="nav-coaching-overview" onclick="setCoachFilterView('overview')">Overview Coachings</div>
       <div class="sb-item sb-navsub" id="nav-coaching-activity" onclick="selectCoachingActivity()">Aktivitäten</div>
       <div id="coachingCoachSubItems"></div>
     </div>
@@ -442,6 +442,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
       <div><label>Start</label><input type="time" id="sessionUhrzeit" value="09:00"></div>
       <div><label>Ende</label><input type="time" id="sessionEndUhrzeit"></div>
     </div>
+    <div style="margin-top:10px"><label>Coach</label><select id="sessionCoach"></select></div>
   </div>
 
   <div style="font-size:10.5px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">② Was für ein Coaching</div>
@@ -983,7 +984,34 @@ function deleteAppUser(uid,name){
 function selectSettingsSub(v){settingsView=v;view='settings';renderSidebar();renderMain();}
 function setOverviewChartMetric(m){overviewChartMetric=m;renderTeam();}
 function setOverviewChartEmp(v){overviewChartEmpId=v||null;renderTeam();}
-function setBannerViewMode(m){bannerViewMode=m;renderTeam();}
+var _bannerRotationOrder=['performance','overview','ziel','coaching'];
+var _bannerRotationTimer=null;
+function _bannerRotateNext(){
+  var cur=bannerViewMode||'overview';
+  var idx=_bannerRotationOrder.indexOf(cur);
+  bannerViewMode=_bannerRotationOrder[(idx+1)%_bannerRotationOrder.length];
+  renderMain();
+}
+// Idempotent: laeuft die Rotation schon, wird nichts veraendert (sonst wuerde jeder normale
+// Re-Render z.B. bei Dateneingaben den 60s-Timer immer wieder zuruecksetzen und er wuerde nie feuern)
+function ensureBannerRotation(){
+  if(_bannerRotationTimer)return;
+  _bannerRotationTimer=setInterval(_bannerRotateNext,60000);
+}
+// Nur bei manuellem Klick auf einen Karussell-Punkt: Timer bewusst zuruecksetzen, damit der Nutzer
+// nach seiner Auswahl die vollen 60s Ruhe hat, bevor automatisch weitergeschaltet wird
+function resetBannerRotation(){
+  if(_bannerRotationTimer)clearInterval(_bannerRotationTimer);
+  _bannerRotationTimer=setInterval(_bannerRotateNext,60000);
+}
+function setBannerViewMode(m){
+  bannerViewMode=m;
+  resetBannerRotation();
+  if(m==='coaching'){ view='coaching'; coachFilterView='overview'; }
+  else { view='team'; wiegandView=m; }
+  renderSidebar();
+  renderMain();
+}
 var overviewToDate=null;   // Bis-Datum (Overview Performance-Tabelle), null = Standard (Monatsende/heute)
 function setOverviewDateRange(from,to){overviewFromDate=from||null;overviewToDate=to||null;renderTeam();}
 function setOverviewQuickRange(type){
@@ -1025,6 +1053,43 @@ function applyOverviewMonth(){
 }
 function setOverviewPerfGroup(g){overviewPerfGroup=g;renderTeam();}
 var coachCalYear=null, coachCalMonthIdx=null; // Kalender-Monatsnavigation SFP Coaching (init. beim ersten Rendern auf aktuellen Monat)
+var coachCalViewMode='month'; // 'month' | 'week'
+var coachCalWeekStart=null; // Montag der aktuell angezeigten Woche (YYYY-MM-DD), init. beim ersten Rendern auf aktuelle Woche
+var coachCalMiniPickerOpen=false;
+var coachCalMiniPickerYear=null; // im Mini-Picker angezeigtes Jahr (kann vom eigentlich aktiven Jahr abweichen, waehrend man blaettert)
+function setCoachCalViewMode(mode){coachCalViewMode=mode;renderCoachingAnsicht();}
+function goToCoachCalToday(){
+  var t=new Date();
+  coachCalYear=t.getFullYear();coachCalMonthIdx=t.getMonth();
+  var _dow=t.getDay()||7;
+  var _mon=new Date(t.getFullYear(),t.getMonth(),t.getDate()-(_dow-1));
+  coachCalWeekStart=_mon.getFullYear()+'-'+('0'+(_mon.getMonth()+1)).slice(-2)+'-'+('0'+_mon.getDate()).slice(-2);
+  renderCoachingAnsicht();
+}
+function toggleCoachCalMiniPicker(){
+  coachCalMiniPickerOpen=!coachCalMiniPickerOpen;
+  coachCalMiniPickerYear=coachCalViewMode==='week'?(new Date(coachCalWeekStart+'T00:00:00')).getFullYear():coachCalYear;
+  renderCoachingAnsicht();
+}
+function coachCalMiniPickerYearNav(delta){coachCalMiniPickerYear+=delta;renderCoachingAnsicht();}
+function jumpToCoachCalMonth(year,monthIdx){
+  coachCalMiniPickerOpen=false;
+  if(coachCalViewMode==='week'){
+    var d=new Date(year,monthIdx,1);
+    var _dow=d.getDay()||7;
+    var _mon=new Date(year,monthIdx,1-(_dow-1));
+    coachCalWeekStart=_mon.getFullYear()+'-'+('0'+(_mon.getMonth()+1)).slice(-2)+'-'+('0'+_mon.getDate()).slice(-2);
+  } else {
+    coachCalYear=year;coachCalMonthIdx=monthIdx;
+  }
+  renderCoachingAnsicht();
+}
+function setCoachCalWeek(delta){
+  var d=new Date(coachCalWeekStart+'T00:00:00');
+  d.setDate(d.getDate()+delta*7);
+  coachCalWeekStart=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
+  renderCoachingAnsicht();
+}
 function setCoachCalMonth(delta){
   var d=new Date(coachCalYear,coachCalMonthIdx+delta,1);
   if(d.getFullYear()<2026)return;
@@ -1677,11 +1742,16 @@ function renderCoachingAnsicht(){
   var ma=document.getElementById('mainArea');if(!ma)return;
   var heute=today(),hD=new Date(heute+'T00:00:00');
   if(coachCalYear===null){coachCalYear=hD.getFullYear();coachCalMonthIdx=hD.getMonth();}
+  if(coachCalWeekStart===null){
+    var _dow=hD.getDay()||7; // Montag=1..Sonntag=7
+    var _mon=new Date(hD.getFullYear(),hD.getMonth(),hD.getDate()-(_dow-1));
+    coachCalWeekStart=_mon.getFullYear()+'-'+('0'+(_mon.getMonth()+1)).slice(-2)+'-'+('0'+_mon.getDate()).slice(-2);
+  }
   var liste=employees.filter(function(e){return e.active!==false;});
   var all=[];
   liste.forEach(function(emp){
     (protocols[emp.id]||[]).forEach(function(p){
-      all.push({eid:emp.id,en:emp.name,d:p.date,r:p.rating,f:p.focus||'',s:p.status||'abgeschlossen',t:p.type||p.typ||'',sid:p.id,uhrzeit:p.uhrzeit||'',endUhrzeit:p.endUhrzeit||'',start:p.start||'',stop:p.stop||'',cont:p.cont||'',notes:p.notes||'',topics:p.topics||[],coachId:p.coachId||null});
+      all.push({eid:emp.id,en:emp.name,d:p.date,r:p.rating,f:p.focus||'',s:p.status||'abgeschlossen',t:p.type||p.typ||'',sid:p.id,uhrzeit:p.uhrzeit||'',endUhrzeit:p.endUhrzeit||'',start:p.start||'',stop:p.stop||'',cont:p.cont||'',notes:p.notes||'',topics:p.topics||[],coachId:p.coachId||null,groupId:p.groupId||null});
     });
   });
   all.sort(function(a,b){return b.d.localeCompare(a.d);});
@@ -1780,17 +1850,86 @@ function renderCoachingAnsicht(){
   }
 
   // Kalender
+  function buildMiniMonthPicker(){
+    var mNamesShort=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    var activeYear=coachCalViewMode==='week'?(new Date(coachCalWeekStart+'T00:00:00')).getFullYear():coachCalYear;
+    var activeMonth=coachCalViewMode==='week'?(new Date(coachCalWeekStart+'T00:00:00')).getMonth():coachCalMonthIdx;
+    var p='<div style="position:absolute;top:100%;left:50%;transform:translateX(-50%);margin-top:6px;background:#fff;border:1px solid var(--border2);border-radius:10px;box-shadow:0 12px 28px rgba(0,0,0,0.14);padding:12px;z-index:50;width:220px">';
+    p+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">';
+    p+='<button onclick="event.stopPropagation();coachCalMiniPickerYearNav(-1)" style="height:28px;width:28px;font-size:12px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><i class="ti ti-chevron-left"></i></button>';
+    p+='<div style="font-weight:700;font-size:13px">'+coachCalMiniPickerYear+'</div>';
+    p+='<button onclick="event.stopPropagation();coachCalMiniPickerYearNav(1)" style="height:28px;width:28px;font-size:12px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center"><i class="ti ti-chevron-right"></i></button>';
+    p+='</div>';
+    p+='<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:6px">';
+    for(var m=0;m<12;m++){
+      var isActive=(coachCalMiniPickerYear===activeYear&&m===activeMonth);
+      p+='<button onclick="event.stopPropagation();jumpToCoachCalMonth('+coachCalMiniPickerYear+','+m+')" style="padding:8px 4px;border-radius:6px;border:1px solid '+(isActive?'#164e54':'var(--border)')+';background:'+(isActive?'#164e54':'#fff')+';color:'+(isActive?'#fff':'var(--text)')+';font-size:11.5px;font-weight:600;cursor:pointer">'+mNamesShort[m]+'</button>';
+    }
+    p+='</div>';
+    p+='</div>';
+    return p;
+  }
+  // Gruppencoaching-Sessions (gleiche groupId, mehrere Mitarbeiter) im Kalender zu EINEM Eintrag
+  // zusammenfassen ("Mehrfachauswahl"), statt sie pro Mitarbeiter einzeln anzuzeigen
+  function dedupeGroupEntries(entries){
+    var seenGroups={},result=[];
+    entries.forEach(function(e){
+      if(e.groupId){
+        if(seenGroups[e.groupId]){seenGroups[e.groupId].count++;return;}
+        var combo={};for(var k in e)combo[k]=e[k];
+        combo.en='Mehrfachauswahl';combo.count=1;combo.isGroup=true;
+        seenGroups[e.groupId]=combo;
+        result.push(combo);
+      } else {
+        result.push(e);
+      }
+    });
+    return result;
+  }
+  // Petrol-Familie: jeder Coach bekommt einen eigenen, stabilen Ton aus dieser Palette (statt einer festen Farbe fuer alle)
+  var COACH_PETROL_PALETTE=['#0c3b40','#164e54','#206A72','#2d8891','#3d9ba3','#5FBAC4'];
+  function coachPetrolColor(coachId){
+    if(!coachId)return COACH_PETROL_PALETTE[1];
+    var coachList=employees.filter(function(e){return e.role==='SDM'||e.role==='SC';}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var idx=coachList.findIndex(function(c){return c.id===coachId;});
+    return COACH_PETROL_PALETTE[idx>=0?idx%COACH_PETROL_PALETTE.length:1];
+  }
+  function buildCalNavControls(){
+    var mNamesShort=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    var mNamesFull=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+    var n='';
+    n+='<button onclick="goToCoachCalToday()" style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center"><i class="ti ti-calendar-event" style="margin-right:4px"></i>Heute</button>';
+    if(coachCalViewMode==='week'){
+      n+='<div style="display:flex;gap:2px">'
+        +'<button onclick="setCoachCalWeek(-1)" style="height:34px;width:34px;font-size:13px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Vorherige Woche"><i class="ti ti-chevron-up"></i></button>'
+        +'<button onclick="setCoachCalWeek(1)" style="height:34px;width:34px;font-size:13px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" title="Nächste Woche"><i class="ti ti-chevron-down"></i></button>'
+        +'</div>';
+      var wkStart=new Date(coachCalWeekStart+'T00:00:00');
+      var wkEnd=new Date(wkStart);wkEnd.setDate(wkEnd.getDate()+6);
+      var iwMeta=isoWeekOf(wkStart);
+      var label=wkStart.getDate()+'. '+mNamesShort[wkStart.getMonth()]+' – '+wkEnd.getDate()+'. '+mNamesShort[wkEnd.getMonth()]+' '+wkEnd.getFullYear()+' (KW '+iwMeta.week+')';
+    } else {
+      var atMin=(coachCalYear===2026&&coachCalMonthIdx===0);
+      var atMax=(coachCalYear===2030&&coachCalMonthIdx===11);
+      n+='<div style="display:flex;gap:2px">'
+        +'<button style="height:34px;width:34px;font-size:13px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" '+(atMin?'disabled style="opacity:0.35;cursor:default"':'onclick="setCoachCalMonth(-1)"')+' title="Vorheriger Monat"><i class="ti ti-chevron-up"></i></button>'
+        +'<button style="height:34px;width:34px;font-size:13px;padding:0;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;justify-content:center" '+(atMax?'disabled style="opacity:0.35;cursor:default"':'onclick="setCoachCalMonth(1)"')+' title="Nächster Monat"><i class="ti ti-chevron-down"></i></button>'
+        +'</div>';
+      var label=mNamesFull[coachCalMonthIdx]+' '+coachCalYear;
+    }
+    // position:relative NUR auf dem Datumstext selbst, damit der Mini-Picker direkt darunter erscheint
+    // statt mittig unter der gesamten (breiteren) Steuerelemente-Zeile
+    n+='<div style="position:relative">'
+      +'<div onclick="toggleCoachCalMiniPicker()" style="font-size:14px;font-weight:700;cursor:pointer;padding:6px 10px;border-radius:6px;display:flex;align-items:center;gap:5px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'\'">'+label+' <i class="ti ti-chevron-down" style="font-size:12px;color:var(--text3)"></i></div>'
+      +(coachCalMiniPickerOpen?buildMiniMonthPicker():'')
+      +'</div>';
+    return n;
+  }
   function buildKal(){
     var mNames=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
     var firstOfMonth=new Date(coachCalYear,coachCalMonthIdx,1);
     var daysInMonth=new Date(coachCalYear,coachCalMonthIdx+1,0).getDate();
-    var atMin=(coachCalYear===2026&&coachCalMonthIdx===0);
-    var atMax=(coachCalYear===2030&&coachCalMonthIdx===11);
-    var k='<div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:12px">';
-    k+='<button class="btn btn-sm" '+(atMin?'disabled style="opacity:0.35;cursor:default"':'onclick="setCoachCalMonth(-1)"')+'><i class="ti ti-chevron-left"></i></button>';
-    k+='<div style="font-size:14px;font-weight:700;min-width:150px;text-align:center">'+mNames[coachCalMonthIdx]+' '+coachCalYear+'</div>';
-    k+='<button class="btn btn-sm" '+(atMax?'disabled style="opacity:0.35;cursor:default"':'onclick="setCoachCalMonth(1)"')+'><i class="ti ti-chevron-right"></i></button>';
-    k+='</div>';
+    var k='';
     k+='<div style="display:grid;grid-template-columns:34px repeat(7,1fr);gap:4px;margin-bottom:3px">';
     k+='<div></div>';
     ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(function(t){k+='<div style="font-size:10px;font-weight:600;color:var(--text3);text-align:center;padding:2px 0">'+t+'</div>';});
@@ -1815,22 +1954,27 @@ function renderCoachingAnsicht(){
         if(d===null){k+='<div></div>';return;}
         var dt=new Date(Date.UTC(coachCalYear,coachCalMonthIdx,d));
         var ds=dt.toISOString().slice(0,10),isH=ds===heute;
-        var sg=all.filter(function(x){return x.d===ds&&x.s==='geplant';});
-        var sa=all.filter(function(x){return x.d===ds&&x.s!=='geplant';});
+        var sg=dedupeGroupEntries(all.filter(function(x){return x.d===ds&&x.s==='geplant';}));
+        var sa=dedupeGroupEntries(all.filter(function(x){return x.d===ds&&x.s!=='geplant';}));
         var entries=sg.map(function(x){return {x:x,planned:true};}).concat(sa.map(function(x){return {x:x,planned:false};}));
-        var bdrCol=isH?'var(--purple)':'var(--border)';
-        var bgCol=isH?'var(--purple-bg)':'var(--bg)';
-        var ftCol=isH?'var(--purple)':'var(--text)';
+        var bdrCol=isH?'#164e54':'var(--border)';
+        var bgCol=isH?'rgba(32,106,114,0.06)':'var(--bg)';
+        var ftCol=isH?'#164e54':'var(--text)';
         k+='<div data-d="'+ds+'" onclick="kalKlick(this.dataset.d)" style="cursor:pointer;border:1px solid '+bdrCol+';background:'+bgCol+';border-radius:6px;padding:6px;min-height:104px">';
         k+='<div style="font-size:12px;font-weight:'+(isH?700:500)+';color:'+ftCol+';margin-bottom:4px">'+d+'</div>';
         entries.slice(0,4).forEach(function(e2){
           var x=e2.x;
+          var coachEmpM=x.coachId?employees.find(function(em){return em.id===x.coachId;}):null;
+          var wenTxt=x.isGroup?'Gruppencoaching':x.en.split(' ')[0];
+          var labelTxt=(coachEmpM?coachEmpM.name.split(' ')[0]+' / ':'')+wenTxt;
+          var dataAttrs='data-eid="'+esc(x.eid)+'" data-sid="'+esc(x.sid)+'" data-typ="'+esc(x.t||'')+'" data-focus="'+esc(x.f||'')+'" data-datum="'+esc(x.d)+'" data-uhrzeit="'+esc(x.uhrzeit)+'"';
           if(e2.planned){
-            var c=ec(x.eid);
-            k+='<div style="font-size:10px;background:'+c.bg+';color:'+c.text+';border-radius:3px;padding:2px 5px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="'+x.en+' · '+(x.t||'')+'">'+x.en.split(' ')[0]+'</div>';
+            var chipBg=coachPetrolColor(x.coachId);
+            var chipOp=x.d<heute?0.4:1;
+            k+='<div '+dataAttrs+' onclick="event.stopPropagation();openPlannedSessionFromChip(this)" style="font-size:10px;background:'+chipBg+';opacity:'+chipOp+';color:#fff;border-radius:3px;padding:2px 5px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer" title="'+(coachEmpM?esc(coachEmpM.name)+' / ':'')+esc(x.isGroup?'Gruppencoaching':x.en)+' · '+esc(x.t||'')+'">'+esc(labelTxt)+'</div>';
           } else {
             var r2=x.r?RS[x.r]:null;
-            k+='<div style="font-size:10px;background:'+(r2?r2.bg:'var(--bg2)')+';color:'+(r2?r2.color:'var(--text2)')+';border-radius:3px;padding:2px 5px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis" title="'+x.en+' · '+(x.t||'')+'"><i class="ti ti-check" style="font-size:8px"></i> '+x.en.split(' ')[0]+'</div>';
+            k+='<div '+dataAttrs+' onclick="event.stopPropagation();openPlannedSessionFromChip(this)" style="font-size:10px;background:'+(r2?r2.bg:'var(--bg2)')+';color:'+(r2?r2.color:'var(--text2)')+';border-radius:3px;padding:2px 5px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer" title="'+(coachEmpM?esc(coachEmpM.name)+' / ':'')+esc(x.isGroup?'Gruppencoaching':x.en)+' · '+esc(x.t||'')+'"><i class="ti ti-check" style="font-size:8px"></i> '+esc(labelTxt)+'</div>';
           }
         });
         if(entries.length>4)k+='<div style="font-size:9px;color:var(--text3);margin-top:1px">+'+(entries.length-4)+' weitere</div>';
@@ -1841,22 +1985,117 @@ function renderCoachingAnsicht(){
     return k;
   }
 
+  // ── Wochenansicht (Outlook-Stil): Stundenraster 8-19 Uhr, Sessions nach Uhrzeit+Dauer positioniert ──
+  function buildWeekKal(){
+    var HOUR_START=8, HOUR_END=19, ROW_H=44; // px pro Stunde
+    var wkStart=new Date(coachCalWeekStart+'T00:00:00');
+    var dowNames=['Mo','Di','Mi','Do','Fr','Sa','So'];
+    var weekDates=[];
+    for(var i=0;i<7;i++){var d=new Date(wkStart);d.setDate(d.getDate()+i);weekDates.push(d);}
+    function dsOf(d){return d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);}
+    var k='';
+    // Kopfzeile mit Wochentagen/Datum
+    k+='<div style="display:grid;grid-template-columns:50px repeat(7,1fr);border:1px solid var(--border);border-bottom:none;border-radius:8px 8px 0 0;overflow:hidden">';
+    k+='<div style="background:var(--bg2)"></div>';
+    weekDates.forEach(function(d,i){
+      var ds=dsOf(d),isH=ds===heute;
+      k+='<div style="padding:8px 4px;text-align:center;font-size:11px;font-weight:700;color:'+(isH?'var(--purple)':'var(--text2)')+';border-left:1px solid var(--border);'+(isH?'background:var(--purple-bg)':'background:var(--bg2)')+'">'
+        +'<div style="font-size:9px;color:var(--text3);text-transform:uppercase;font-weight:600">'+dowNames[i]+'</div>'+d.getDate()+'.'+('0'+(d.getMonth()+1)).slice(-2)
+        +'</div>';
+    });
+    k+='</div>';
+    // Zeitraster + Sessions
+    var nHours=HOUR_END-HOUR_START+1;
+    k+='<div style="display:grid;grid-template-columns:50px repeat(7,1fr);border:1px solid var(--border);border-radius:0 0 8px 8px;overflow:hidden;position:relative">';
+    k+='<div style="border-right:1px solid var(--border)">';
+    for(var hh=HOUR_START;hh<=HOUR_END;hh++){
+      k+='<div style="height:'+ROW_H+'px;font-size:9.5px;color:var(--text3);text-align:right;padding-right:6px;position:relative;top:-6px">'+('0'+hh).slice(-2)+':00</div>';
+    }
+    k+='</div>';
+    function parseHM(s){ // "HH:MM" -> Minuten seit 00:00, oder null
+      if(!s||s.indexOf(':')<0)return null;
+      var p=s.split(':');return (+p[0])*60+(+p[1]);
+    }
+    // Farben jetzt pro Coach individuell (siehe coachPetrolColor), vergangene Termine werden per Opacity verblasst
+    weekDates.forEach(function(d,di){
+      var ds=dsOf(d),isH=ds===heute;
+      k+='<div style="border-left:1px solid var(--border);position:relative;'+(isH?'background:rgba(106,95,193,0.03)':'')+'">';
+      for(var hh=HOUR_START;hh<=HOUR_END;hh++){
+        k+='<div ondragover="event.preventDefault()" ondrop="dropSessionOnSlot(event,\''+ds+'\','+hh+')" onclick="kalKlickMitZeit(\''+ds+'\','+hh+')" style="height:'+ROW_H+'px;border-bottom:1px solid var(--border);cursor:pointer"></div>';
+      }
+      // Sessions des Tages sammeln + Zeiten parsen
+      var dayEntries=dedupeGroupEntries(all.filter(function(x){return x.d===ds;})).map(function(x){
+        var startMin=parseHM(x.uhrzeit);
+        if(startMin===null)return null;
+        var endMin=parseHM(x.endUhrzeit);
+        if(endMin===null||endMin<=startMin)endMin=startMin+60;
+        return {x:x,startMin:startMin,endMin:endMin};
+      }).filter(function(e){return e!==null;});
+      // Ueberlappungs-Layout: greedy Spaltenzuweisung, max 3 Spalten nebeneinander (wie Outlook)
+      dayEntries.sort(function(a,b){return a.startMin-b.startMin;});
+      var columns=[];
+      dayEntries.forEach(function(e){
+        var placed=false;
+        for(var ci=0;ci<columns.length;ci++){
+          var lastInCol=columns[ci][columns[ci].length-1];
+          if(lastInCol.endMin<=e.startMin){columns[ci].push(e);e._col=ci;placed=true;break;}
+        }
+        if(!placed){columns.push([e]);e._col=columns.length-1;}
+      });
+      var totalCols=Math.min(Math.max(columns.length,1),3);
+      dayEntries.forEach(function(e){
+        e._col=Math.min(e._col,totalCols-1);
+        var x=e.x;
+        var gridStartMin=HOUR_START*60,gridEndMin=(HOUR_END+1)*60;
+        if(e.endMin<=gridStartMin||e.startMin>=gridEndMin)return; // ausserhalb des sichtbaren Zeitraums
+        var top=Math.max(0,(e.startMin-gridStartMin)/60*ROW_H);
+        var bottom=Math.min(nHours*ROW_H,(e.endMin-gridStartMin)/60*ROW_H);
+        var height=Math.max(20,bottom-top);
+        var planned=x.s==='geplant';
+        var isPast=x.d<heute;
+        var baseColor=coachPetrolColor(x.coachId);
+        var bg=baseColor, bdr=isPast?'#c3cccc':'#0c3b40';
+        var fg='#fff', fgSub='rgba(255,255,255,0.85)';
+        var opacity=isPast?0.4:1;
+        var colWidthPct=100/totalCols;
+        var leftPct=e._col*colWidthPct;
+        var coachEmp=x.coachId?employees.find(function(em){return em.id===x.coachId;}):null;
+        var wenTxt=x.isGroup?'Gruppencoaching':x.en;
+        var labelTxt=(coachEmp?coachEmp.name+' / ':'')+wenTxt+(x.f?' - '+x.f:'');
+        var dataAttrs='data-eid="'+esc(x.eid)+'" data-sid="'+esc(x.sid)+'" data-typ="'+esc(x.t||'')+'" data-focus="'+esc(x.f||'')+'" data-datum="'+esc(x.d)+'" data-uhrzeit="'+esc(x.uhrzeit)+'"';
+        k+='<div draggable="true" '+dataAttrs+' ondragstart="dragSessionStart(event,\''+x.sid+'\',\''+x.eid+'\')" onclick="event.stopPropagation();openPlannedSessionFromChip(this)" style="position:absolute;left:calc('+leftPct+'% + 2px);width:calc('+colWidthPct+'% - 4px);top:'+top+'px;height:'+height+'px;background:'+bg+';opacity:'+opacity+';border-left:3px solid '+bdr+';border-radius:5px;padding:3px 5px;font-size:9.5px;overflow:hidden;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,0.12)" title="'+esc(labelTxt)+' · '+esc(x.t||'')+'">'
+          +'<div style="font-weight:700;color:'+fg+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(labelTxt)+'</div>'
+          +'<div style="color:'+fgSub+'">'+x.uhrzeit+(x.endUhrzeit?'–'+x.endUhrzeit:'')+'</div>'
+          +'</div>';
+      });
+      k+='</div>';
+    });
+    k+='</div>';
+    return k;
+  }
+
   var h='<div class="content">';
+  h+=buildGlobalBannerHtml(employees.filter(function(e){return !e.isPureCoach;}));
 
   if(coachFilterView==='coverage'){
     h+=buildCoachingAbdeckungTab(liste,hD,heute);
   } else {
 
   // ══ Petrol-Infobox: Zeitraum, QA fällig, Überfällige Coachings, Sessions gesamt, je Coach eine Spalte ══
-  h+=coachingOverviewInfoBoxHtml(liste,hD,heute);
 
-  // ══ ZEILE 1: 3 Stat-Kacheln + Linien-Chart (volle Breite) ══
-  h+='<div style="display:grid;grid-template-columns:repeat(3,140px) 1fr;gap:12px;margin-bottom:16px;align-items:stretch">';
-  h+='<div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--purple);border-radius:var(--r-lg);padding:12px 14px"><div style="font-size:10.5px;font-weight:600;color:var(--purple);letter-spacing:.05em;margin-bottom:4px">7 TAGE</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:20px;font-weight:700;color:var(--purple);line-height:1">'+s7+'</div><div style="font-size:12px;font-weight:700;color:'+t7.col+'">'+t7.arrow+'</div></div><div style="font-size:10.5px;color:var(--text2);margin-top:3px">Sessions</div><div style="font-size:10px;color:'+t7.col+';margin-top:1px;font-weight:600">'+t7.txt+'</div></div>';
-  h+='<div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--teal);border-radius:var(--r-lg);padding:12px 14px"><div style="font-size:10.5px;font-weight:600;color:var(--teal);letter-spacing:.05em;margin-bottom:4px">14 TAGE</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:20px;font-weight:700;color:var(--teal);line-height:1">'+s14+'</div><div style="font-size:12px;font-weight:700;color:'+t14.col+'">'+t14.arrow+'</div></div><div style="font-size:10.5px;color:var(--text2);margin-top:3px">Sessions</div><div style="font-size:10px;color:'+t14.col+';margin-top:1px;font-weight:600">'+t14.txt+'</div></div>';
-  h+='<div style="background:var(--bg);border:1px solid var(--border);border-top:3px solid var(--blue);border-radius:var(--r-lg);padding:12px 14px"><div style="font-size:10.5px;font-weight:600;color:var(--blue-dark);letter-spacing:.05em;margin-bottom:4px">30 TAGE</div><div style="display:flex;align-items:baseline;gap:6px"><div style="font-size:20px;font-weight:700;color:var(--blue-dark);line-height:1">'+s30+'</div><div style="font-size:12px;font-weight:700;color:'+t30.col+'">'+t30.arrow+'</div></div><div style="font-size:10.5px;color:var(--text2);margin-top:3px">Sessions</div><div style="font-size:10px;color:'+t30.col+';margin-top:1px;font-weight:600">'+t30.txt+'</div></div>';
-  h+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-lg);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:12px 14px"><div style="font-size:10.5px;font-weight:600;color:var(--text2);letter-spacing:.05em;margin-bottom:8px">SESSION-VERLAUF – 45 TAGE VOR/NACH HEUTE</div>'+buildChart()+'</div>';
+  // ══ ZEILE 2: Kalender volle Breite ══
+  h+='<div class="card" style="margin-bottom:22px">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:10px">';
+  h+='<div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap">';
+  h+='<div style="display:flex;gap:6px">'
+    +'<button style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;'+(coachCalViewMode==='month'?'background:#164e54;color:#fff;border-color:#164e54':'')+'" onclick="setCoachCalViewMode(\'month\')">Monat</button>'
+    +'<button style="height:34px;font-size:12px;font-weight:500;padding:0 12px;border:1px solid var(--border2);border-radius:var(--r-md);background:var(--bg);color:var(--text);cursor:pointer;display:inline-flex;align-items:center;'+(coachCalViewMode==='week'?'background:#164e54;color:#fff;border-color:#164e54':'')+'" onclick="setCoachCalViewMode(\'week\')">Woche</button>'
+    +'</div>';
+  h+=buildCalNavControls();
   h+='</div>';
+  h+='<div style="display:flex;gap:10px"><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;border:1px solid #164e54;background:rgba(32,106,114,0.1);display:inline-block"></span>Heute</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#164e54;display:inline-block"></span>Geplant</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#7ED2DB;display:inline-block"></span>Abgeschlossen</span></div>';
+  h+='</div>';
+  h+=(coachCalViewMode==='week'?buildWeekKal():buildKal())+'</div>';
 
   // ══ Coach-Wirksamkeit (nur Overview, ab 2 Coaches sinnvoll) ══
   if(coachFilterView==='overview'&&coachList.length>=2){
@@ -1886,13 +2125,6 @@ function renderCoachingAnsicht(){
     }
     h+='</div>';
   }
-
-  // ══ ZEILE 2: Kalender volle Breite ══
-  h+='<div class="card" style="margin-bottom:22px">';
-  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">';
-  h+='<div class="card-title" style="margin:0">Kalender <span style="font-weight:400;font-size:12px;color:var(--text3)">· Klick auf Tag = Session planen</span></div>';
-  h+='<div style="display:flex;gap:10px"><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;border:1px solid var(--purple);background:var(--purple-bg);display:inline-block"></span>Heute</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#EEEDFE;display:inline-block"></span>Geplant</span><span style="font-size:11px;color:var(--text2);display:flex;align-items:center;gap:4px"><span style="width:8px;height:8px;border-radius:50%;background:#9FE1CB;display:inline-block"></span>Abgeschlossen</span></div>';
-  h+='</div>'+buildKal()+'</div>';
 
   // ══ Geplante Sessions (volle Breite, weiße Box) ══
   h+='<div class="card" style="margin-bottom:22px">';
@@ -2273,6 +2505,65 @@ function kalKlick(d){
   openSessionModal(0);
   setTimeout(function(){var el=document.getElementById('sessionDatum');if(el)el.value=d;},50);
 }
+function openPlannedSessionFromChip(el){
+  var empId=el.dataset.eid,sessionId=el.dataset.sid,typ=el.dataset.typ,fokus=el.dataset.focus,datum=el.dataset.datum,uhrzeit=el.dataset.uhrzeit;
+  var proto0=null;
+  if(sessionId&&protocols[empId]){
+    proto0=protocols[empId].find(function(p){return String(p.id)===String(sessionId);});
+  }
+  if(proto0&&proto0.groupId){openGroupSessionModal(proto0.groupId);return;}
+  var proto=proto0;
+  openNeuesCoachingModal(empId);
+  _editingSessionId=sessionId||null;
+  var dateEl=document.getElementById('sess-date');
+  var timeEl=document.getElementById('sess-time');
+  var endTimeEl=document.getElementById('sess-end-time');
+  var topicEl=document.getElementById('sess-topic-sel');
+  var noteEl=document.getElementById('sess-note');
+  if(dateEl&&datum) dateEl.value=datum;
+  if(timeEl&&uhrzeit) timeEl.value=uhrzeit;
+  if(endTimeEl&&proto&&proto.endUhrzeit) endTimeEl.value=proto.endUhrzeit;
+  if(typ)setCoachingTypeSelection('sess-category','sess-type',typ);
+  if(topicEl&&fokus){
+    for(var j=0;j<topicEl.options.length;j++){
+      if(topicEl.options[j].value===fokus||topicEl.options[j].text===fokus){topicEl.selectedIndex=j;break;}
+    }
+  }
+  if(noteEl&&proto&&proto.note) noteEl.value=proto.note;
+}
+function kalKlickMitZeit(d,hh){
+  openSessionModal(0);
+  setTimeout(function(){
+    var elD=document.getElementById('sessionDatum');if(elD)elD.value=d;
+    var elT=document.getElementById('sessionUhrzeit');if(elT)elT.value=('0'+hh).slice(-2)+':00';
+  },50);
+}
+var _dragSessionInfo=null; // {sid, eid}
+function dragSessionStart(ev,sid,eid){
+  _dragSessionInfo={sid:sid,eid:eid};
+  ev.dataTransfer.effectAllowed='move';
+}
+function dropSessionOnSlot(ev,newDate,newHour){
+  ev.preventDefault();
+  if(!_dragSessionInfo)return;
+  var eid=_dragSessionInfo.eid,sid=_dragSessionInfo.sid;
+  var list=protocols[eid]||[];
+  var p=list.find(function(x){return x.id===sid;});
+  _dragSessionInfo=null;
+  if(!p)return;
+  var oldStartMin=p.uhrzeit&&p.uhrzeit.indexOf(':')>=0?(+p.uhrzeit.split(':')[0])*60+(+p.uhrzeit.split(':')[1]):null;
+  var oldEndMin=p.endUhrzeit&&p.endUhrzeit.indexOf(':')>=0?(+p.endUhrzeit.split(':')[0])*60+(+p.endUhrzeit.split(':')[1]):null;
+  var durationMin=(oldStartMin!==null&&oldEndMin!==null&&oldEndMin>oldStartMin)?(oldEndMin-oldStartMin):60;
+  var newUhrzeit=('0'+newHour).slice(-2)+':00';
+  var newEndMin=newHour*60+durationMin;
+  var newEndUhrzeit=('0'+Math.floor(newEndMin/60)).slice(-2)+':'+('0'+(newEndMin%60)).slice(-2);
+  // Lokal sofort aktualisieren (optimistisch), dann in Supabase speichern
+  p.date=newDate;p.uhrzeit=newUhrzeit;p.endUhrzeit=newEndUhrzeit;
+  renderCoachingAnsicht();
+  sb.from('protocols').update({date:newDate,uhrzeit:newUhrzeit,end_uhrzeit:newEndUhrzeit}).eq('id',sid).then(function(res){
+    if(res.error){alert('Verschieben fehlgeschlagen: '+res.error.message);}
+  });
+}
 
 function emailSession(eid,datum,fokus){
   var emp=employees.find(function(e){return e.id===eid;});if(!emp)return;
@@ -2563,7 +2854,7 @@ function loadZielvereinbarungFromSupabase(){
     zielStore={};
     res.data.forEach(function(r){
       if(!zielStore[r.month])zielStore[r.month]={};
-      zielStore[r.month][r.employee_id]={weeks:[r.week1,r.week2,r.week3,r.week4,r.week5],optTag:r.opt_per_tag,margeOpt:r.marge_per_opt};
+      zielStore[r.month][r.employee_id]={weeks:[r.week1,r.week2,r.week3,r.week4,r.week5],optTag:r.opt_per_tag,margeOpt:r.marge_per_opt,arbeitstage:r.arbeitstage||null};
     });
     return true;
   });
@@ -2588,6 +2879,140 @@ function updateZielField(empId,field,weekIdx,value){
   if(field==='week'){if(!rec.weeks)rec.weeks=[];rec.weeks[weekIdx]=num;}
   else{rec[field]=num;}
   renderTeam();
+}
+// ── Arbeitstage-Kalender: Tage statt reiner KW-Zahlen anklicken, daraus werden die Wochensummen berechnet ──
+var _kalenderState=null; // {empId, mk, tage:{'YYYY-MM-DD':true/false}}
+function openArbeitstageKalender(empId){
+  var mk=zielMonth;
+  var year=+mk.slice(0,4),month=+mk.slice(5,7);
+  var feiertage=bayernFeiertage(year);
+  var daysInMonth=new Date(Date.UTC(year,month,0)).getUTCDate();
+  var existing=zielStore[mk]&&zielStore[mk][empId]&&zielStore[mk][empId].arbeitstage;
+  // Rueckwaertskompatibel: altes Format war ein Array von Arbeitstagen (nur "work"), neues Format
+  // ist ein Objekt {datum: 'work'|'urlaub'|'krank'} - "off" wird nicht gespeichert (spart Platz).
+  var existingMap={};
+  if(Array.isArray(existing)){existing.forEach(function(ds){existingMap[ds]='work';});}
+  else if(existing&&typeof existing==='object'){existingMap=existing;}
+  var hasExisting=Object.keys(existingMap).length>0;
+  var tage={};
+  for(var d=1;d<=daysInMonth;d++){
+    var dt=new Date(Date.UTC(year,month-1,d));
+    var ds=dt.toISOString().slice(0,10);
+    var dow=dt.getUTCDay();
+    if(dow===0||dow===6||feiertage[ds])continue; // Wochenende/Feiertag: kein Eintrag noetig, immer frei
+    tage[ds]=hasExisting?(existingMap[ds]||'off'):'work'; // Vorhandene Auswahl uebernehmen, sonst alle Wochentage als Arbeitstag vorbelegt
+  }
+  _kalenderState={empId:empId,mk:mk,tage:tage};
+  renderArbeitstageKalenderModal();
+}
+var KALENDER_ZYKLUS=['work','off','urlaub','krank'];
+function toggleKalenderTag(ds){
+  if(!_kalenderState)return;
+  var cur=_kalenderState.tage[ds]||'off';
+  var idx=KALENDER_ZYKLUS.indexOf(cur);
+  _kalenderState.tage[ds]=KALENDER_ZYKLUS[(idx+1)%KALENDER_ZYKLUS.length];
+  renderArbeitstageKalenderModal();
+}
+function closeArbeitstageKalender(){
+  _kalenderState=null;
+  var el=document.getElementById('arbeitstage-kalender-overlay');
+  if(el)el.remove();
+}
+function uebernehmeArbeitstageKalender(){
+  if(!_kalenderState)return;
+  var wMeta=getMonthWeeksZiel(_kalenderState.mk);
+  var weekCounts=wMeta.map(function(){return 0;});
+  var statusMap={};
+  Object.keys(_kalenderState.tage).sort().forEach(function(ds){
+    var status=_kalenderState.tage[ds];
+    if(status&&status!=='off')statusMap[ds]=status; // 'off' nicht speichern, spart Platz (impliziter Standard)
+    if(status!=='work')return;
+    wMeta.forEach(function(wm,i){
+      if(ds>=wm.from&&ds<=wm.to)weekCounts[i]++;
+    });
+  });
+  var empId=_kalenderState.empId,mk=_kalenderState.mk;
+  if(!zielStore[mk])zielStore[mk]={};
+  if(!zielStore[mk][empId])zielStore[mk][empId]={};
+  zielStore[mk][empId].weeks=weekCounts;
+  zielStore[mk][empId].arbeitstage=statusMap;
+  closeArbeitstageKalender();
+  renderTeam();
+}
+function renderArbeitstageKalenderModal(){
+  var old=document.getElementById('arbeitstage-kalender-overlay');
+  if(old)old.remove();
+  var st=_kalenderState;
+  var emp=employees.find(function(e){return e.id===st.empId;});
+  var year=+st.mk.slice(0,4),month=+st.mk.slice(5,7);
+  var monthLabel=MONTH_NAMES_ZIEL[month-1]+' '+year;
+  var feiertage=bayernFeiertage(year);
+  var firstOfMonth=new Date(Date.UTC(year,month-1,1));
+  var daysInMonth=new Date(Date.UTC(year,month,0)).getUTCDate();
+  var leadEmpty=(firstOfMonth.getUTCDay()+6)%7; // Montag=0
+  var wMeta=getMonthWeeksZiel(st.mk);
+  var cells='';
+  for(var i=0;i<leadEmpty;i++)cells+='<div></div>';
+  for(var d=1;d<=daysInMonth;d++){
+    var dt=new Date(Date.UTC(year,month-1,d));
+    var ds=dt.toISOString().slice(0,10);
+    var dow=dt.getUTCDay();
+    var isWeekend=(dow===0||dow===6);
+    var holName=feiertage[ds];
+    var isToday=ds===today();
+    if(isWeekend){
+      cells+='<div style="aspect-ratio:1;display:flex;align-items:center;justify-content:center;border-radius:8px;color:#d5dcdc;font-size:13px;font-weight:600">'+d+'</div>';
+    } else if(holName){
+      cells+='<div style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;background:#fdeeee;color:#c0392b;font-size:13px;font-weight:600" title="'+esc(holName)+'"><div>'+d+'</div><div style="font-size:6.5px;font-weight:700;padding:0 2px;text-align:center;line-height:1.1">'+esc(holName)+'</div></div>';
+    } else {
+      var status=st.tage[ds]||'off';
+      var styleMap={
+        work:{bg:'#7ED2DB',fg:'#0c3b40',sub:''},
+        off:{bg:'#f4f6f6',fg:'#94a4a4',sub:''},
+        urlaub:{bg:'#e8ecfb',fg:'#3d4fb0',sub:'Urlaub'},
+        krank:{bg:'#fff2e0',fg:'#b5720c',sub:'Krank'}
+      };
+      var sm=styleMap[status];
+      cells+='<div onclick="toggleKalenderTag(\''+ds+'\')" style="aspect-ratio:1;display:flex;flex-direction:column;align-items:center;justify-content:center;border-radius:8px;cursor:pointer;border:1.5px solid '+(isToday?'#e0a13a':'transparent')+';background:'+sm.bg+';color:'+sm.fg+'"><div style="font-size:13px;font-weight:600">'+d+'</div>'+(sm.sub?'<div style="font-size:6.5px;font-weight:700;margin-top:1px">'+sm.sub+'</div>':'')+'</div>';
+    }
+  }
+  var weekChips=wMeta.map(function(wm){
+    var n=0;
+    Object.keys(st.tage).forEach(function(ds){if(st.tage[ds]==='work'&&ds>=wm.from&&ds<=wm.to)n++;});
+    return '<div style="flex:1;background:#f7fafa;border-radius:8px;padding:8px 6px;text-align:center;border:1px solid #e3e8e8"><div style="font-size:10px;color:#94a4a4;font-weight:600">KW '+wm.kw+'</div><div style="font-size:16px;font-weight:800;color:#0c3b40;margin-top:2px">'+n+'</div></div>';
+  }).join('');
+  var html='<div id="arbeitstage-kalender-overlay" style="position:fixed;inset:0;background:rgba(15,35,38,0.45);z-index:9999;display:flex;align-items:center;justify-content:center" onclick="if(event.target===this)closeArbeitstageKalender()">'
+    +'<div style="background:#fff;border-radius:16px;width:520px;max-width:92vw;box-shadow:0 20px 50px rgba(0,0,0,0.25);overflow:hidden">'
+    +'<div style="background:linear-gradient(180deg,#0c3b40,#164e54);color:#fff;padding:18px 22px">'
+    +'<div style="font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px"><i class="ti ti-calendar-event"></i> Arbeitstage festlegen</div>'
+    +'<div style="font-size:12px;color:#9fc9cd;margin-top:3px">'+esc(emp?emp.name:'')+' · '+monthLabel+'</div>'
+    +'</div>'
+    +'<div style="padding:20px 22px">'
+    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px;margin-bottom:4px">'
+    +['Mo','Di','Mi','Do','Fr','Sa','So'].map(function(d){return '<div style="text-align:center;font-size:10px;font-weight:700;color:#94a4a4;padding-bottom:4px;text-transform:uppercase">'+d+'</div>';}).join('')
+    +'</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:4px">'+cells+'</div>'
+    +'<div style="font-size:10.5px;color:#94a4a4;margin-top:10px">Klicke einen Tag mehrfach: Arbeitstag → Frei → Urlaub → Krank → Arbeitstag …</div>'
+    +'<div style="display:flex;gap:12px;margin-top:10px;font-size:11px;color:#5c7070;flex-wrap:wrap">'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;background:#7ED2DB"></span>Arbeitstag</span>'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;background:#f4f6f6;border:1px solid #e3e8e8"></span>Frei</span>'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;background:#e8ecfb;border:1px solid #d3d9f5"></span>Urlaub</span>'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;background:#fff2e0;border:1px solid #f5dfb8"></span>Krank</span>'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;border:1px solid #d5dcdc"></span>Wochenende</span>'
+    +'<span><span style="width:10px;height:10px;border-radius:3px;display:inline-block;margin-right:5px;vertical-align:middle;background:#fdeeee;border:1px solid #f3c9c9"></span>Feiertag</span>'
+    +'</div>'
+    +'<div style="margin-top:20px;padding-top:16px;border-top:1px solid #e3e8e8">'
+    +'<div style="font-size:11px;font-weight:700;color:#94a4a4;text-transform:uppercase;letter-spacing:.03em;margin-bottom:8px">Automatisch berechnete Wochensummen</div>'
+    +'<div style="display:flex;gap:8px">'+weekChips+'</div>'
+    +'</div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:flex-end;gap:10px;padding:16px 22px;border-top:1px solid #e3e8e8;background:#fafcfc">'
+    +'<button onclick="closeArbeitstageKalender()" style="padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:1px solid #e3e8e8;background:transparent;color:#5c7070">Abbrechen</button>'
+    +'<button onclick="uebernehmeArbeitstageKalender()" style="padding:9px 18px;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;border:none;background:#164e54;color:#fff">Übernehmen</button>'
+    +'</div>'
+    +'</div>'
+    +'</div>';
+  document.body.insertAdjacentHTML('beforeend',html);
 }
 // Tab/Shift+Tab in der Zielvereinbarung: der volle Re-Render bei jeder Eingabe (renderTeam) ersetzt
 // das DOM, wodurch der Browser das naechste Tab-Ziel verliert und an den Anfang springt. Wir merken
@@ -2864,8 +3289,8 @@ function zielvereinbarungHtml(){
   var ZIEL_WK_COL=64; // KW-Tage-Felder bleiben fest, brauchen konsistente lesbare Breite
   var ZIEL_WK_TARGET_COL=108; // Wochenziel-Spalten (Euro-Beträge sind meist 5-stellig, brauchen mehr Platz gegen Zeilenumbruch)
   var weeksMeta=getMonthWeeksZiel(zielMonth);
-  var weekGridTemplate='2.2fr repeat('+weeksMeta.length+','+ZIEL_WK_COL+'px) 0.8fr 0.9fr 1fr repeat('+weeksMeta.length+','+ZIEL_WK_TARGET_COL+'px) 1.3fr 1.2fr 0.8fr';
-  var yearGridTemplate='1.6fr 1fr 0.9fr 1fr 1.2fr 1.3fr 1.2fr 0.8fr';
+  var weekGridTemplate='2.2fr '+ZIEL_WK_COL+'px '+ZIEL_WK_COL+'px repeat('+weeksMeta.length+','+ZIEL_WK_COL+'px) 0.8fr 0.9fr 1fr repeat('+weeksMeta.length+','+ZIEL_WK_TARGET_COL+'px) 1.3fr 1.2fr 0.8fr';
+  var yearGridTemplate='1.6fr 0.8fr 0.9fr 0.9fr 1fr 0.9fr 1fr 1.2fr 1.3fr 1.2fr 0.8fr';
 
   // ── Aufgeklappter Wochen-Detailblick fuer den aktuell gewaehlten Monat (wird unter dessen Monatszeile eingehaengt) ──
   var weekDetailHtml=(function(){
@@ -2878,7 +3303,7 @@ function zielvereinbarungHtml(){
       return a.name.localeCompare(b.name);
     });
     var rec=zielStore[zielMonth]||{};
-    var teamDaysSum=0,teamTargetSum=0,teamIstSum=0,margeVals=[],teamWeekTargetSums=null;
+    var teamDaysSum=0,teamTargetSum=0,teamIstSum=0,margeVals=[],teamWeekTargetSums=null,teamWeekDaysSums=null,teamUrlaubSum=0,teamKrankSum=0;
     var weekHeaderCells=weeksMeta.map(function(wm){
       var isHol=wm.holidayNames.length>0;
       var isShort=wm.defaultDays<5;
@@ -2894,6 +3319,8 @@ function zielvereinbarungHtml(){
     var rowsHtml=visibleEmps.map(function(e,idx){
       var r=rec[e.id]||{};
       var weeks=weeksMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
+      if(!teamWeekDaysSums)teamWeekDaysSums=weeksMeta.map(function(){return 0;});
+      weeks.forEach(function(d,i){teamWeekDaysSums[i]+=d;});
       var monthSum=weeks.reduce(function(a,b){return a+b;},0);
       var optTag=r.optTag!=null?r.optTag:0;
       var margeOpt=r.margeOpt!=null?r.margeOpt:0;
@@ -2907,13 +3334,27 @@ function zielvereinbarungHtml(){
       var pctBadge='<span style="font-weight:700;font-size:11.5px;padding:3px 9px;border-radius:12px;background:'+(pctOk?'rgba(32,106,114,0.14)':'rgba(200,60,60,0.12)')+';color:'+(pctOk?'#0c3b40':'#B23A3A')+'">'+pct+'%</span>';
       teamDaysSum+=monthSum;teamTargetSum+=target;teamIstSum+=istMarge;if(margeOpt)margeVals.push(margeOpt);
       var c=COLORS[e.color%COLORS.length];
+      var urlaubCount=0,krankCount=0;
+      if(r.arbeitstage&&typeof r.arbeitstage==='object'&&!Array.isArray(r.arbeitstage)){
+        Object.keys(r.arbeitstage).forEach(function(ds){
+          if(r.arbeitstage[ds]==='urlaub')urlaubCount++;
+          else if(r.arbeitstage[ds]==='krank')krankCount++;
+        });
+      }
+      teamUrlaubSum+=urlaubCount;teamKrankSum+=krankCount;
+      function abwCell(n,kind){
+        var style=n>0?(kind==='urlaub'?'background:#e8ecfb;color:#3d4fb0;border:1px solid #d3d9f5':'background:#fff2e0;color:#b5720c;border:1px solid #f5dfb8'):'background:#f7fafa;color:#c3cccc;border:1px solid var(--border)';
+        return '<div style="'+GD+';justify-content:center"><div style="width:48px;height:34px;border-radius:6px;font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;'+style+'">'+n+'</div></div>';
+      }
       var weekCells=weeksMeta.map(function(wm,i){
         var isHol=wm.holidayNames.length>0;
         return '<div style="'+GD+';justify-content:center"><input type="number" class="ziel-num" id="zf-'+e.id+'-w'+i+'" min="0" max="7" value="'+weeks[i]+'" onchange="updateZielField(\''+e.id+'\',\'week\','+i+',this.value)" onkeydown="return zielTabNav(event,this)" style="width:48px;height:34px;box-sizing:border-box;padding:0 2px;text-align:center'+(isHol?';border-color:var(--amber)':'')+'"></div>';
       }).join('');
       var rowBg=idx%2===1?'background:rgba(32,106,114,0.07);':'';
       return '<div style="display:grid;grid-template-columns:'+weekGridTemplate+';'+rowBg+'">'
-        +'<div style="'+GD+'"><div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden"><div class="av" style="width:28px;height:28px;font-size:10.5px;background:'+c.bg+';color:'+c.text+';flex-shrink:0">'+ini(e.name)+'</div><div style="min-width:0;overflow:hidden"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(e.name)+'</div><div style="font-size:10.5px;color:var(--text3)">'+e.role+'</div></div></div></div>'
+        +'<div style="'+GD+'"><div style="display:flex;align-items:center;gap:8px;min-width:0;overflow:hidden;cursor:pointer" onclick="openArbeitstageKalender(\''+e.id+'\')" title="Arbeitstage per Kalender festlegen"><div class="av" style="width:28px;height:28px;font-size:10.5px;background:'+c.bg+';color:'+c.text+';flex-shrink:0">'+ini(e.name)+'</div><div style="min-width:0;overflow:hidden"><div style="font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center;gap:5px">'+esc(e.name)+' <i class="ti ti-calendar-event" style="font-size:12px;color:var(--text3)"></i></div><div style="font-size:10.5px;color:var(--text3)">'+e.role+'</div></div></div></div>'
+        +abwCell(urlaubCount,'urlaub')
+        +abwCell(krankCount,'krank')
         +weekCells
         +'<div style="'+GD+';justify-content:center;font-weight:600">'+monthSum+'</div>'
         +'<div style="'+GD+'"><input type="number" class="ziel-num" id="zf-'+e.id+'-opt" min="0" value="'+optTag+'" onchange="updateZielField(\''+e.id+'\',\'optTag\',null,this.value)" onkeydown="return zielTabNav(event,this)" style="height:34px;box-sizing:border-box;text-align:right"></div>'
@@ -2925,12 +3366,14 @@ function zielvereinbarungHtml(){
         +'</div>';
     }).join('');
     var avgMarge=margeVals.length?Math.round(margeVals.reduce(function(a,b){return a+b;},0)/margeVals.length):0;
-    var weekTotalCells=weeksMeta.map(function(){return '<div style="border-top:1px solid var(--border2)"></div>';}).join('');
+    var weekTotalCells=(teamWeekDaysSums||weeksMeta.map(function(){return 0;})).map(function(sum){return '<div style="border-top:1px solid var(--border2);justify-content:center;font-weight:700;color:#fff;padding:10px 6px;display:flex;align-items:center">'+sum+'</div>';}).join('');
     return '<div style="grid-column:1/-1;padding:16px 14px 18px;background:rgba(32,106,114,0.03);border-top:2px solid var(--purple)">'
       +'<div style="font-size:12.5px;font-weight:700;color:var(--purple-dark);margin-bottom:12px"><i class="ti ti-calendar-event" style="margin-right:5px"></i>Wochen-Detail · '+monthLabel+'</div>'
       +'<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2);background:var(--bg-solid,#fff)">'
       +'<div style="display:grid;grid-template-columns:'+weekGridTemplate+'">'
       +'<div style="'+GH+'">Mitarbeiter</div>'
+      +'<div style="'+GH+';justify-content:center">Urlaub</div>'
+      +'<div style="'+GH+';justify-content:center">Krank</div>'
       +weekHeaderCells
       +'<div style="'+GH+';justify-content:center">Σ Mon.</div>'
       +'<div style="'+GH+';justify-content:flex-end">Opt./Tag</div>'
@@ -2943,6 +3386,8 @@ function zielvereinbarungHtml(){
       +rowsHtml
       +'<div style="display:grid;grid-template-columns:'+weekGridTemplate+';background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%)">'
       +'<div style="font-weight:700;color:#fff;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center">Team gesamt</div>'
+      +'<div style="font-weight:700;color:#7ED2DB;text-align:center;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">'+teamUrlaubSum+'</div>'
+      +'<div style="font-weight:700;color:#e0a13a;text-align:center;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">'+teamKrankSum+'</div>'
       +weekTotalCells
       +'<div style="font-weight:700;color:#fff;text-align:center;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center">'+teamDaysSum+'</div>'
       +'<div style="color:#fff;padding:10px 14px;border-top:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:flex-end">–</div>'
@@ -2960,13 +3405,13 @@ function zielvereinbarungHtml(){
   // ── Eine Tabelle: 12 Monatszeilen, Klick klappt den Wochen-Detailblick direkt darunter auf/zu ──
   var year=zielYearView;
   var monthRows=[];
-  var yearDaysSum=0,yearNlSum=0,yearTargetSum=0,yearIstSum=0;
+  var yearDaysSum=0,yearNlSum=0,yearTargetSum=0,yearIstSum=0,yearUrlaubSum=0,yearKrankSum=0;
   for(var m=1;m<=12;m++){
     var mk=year+'-'+(m<10?'0'+m:m);
     var wMeta=getMonthWeeksZiel(mk);
     var mRec=zielStore[mk]||{};
     var mVisible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
-    var mDaysSum=0,mTargetSum=0,mIstSum=0,mMargeVals=[],mOptVals=[];
+    var mDaysSum=0,mTargetSum=0,mIstSum=0,mMargeVals=[],mOptVals=[],mUrlaubSum=0,mKrankSum=0;
     mVisible.forEach(function(e){
       var r=mRec[e.id]||{};
       var weeks=wMeta.map(function(wm,i){return(r.weeks&&r.weeks[i]!=null)?r.weeks[i]:wm.defaultDays;});
@@ -2977,16 +3422,25 @@ function zielvereinbarungHtml(){
       mIstSum+=istForEmpMonth(e.id,mk);
       if(margeOpt)mMargeVals.push(margeOpt);
       if(optTag)mOptVals.push(optTag);
+      if(r.arbeitstage&&typeof r.arbeitstage==='object'&&!Array.isArray(r.arbeitstage)){
+        Object.keys(r.arbeitstage).forEach(function(ds){
+          if(r.arbeitstage[ds]==='urlaub')mUrlaubSum++;
+          else if(r.arbeitstage[ds]==='krank')mKrankSum++;
+        });
+      }
     });
     var mAvgMarge=mMargeVals.length?Math.round(mMargeVals.reduce(function(a,b){return a+b;},0)/mMargeVals.length):0;
     var mAvgOpt=mOptVals.length?Math.round(mOptVals.reduce(function(a,b){return a+b;},0)/mOptVals.length):0;
     var mNl=zielNlTargets[mk]!=null?zielNlTargets[mk]:0;
     var mPct=mTargetSum>0?Math.round(mIstSum/mTargetSum*100):(mIstSum>0?100:0);
-    yearDaysSum+=mDaysSum;yearNlSum+=mNl;yearTargetSum+=mTargetSum;yearIstSum+=mIstSum;
+    yearDaysSum+=mDaysSum;yearNlSum+=mNl;yearTargetSum+=mTargetSum;yearIstSum+=mIstSum;yearUrlaubSum+=mUrlaubSum;yearKrankSum+=mKrankSum;
     var isCurrent=mk===zielMonth;
     var rowBg=isCurrent?'background:var(--purple-bg);':(m%2===0?'background:rgba(32,106,114,0.07);':'');
     monthRows.push('<div style="display:grid;grid-template-columns:'+yearGridTemplate+';cursor:pointer;'+rowBg+(isCurrent?'border-left:3px solid var(--purple);':'')+'" onclick="toggleZielMonth(\''+mk+'\')">'
       +'<div style="'+GD+';font-weight:'+(isCurrent?'700':'600')+'"><i class="ti ti-chevron-'+(isCurrent?'down':'right')+'" style="font-size:12px;margin-right:6px;color:var(--text3)"></i>'+MONTH_NAMES_ZIEL[m-1]+'</div>'
+      +'<div style="'+GD+';justify-content:center;color:var(--text2);font-weight:600">'+mVisible.length+'</div>'
+      +'<div style="'+GD+';justify-content:center"><span style="font-weight:700;padding:2px 8px;border-radius:8px;'+(mUrlaubSum>0?'background:#e8ecfb;color:#3d4fb0':'color:var(--text3)')+'">'+mUrlaubSum+'</span></div>'
+      +'<div style="'+GD+';justify-content:center"><span style="font-weight:700;padding:2px 8px;border-radius:8px;'+(mKrankSum>0?'background:#fff2e0;color:#b5720c':'color:var(--text3)')+'">'+mKrankSum+'</span></div>'
       +'<div style="'+GD+';justify-content:center;font-weight:600">'+mDaysSum+'</div>'
       +'<div style="'+GD+';justify-content:center;color:var(--text2)">'+(mAvgOpt||'–')+'</div>'
       +'<div style="'+GD+';justify-content:center;color:var(--text2)">'+(mAvgMarge?'€ '+mAvgMarge:'–')+'</div>'
@@ -2999,6 +3453,9 @@ function zielvereinbarungHtml(){
   }
   var yearTotalRow='<div style="display:grid;grid-template-columns:'+yearGridTemplate+';background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%)">'
     +'<div style="font-weight:800;color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center">Jahresergebnis</div>'
+    +'<div style="color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">–</div>'
+    +'<div style="font-weight:800;color:#7ED2DB;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">'+yearUrlaubSum+'</div>'
+    +'<div style="font-weight:800;color:#e0a13a;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">'+yearKrankSum+'</div>'
     +'<div style="font-weight:800;color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">'+yearDaysSum+'</div>'
     +'<div style="color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">–</div>'
     +'<div style="color:#fff;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">–</div>'
@@ -3008,8 +3465,6 @@ function zielvereinbarungHtml(){
     +'<div style="font-weight:800;color:#7ED2DB;padding:10px 14px;border-top:2px solid #7ED2DB;display:flex;align-items:center;justify-content:center">'+(yearTargetSum>0?Math.round(yearIstSum/yearTargetSum*100):(yearIstSum>0?100:0))+'%</div>'
     +'</div>';
   return buildGlobalBannerHtml(employees.filter(function(e){return !e.isPureCoach;}))
-    +zielInfoBoxHtml()
-    +zielverlaufJahrChartHtml()
     +wochenzielKachelnHtml()
     +'<div class="card card-static">'
     +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px">'
@@ -3022,6 +3477,9 @@ function zielvereinbarungHtml(){
     +'<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)">'
     +'<div style="display:grid;grid-template-columns:'+yearGridTemplate+'">'
     +'<div style="'+GH+'">Monat</div>'
+    +'<div style="'+GH+';justify-content:center">MA</div>'
+    +'<div style="'+GH+';justify-content:center">Urlaub</div>'
+    +'<div style="'+GH+';justify-content:center">Krank</div>'
     +'<div style="'+GH+';justify-content:center">Σ Einsatztage</div>'
     +'<div style="'+GH+';justify-content:center">Ø Opt./Tag</div>'
     +'<div style="'+GH+';justify-content:center">Ø Marge/Opt.</div>'
@@ -3056,7 +3514,8 @@ function saveZielvereinbarung(){
       employee_id:e.id,month:zielMonth,
       week1:weeks[0],week2:weeks[1],week3:weeks[2],week4:weeks[3],week5:weeks[4],
       opt_per_tag:r.optTag!=null?r.optTag:0,
-      marge_per_opt:r.margeOpt!=null?r.margeOpt:0
+      marge_per_opt:r.margeOpt!=null?r.margeOpt:0,
+      arbeitstage:r.arbeitstage||[]
     };
   });
   _savingZielvereinbarung=true;
@@ -3301,9 +3760,9 @@ function renderSidebar(){
   if(view==='team'&&!isTeamTab)document.getElementById('nav-team').classList.add('active');
   var ntp=document.getElementById('nav-team-performance');if(ntp)ntp.classList.toggle('active',view==='team'&&wiegandView==='performance');
   var nto=document.getElementById('nav-team-overview');if(nto)nto.classList.toggle('active',view==='team'&&wiegandView==='overview');
+  var ntc=document.getElementById('nav-team-coaching');if(ntc)ntc.classList.toggle('active',view==='coaching'&&coachFilterView==='overview');
   var ntz=document.getElementById('nav-team-ziel');if(ntz)ntz.classList.toggle('active',view==='team'&&wiegandView==='ziel');
   var nc=document.getElementById('nav-coaching');if(nc)nc.classList.toggle('active',view==='coaching'||isTeamTab||view==='activity');
-  var nco=document.getElementById('nav-coaching-overview');if(nco)nco.classList.toggle('active',view==='coaching'&&coachFilterView==='overview');
   var nct=document.getElementById('nav-coaching-team');if(nct)nct.classList.toggle('active',isTeamTab);
   var na=document.getElementById('nav-coaching-activity');if(na)na.classList.toggle('active',view==='activity');
   if(view==='settings')document.getElementById('nav-settings').classList.add('active');
@@ -3437,7 +3896,7 @@ function toggleWiegandNav(){
   if(wiegandView==='team')wiegandView='overview'; // 'team' gehoert jetzt zu SFP Coaching, nicht mehr zu SFP Wiegand
   selectWiegandSub(wiegandView);
 }
-function selectWiegandSub(v){wiegandView=v;view='team';renderSidebar();renderMain();}
+function selectWiegandSub(v){wiegandView=v;view='team';if(v==='ziel')bannerViewMode='ziel';renderSidebar();renderMain();}
 var coachingNavOpen=false;
 function toggleCoachingNav(){
   coachingNavOpen=!coachingNavOpen;
@@ -3705,11 +4164,22 @@ function currentWeekMargin(){ return currentWeekStat('marge'); }
 function todayTargetStat(kind){
   var withMarge=(kind==='marge');
   var mk=today().slice(0,7);
+  var t=today();
   var rec=zielStore[mk]||{};
   var visible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
   var target=0;
   visible.forEach(function(e){
     var r=rec[e.id]||{};
+    // Wenn fuer diesen Mitarbeiter/Monat bereits konkrete Arbeitstage hinterlegt sind (Kalender-Auswahl),
+    // zaehlt das Tagesziel nur, wenn er laut Kalender heute tatsaechlich arbeitet - sonst (Altbestand
+    // ohne Tagesdaten) faellt es wie bisher auf "immer mitzaehlen" zurueck. Neues Format ist ein Objekt
+    // {datum:'work'|'urlaub'|'krank'}, altes Format war ein reines Array von Arbeitstagen.
+    var at=r.arbeitstage;
+    var hatArbeitstage=(Array.isArray(at)&&at.length>0)||(at&&typeof at==='object'&&!Array.isArray(at)&&Object.keys(at).length>0);
+    if(hatArbeitstage){
+      var arbeitetHeute=Array.isArray(at)?(at.indexOf(t)>=0):(at[t]==='work');
+      if(!arbeitetHeute)return;
+    }
     var optTag=r.optTag!=null?r.optTag:0;
     var margeOpt=r.margeOpt!=null?r.margeOpt:0;
     target+=withMarge?optTag*margeOpt:optTag;
@@ -3791,6 +4261,7 @@ function renderOptGesHeuteTileHtml(visible){
     +'</div>';
 }
 function buildGlobalBannerHtml(visible){
+  ensureBannerRotation();
   function avgOptTagZielvereinbarungLocal(){
     var zmk=today().slice(0,7);
     var zRec=zielStore[zmk]||{};
@@ -3875,6 +4346,63 @@ function buildGlobalBannerHtml(visible){
       +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
       +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
       +'<div onclick="setBannerViewMode(\'ziel\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Zielvereinbarung"></div>'
+      +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
+      +'</div>';
+    h+='</div>';
+    return h;
+  }
+  if(_bvMode==='coaching'){
+    var _heute=today();
+    var _coachDays=[];
+    var _allSess=[];
+    employees.forEach(function(e){
+      (protocols[e.id]||[]).forEach(function(p){_allSess.push({d:p.date,s:p.status||'abgeschlossen'});});
+    });
+    for(var _i=-45;_i<=45;_i++){
+      var _ds=addDaysUTC(_heute,_i);
+      var _cnt=_i>0
+        ?_allSess.filter(function(x){return x.d===_ds&&x.s==='geplant';}).length
+        :_allSess.filter(function(x){return x.d===_ds&&x.s!=='geplant';}).length;
+      _coachDays.push(_cnt);
+    }
+    var _maxN=Math.max.apply(null,_coachDays.concat([1]));
+    var _CW=900,_CHh=195,_nD=_coachDays.length,_hIdx=45;
+    function _xP(idx){return Math.round(idx/(_nD-1)*_CW);}
+    function _yP(n){return _CHh-Math.round(n/_maxN*_CHh);}
+    // Weiche Bezier-Kurve statt eckiger Linie (gleiche Technik wie beim Performance-Diagramm)
+    var _linePath='M '+_xP(0)+' '+_yP(_coachDays[0]);
+    for(var _pi=1;_pi<_coachDays.length;_pi++){
+      var _px=_xP(_pi-1),_py=_yP(_coachDays[_pi-1]),_cx=_xP(_pi),_cy=_yP(_coachDays[_pi]),_mx=_px+(_cx-_px)*0.5;
+      _linePath+=' C '+_mx+' '+_py+','+_mx+' '+_cy+','+_cx+' '+_cy;
+    }
+    var _areaPath=_linePath+' L '+_xP(_nD-1)+' '+_CHh+' L '+_xP(0)+' '+_CHh+' Z';
+    var _hX=_xP(_hIdx);
+    h+='<div style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 55%,#1d6169 100%);box-shadow:0 12px 28px rgba(15,61,66,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:56px;height:278px;box-sizing:border-box;position:relative;overflow:hidden">';
+    h+='<div style="display:flex;height:195px">';
+    h+='<div style="width:16.6667%;flex-shrink:0;display:flex;flex-direction:column">';
+    h+='<div style="min-height:118px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center;padding-left:14px">'
+      +renderOemTileHtml(visible)
+      +'</div>';
+    h+='<div style="min-height:60px;display:flex;align-items:center;padding-top:8px">'
+      +'<div style="padding:4px 14px;display:flex;justify-content:space-between;align-items:center;width:100%">'
+      +renderOptGesHeuteTileHtml(visible)
+      +'</div>'
+      +'</div>';
+    h+='</div>';
+    h+='<div style="flex:1;padding:0 4px 0 18px;position:relative">'
+      +'<svg width="100%" height="195" viewBox="0 0 '+_CW+' '+_CHh+'" preserveAspectRatio="none">'
+      +'<line x1="'+_hX+'" y1="0" x2="'+_hX+'" y2="'+_CHh+'" stroke="#e0a13a" stroke-width="1.5" stroke-dasharray="4,3"/>'
+      +'<path d="'+_areaPath+'" fill="#7ED2DB" opacity="0.12"/>'
+      +'<path d="'+_linePath+'" fill="none" stroke="#7ED2DB" stroke-width="2.5" stroke-linecap="round"/>'
+      +'</svg>'
+      +'<div style="position:absolute;top:0;left:calc('+(_hX/_CW*100)+'% + 4px);font-size:10px;font-weight:700;color:#e0a13a;white-space:nowrap">HEUTE</div>'
+      +'</div>';
+    h+='</div>';
+    h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
+      +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
+      +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
+      +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
+      +'<div onclick="setBannerViewMode(\'coaching\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Coaching"></div>'
       +'</div>';
     h+='</div>';
     return h;
@@ -4037,6 +4565,7 @@ function buildGlobalBannerHtml(visible){
     +'<div onclick="setBannerViewMode(\'performance\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Performance"></div>'
     +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
     +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
+    +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
     +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } else {
@@ -4162,6 +4691,7 @@ function buildGlobalBannerHtml(visible){
     +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
     +'<div onclick="setBannerViewMode(\'overview\')" style="width:20px;height:7px;border-radius:4px;background:#7ED2DB;cursor:pointer" title="Overview"></div>'
     +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
+    +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
     +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } // Ende else (Overview)
@@ -7413,7 +7943,7 @@ function saveSession(empId){
       logActivity('session','created','Gruppensession erfasst ('+empIds.length+' Mitarbeiter): '+(type||'Session'),null,namesTxt+(focus?' · '+focus:'')+' · '+fd(date));
       resetSessionFormFields();
       closeModal('neuesCoachingModal');
-      renderTab();
+      if(view==='coaching')renderCoachingAnsicht();else renderTab();
     }).catch(function(err){_savingSession=false;alert('Unerwarteter Fehler: '+err.message);});
     return;
   }
@@ -7451,7 +7981,7 @@ function saveSession(empId){
     _editingSessionId=null;
     resetSessionFormFields();
     closeModal('neuesCoachingModal');
-    renderTab();
+    if(view==='coaching')renderCoachingAnsicht();else renderTab();
   }).catch(function(err){
     _savingSession=false;
     alert('Unerwarteter Fehler: '+err.message);
@@ -8206,6 +8736,8 @@ function sessionSpeichernNeu(){
   var fmEl=document.getElementById('sessionFocusMetric');
   var focusMetric=fmEl?fmEl.value:'';
   var notiz=document.getElementById('sessionNotiz').value.trim();
+  var coachSelEl=document.getElementById('sessionCoach');
+  var selectedCoachId=coachSelEl&&coachSelEl.value?coachSelEl.value:(currentCoach?currentCoach.id:null);
   if(!empIds.length||!datum)return alert('Bitte mindestens einen Mitarbeiter und ein Datum auswählen.');
   if(uhrzeit&&endUhrzeit&&endUhrzeit<=uhrzeit)return alert('Die Endzeit muss nach der Startzeit liegen.');
   var groupId=empIds.length>1?('grp_'+Date.now()+'_'+Math.random().toString(36).slice(2,8)):null;
@@ -8213,7 +8745,7 @@ function sessionSpeichernNeu(){
     return {
       employee_id:empId,date:datum,uhrzeit:uhrzeit||null,end_uhrzeit:endUhrzeit||null,art:typ,rating:null,
       note:notiz||'',focus:thema,status:'geplant',
-      coach_id:currentCoach?currentCoach.id:null,
+      coach_id:selectedCoachId,
       focus_metric:focusMetric||null,group_id:groupId
     };
   });
@@ -8606,6 +9138,15 @@ function openSessionModal(empId){
     FOCUS_METRICS.forEach(function(m){
       var o=document.createElement('option');o.value=m.key;o.textContent=m.label;fmSel.appendChild(o);
     });
+  }
+  var coachSel=document.getElementById('sessionCoach');
+  if(coachSel){
+    coachSel.innerHTML='';
+    var coachList=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    coachList.forEach(function(c){
+      var o=document.createElement('option');o.value=c.id;o.textContent=c.name;coachSel.appendChild(o);
+    });
+    coachSel.value=currentCoach?currentCoach.id:(coachList[0]?coachList[0].id:'');
   }
   var datumEl=document.getElementById('sessionDatum');
   if(datumEl&&!datumEl.value)datumEl.value=today();

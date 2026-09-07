@@ -328,6 +328,7 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
     <div id="wiegandSubNav" class="wiegand-subnav">
       <div class="sb-item sb-navsub" id="nav-team-overview" onclick="selectWiegandSub('overview')">Performance</div>
       <div class="sb-item sb-navsub" id="nav-team-coaching" onclick="bannerViewMode='coaching';resetBannerRotation();setCoachFilterView('overview')">Coaching</div>
+      <div class="sb-item sb-navsub" id="nav-team-provision" onclick="selectProvisionTeam()">Provision</div>
       <div class="sb-item sb-navsub" id="nav-coaching-activity" onclick="selectCoachingActivity()">Aktivitäten</div>
       <div class="sb-item sb-navsub" id="nav-team-ziel" onclick="selectWiegandSub('ziel')">Zielvereinbarung</div>
     </div>
@@ -357,8 +358,9 @@ tr.perf-avg-row:hover td{background:rgba(32,106,114,0.14) !important;}
 <div class="wizard-overlay hidden" id="dailyWizardOverlay">
   <div class="wizard-card" style="width:420px;min-height:0">
     <div class="wizard-body" id="dailyWizardBody" style="padding:32px 28px 24px"></div>
-    <div class="wizard-footer" style="justify-content:flex-end">
-      <button class="wizard-next-btn" onclick="closeDailyWizard()">Verstanden</button>
+    <div class="wizard-footer">
+      <div class="wizard-dots" id="dailyWizardDots" style="display:flex;gap:6px;align-items:center"></div>
+      <button class="wizard-next-btn" id="dailyWizardNextBtn" onclick="dailyWizardNext()">Weiter →</button>
     </div>
   </div>
 </div>
@@ -832,7 +834,7 @@ function loadEmployeesFromSupabase(){
         color: e.color_index, startDate: e.start_date, endDate: e.end_date || null,
         team: e.team, contract: e.contract, hours: e.hours, active: e.active,
         auth_user_id: e.auth_user_id || null, notes: e.notes || '',
-        isPureCoach: e.is_pure_coach===true
+        isPureCoach: e.is_pure_coach===true, provisionSettings: e.provision_settings || {}
       };
     });
     return true;
@@ -844,6 +846,25 @@ var currentCoach = null;      // {id,name,role} falls eingeloggter User ein Coac
 var coachFilterView = 'overview'; // 'overview' | employee-id des Coaches
 var wiegandView='overview'; // 'overview' | 'team' | 'performance' (SFP Wiegand Tab-Navigation) - Overview ist der Standard-Landing-Tab nach dem Login (Performance-Menue entfernt, per Banner-Umschalter in Overview weiterhin erreichbar)
 var overviewSelectedIds=null; // Array ausgewählter Mitarbeiter-IDs in SFP Wiegand > Overview (Mehrfachauswahl)
+var provisionTeamSelectedIds=null; // null = alle Mitarbeiter; sonst Array ausgewaehlter IDs (eigenstaendig, unabhaengig von overviewSelectedIds)
+var provisionTeamDropdownOpen=false;
+var provisionTeamSearchQuery='';
+function toggleProvisionTeamDropdown(){provisionTeamDropdownOpen=!provisionTeamDropdownOpen;if(!provisionTeamDropdownOpen)provisionTeamSearchQuery='';renderProvisionTeam();}
+function toggleProvisionTeamEmpId(id){
+  var visIds=employees.filter(function(e){return !e.isPureCoach&&e.active!==false;}).map(function(e){return e.id;});
+  if(!provisionTeamSelectedIds)provisionTeamSelectedIds=visIds.slice();
+  var idx=provisionTeamSelectedIds.indexOf(id);
+  if(idx>=0)provisionTeamSelectedIds.splice(idx,1);else provisionTeamSelectedIds.push(id);
+  renderProvisionTeam();
+}
+function setProvisionTeamSelectAll(allIds){provisionTeamSelectedIds=allIds.slice();renderProvisionTeam();}
+function setProvisionTeamSelectNone(){provisionTeamSelectedIds=[];renderProvisionTeam();}
+function filterProvisionTeamEmpList(q){
+  q=(q||'').toLowerCase();
+  document.querySelectorAll('#provisionTeamEmpScrollList .emp-opt-row').forEach(function(row){
+    row.style.display=row.dataset.search.indexOf(q)>=0?'grid':'none';
+  });
+}
 var overviewRenderTarget='team'; // 'team' | 'emp' - steuert ob die Performance-Tabelle im Team-Kontext (renderTeam) oder eingebettet auf der Mitarbeiterseite (renderTab) neu gerendert wird
 function rerenderOverviewContext(){
   if(overviewRenderTarget==='emp'){
@@ -1593,54 +1614,87 @@ function closeDailyWizard(){
   document.getElementById('dailyWizardOverlay').classList.add('hidden');
   localStorage.setItem('dailyWizardShownDate',today());
 }
-function buildDailyWizardHtml(){
-  var visible=employees.filter(function(e){return !e.isPureCoach&&e.active!==false;});
-  var mk=today().slice(0,7);
-  var margeMonat=0;
-  visible.forEach(function(e){
-    (performance[e.id]||[]).forEach(function(x){
-      if((x.date||'').slice(0,7)!==mk)return;
-      margeMonat+=x.margeGesamt||x.margin||0;
-    });
+var dailyWizardPage=0;
+var dailyWizardPages=[];
+function fmtEur(v){return Math.round(v).toLocaleString('de-DE')+' €';}
+function dailyWizardVisible(){return employees.filter(function(e){return !e.isPureCoach&&e.active!==false;});}
+function dailyWizardMargeHeute(empId){
+  var todayStr=today(),m=0;
+  (performance[empId]||[]).forEach(function(x){if(x.date===todayStr)m+=x.margeGesamt||x.margin||0;});
+  return m;
+}
+function dailyWizardWorstPage(title,metricKey,metricLabel,isPct){
+  var visible=dailyWizardVisible();
+  var rows=visible.map(function(e){
+    var val;
+    if(metricKey==='margeHeute')val=dailyWizardMargeHeute(e.id);
+    else if(metricKey==='crSyMy'){
+      var sy=monthAvg(e.id,'crSuperYes',0), my=monthAvg(e.id,'crMegaYes',0);
+      val=(sy!==null&&my!==null)?(sy+my):null;
+    } else val=monthAvg(e.id,metricKey,0);
+    return {name:e.name,val:val,margeHeute:dailyWizardMargeHeute(e.id)};
+  }).filter(function(x){return x.val!==null;}).sort(function(a,b){return a.val-b.val;}).slice(0,3);
+  var h='<div style="width:48px;height:48px;border-radius:12px;background:rgba(229,115,115,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">⚠️</div>';
+  h+='<div style="font-size:18px;font-weight:700;margin-bottom:4px">'+title+'</div>';
+  h+='<div style="font-size:12.5px;color:#9fc9cd;margin-bottom:20px">Schwächste 3 im Team</div>';
+  rows.forEach(function(r,i){
+    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:10px 12px;background:rgba(229,115,115,0.12);border-radius:8px;margin-bottom:8px;font-size:13px">'
+      +'<span style="font-weight:600">'+(i+1)+'. '+esc(r.name)+'</span>'
+      +'<span>'+(metricKey!=='margeHeute'?'<span style="color:#cfe7e9;font-weight:500;margin-right:10px">'+fmtEur(r.margeHeute)+'</span>':'')
+      +'<span style="font-weight:700;color:#ffb3b3">'+(isPct?Math.round(r.val)+'%':fmtEur(r.val))+'</span></span>'
+      +'</div>';
   });
+  if(!rows.length)h+='<div style="font-size:13px;color:#9fc9cd">Keine Daten vorhanden</div>';
+  return h;
+}
+function buildDailyWizardPage1(){
+  var visible=dailyWizardVisible();
+  var todayStr=today();
+  var margeHeuteTeam=0;
+  visible.forEach(function(e){margeHeuteTeam+=dailyWizardMargeHeute(e.id);});
   function teamCrAvg(key){
     var vals=visible.map(function(e){return monthAvg(e.id,key,0);}).filter(function(v){return v!==null;});
     return vals.length?Math.round(vals.reduce(function(a,b){return a+b;},0)/vals.length):null;
   }
   var crOem=teamCrAvg('crOEM'), crTw=teamCrAvg('crTeilweise'), crSyMy=teamCrAvg('crSyMy');
   if(crSyMy===null){
-    // Fallback falls crSyMy nicht direkt als Monatsmittel existiert: aus SY + MY zusammensetzen
     var sy=teamCrAvg('crSuperYes'), my=teamCrAvg('crMegaYes');
     crSyMy=(sy!==null&&my!==null)?Math.round(sy+my):null;
   }
-  var todayStr=today();
-  var worst3=visible.map(function(e){
-    var cr=monthAvg(e.id,'crMegaYes',0);
-    var margeHeute=0;
-    (performance[e.id]||[]).forEach(function(x){if(x.date===todayStr)margeHeute+=x.margeGesamt||x.margin||0;});
-    return {name:e.name,cr:cr,margeHeute:margeHeute};
-  }).filter(function(x){return x.cr!==null;}).sort(function(a,b){return a.cr-b.cr;}).slice(0,3);
-  var fmtEur=function(v){return Math.round(v).toLocaleString('de-DE')+' €';};
   var h='<div style="width:48px;height:48px;border-radius:12px;background:rgba(126,210,219,0.15);display:flex;align-items:center;justify-content:center;font-size:22px;margin-bottom:16px">📊</div>';
   h+='<div style="font-size:18px;font-weight:700;margin-bottom:4px">Dein Tages-Überblick</div>';
   h+='<div style="font-size:12.5px;color:#9fc9cd;margin-bottom:20px">'+fd(todayStr)+' · 13:00 Uhr</div>';
   h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:20px">';
-  h+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">MARGE (MONAT)</div><div style="font-size:20px;font-weight:700;margin-top:4px">'+fmtEur(margeMonat)+'</div></div>';
+  h+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">MARGE (HEUTE)</div><div style="font-size:20px;font-weight:700;margin-top:4px">'+fmtEur(margeHeuteTeam)+'</div></div>';
   h+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">CR OEM (TEAM)</div><div style="font-size:20px;font-weight:700;margin-top:4px">'+(crOem!==null?crOem+'%':'—')+'</div></div>';
   h+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">CR TW (TEAM)</div><div style="font-size:20px;font-weight:700;margin-top:4px">'+(crTw!==null?crTw+'%':'—')+'</div></div>';
   h+='<div style="background:rgba(255,255,255,0.08);border-radius:10px;padding:12px 14px"><div style="font-size:9.5px;font-weight:600;color:#9fc9cd;letter-spacing:.04em">CR SY/MY (TEAM)</div><div style="font-size:20px;font-weight:700;margin-top:4px">'+(crSyMy!==null?crSyMy+'%':'—')+'</div></div>';
   h+='</div>';
-  h+='<div style="font-size:11px;font-weight:700;color:#ffb3b3;letter-spacing:.03em;margin-bottom:8px">⚠ SCHWÄCHSTE 3 MITARBEITER (CR MY)</div>';
-  worst3.forEach(function(w){
-    h+='<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:rgba(229,115,115,0.12);border-radius:8px;margin-bottom:6px;font-size:13px">'
-      +'<span style="font-weight:600">'+esc(w.name)+'</span>'
-      +'<span><span style="color:#cfe7e9;font-weight:500;margin-right:10px">'+fmtEur(w.margeHeute)+'</span><span style="font-weight:700;color:#ffb3b3">'+Math.round(w.cr)+'%</span></span>'
-      +'</div>';
-  });
   return h;
 }
+function renderDailyWizardPage(){
+  document.getElementById('dailyWizardBody').innerHTML=dailyWizardPages[dailyWizardPage]();
+  var dotsEl=document.getElementById('dailyWizardDots');
+  dotsEl.innerHTML=dailyWizardPages.map(function(_,i){
+    return '<div style="width:'+(i===dailyWizardPage?'16px':'6px')+';height:6px;border-radius:3px;background:'+(i===dailyWizardPage?'#7ED2DB':'rgba(255,255,255,0.3)')+'"></div>';
+  }).join('');
+  var btn=document.getElementById('dailyWizardNextBtn');
+  btn.textContent=dailyWizardPage>=dailyWizardPages.length-1?'Fertig':'Weiter →';
+}
+function dailyWizardNext(){
+  if(dailyWizardPage>=dailyWizardPages.length-1){closeDailyWizard();return;}
+  dailyWizardPage++;
+  renderDailyWizardPage();
+}
 function showDailyWizard(){
-  document.getElementById('dailyWizardBody').innerHTML=buildDailyWizardHtml();
+  dailyWizardPages=[
+    buildDailyWizardPage1,
+    function(){return dailyWizardWorstPage('Schwächste 3 – CR OEM','crOEM','CR OEM',true);},
+    function(){return dailyWizardWorstPage('Schwächste 3 – CR SY/MY','crSyMy','CR SY/MY',true);},
+    function(){return dailyWizardWorstPage('Schwächste 3 – Marge (Heute)','margeHeute','Marge',false);}
+  ];
+  dailyWizardPage=0;
+  renderDailyWizardPage();
   document.getElementById('dailyWizardOverlay').classList.remove('hidden');
 }
 function checkDailyWizard(){
@@ -2834,8 +2888,8 @@ function groupPerfRows(rows,mode){
     if(!groups[key]){groups[key]={label:label,items:[]};order.push(key);}
     groups[key].items.push(r);
   });
-  var sumFields=['oem_aktivitaeten','calls','notReached','notPossible','notSuccessful','convOEM','convTW','convYes','convSY','convMY','ups_yes','wka_gesamt_yes','optGesamt','margeGesamt','margin','gesamtAktivitaeten','gesamtNichtErreicht','gesamtNichtMoeglich','gesamtNichtErfolgreich'];
-  var avgFields=['crOEM','crTeilweise','crSuperYes','crMegaYes'];
+  var sumFields=['oem_aktivitaeten','calls','notReached','notPossible','notSuccessful','convOEM','convTW','convYes','convSY','convMY','ups_yes','wka_gesamt_yes','optGesamt','margeGesamt','margin','margeOEM','margeUpsell','margeWKA','gesamtAktivitaeten','gesamtNichtErreicht','gesamtNichtMoeglich','gesamtNichtErfolgreich'];
+  var avgFields=['crOEM','crTeilweise','crSuperYes','crMegaYes','optPerH'];
   return order.sort().reverse().map(function(key){
     var g=groups[key],agg={};
     sumFields.forEach(function(f){agg[f]=g.items.reduce(function(a,x){return a+(x[f]||0);},0);});
@@ -3911,9 +3965,10 @@ function renderSidebar(){
   var nto=document.getElementById('nav-team-overview');if(nto)nto.classList.toggle('active',view==='team'&&wiegandView==='overview');
   var ntc=document.getElementById('nav-team-coaching');if(ntc)ntc.classList.toggle('active',view==='coaching'&&coachFilterView==='overview');
   var ntz=document.getElementById('nav-team-ziel');if(ntz)ntz.classList.toggle('active',view==='team'&&wiegandView==='ziel');
-  var nc=document.getElementById('nav-coaching');if(nc)nc.classList.toggle('active',view==='coaching'||isTeamTab||view==='activity');
+  var nc=document.getElementById('nav-coaching');if(nc)nc.classList.toggle('active',view==='coaching'||isTeamTab||view==='activity'||view==='provisionTeam');
   var nct=document.getElementById('nav-coaching-team');if(nct)nct.classList.toggle('active',isTeamTab);
   var na=document.getElementById('nav-coaching-activity');if(na)na.classList.toggle('active',view==='activity');
+  var ntp=document.getElementById('nav-team-provision');if(ntp)ntp.classList.toggle('active',view==='provisionTeam');
   if(view==='settings')document.getElementById('nav-settings').classList.add('active');
   ['users','integrations','data'].forEach(function(sv){
     var el=document.getElementById('nav-settings-'+sv);if(el)el.classList.toggle('active',view==='settings'&&settingsView===sv);
@@ -4021,6 +4076,7 @@ function showView(v){
   renderSidebar();renderMain();
 }
 function selectCoachingActivity(){view='activity';wiegandNavOpen=true;bannerViewMode='activity';resetBannerRotation();renderSidebar();renderMain();}
+function selectProvisionTeam(){view='provisionTeam';wiegandNavOpen=true;bannerViewMode='overview';resetBannerRotation();renderSidebar();renderMain();}
 function closeWiegandSubnav(){
   wiegandNavOpen=false;
   var sub=document.getElementById('wiegandSubNav');if(sub)sub.classList.add('hidden');
@@ -4059,7 +4115,7 @@ function toggleCoachingNav(){
   }
 }
 function selectCoachingTeam(){wiegandView='team';view='team';coachingNavOpen=true;renderSidebar();renderMain();}
-function renderMain(){if(view==='team')renderTeam();else if(view==='coaching')renderCoachingAnsicht();else if(view==='activity')renderActivity();else if(view==='settings')renderEinstellungen();else renderEmpDetail();}
+function renderMain(){if(view==='team')renderTeam();else if(view==='coaching')renderCoachingAnsicht();else if(view==='activity')renderActivity();else if(view==='provisionTeam')renderProvisionTeam();else if(view==='settings')renderEinstellungen();else renderEmpDetail();}
 
 // ── TEAM VIEW ──
 
@@ -6019,6 +6075,7 @@ function renderEmpDetail(){
     +'<div class="tab-bar" id="empTabBar">'
     +'<div class="tab" data-tab="performance" onclick="switchTab(\'performance\')">KPI Performance</div>'
     +'<div class="tab" data-tab="call-performance" onclick="switchTab(\'call-performance\')">QA Performance</div>'
+    +'<div class="tab" data-tab="provision" onclick="switchTab(\'provision\')">Provision</div>'
     +'<div class="tab" data-tab="timeline" onclick="switchTab(\'timeline\')">Timeline</div>'
     +'<div class="tab" data-tab="session" onclick="switchTab(\'session\')">Coaching Sessions</div>'
     +'<div class="tab" data-tab="coaching-eval" onclick="switchTab(\'coaching-eval\')">Development</div>'
@@ -6288,6 +6345,9 @@ function renderTab(){
 
 
   // ── PERFORMANCE TAB ──
+  if(activeTab==='provision'){
+    html+=buildProvisionTable(emp.id);
+  }
   if(activeTab==='performance'){
     var empT=empTargets(emp);
     var perf7=getPerf(emp.id,7);
@@ -6456,6 +6516,8 @@ function renderTab(){
         html+='<span style="font-size:13px;color:var(--text2);background:var(--bg-solid);padding:2px 8px;border-radius:20px;flex-shrink:0">'+(r.b2b||'B2C')+'</span>';
         html+='<span style="font-size:13px;color:'+(r.status==='ja'?'var(--teal-dark)':'var(--red)')+';flex:1">'+(r.status==='ja'?'✓ Abschluss':'✗ Kein Abschluss')+(r.abschlussArt?' · Opt.: '+r.abschlussArt:'')+'</span>';
         html+='<span style="font-size:13px;font-weight:700;color:'+tcol+';flex-shrink:0">'+ts.toFixed(0)+'</span>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();openQaBewertungModal(this.dataset.eid,this.dataset.rid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();deleteHistorieCallRating(this.dataset.eid,this.dataset.rid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>';
         html+='<span id="arr-'+cardId+'" style="color:var(--text3);font-size:12px;flex-shrink:0;transition:transform .2s">▾</span></div>';
         html+='<div id="body-'+cardId+'" style="display:none;border-top:1px solid var(--border)">';
         CALL_CATS.forEach(function(cat){
@@ -6585,6 +6647,7 @@ function renderTab(){
       });
       html+='</select>';
     }
+    html+='<button class="btn" data-eid="'+emp.id+'" onclick="openCommentModal(this.dataset.eid)" style="margin-right:8px"><i class="ti ti-message-plus"></i> Kommentar</button>';
     html+='<button class="btn btn-primary" data-eid="'+emp.id+'" onclick="openCoachingEval(this.dataset.eid)"><i class="ti ti-clipboard-plus"></i> Mitarbeiterentwicklung bewerten</button>';
     html+='</div>';
     html+='</div>'; // Ende Entwicklungsprofil-Karte
@@ -6659,21 +6722,45 @@ function renderTab(){
     })();
 
     // ── Bewertungs-Historie (weiße Box, aufklappbare Zeilen) ──
+    var comments=(reviews[emp.id]||[]).filter(function(r){return r.isComment;});
+    var historyItems=evals.map(function(ev){return {type:'eval',data:ev};})
+      .concat(comments.map(function(c){return {type:'comment',data:c};}))
+      .sort(function(a,b){return b.data.date.localeCompare(a.data.date);});
     html+='<div class="card" style="margin-bottom:22px">';
-    html+='<div class="card-title"><i class="ti ti-history"></i> Bewertungs-Historie <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+evals.length+')</span></div>';
-    if(!evals.length){
+    html+='<div class="card-title"><i class="ti ti-history"></i> Bewertungs-Historie <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+historyItems.length+')</span></div>';
+    if(!historyItems.length){
       html+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-clipboard-off" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Bewertungen</div>';
     } else {
       html+='<div style="display:flex;flex-direction:column;gap:6px">';
-      evals.forEach(function(ev,idx){
+      var commentTypeCol={skill:'#0c3b40',will:'#164e54',result:'#1d6169',diverses:'#5c7070'};
+      historyItems.forEach(function(item,idx){
+        if(item.type==='comment'){
+          var c=item.data;
+          var tcol=commentTypeCol[c.commentType]||'#5c7070';
+          html+='<div style="background:rgba(32,106,114,0.07);border:1px solid var(--border2);border-radius:var(--r-md);padding:10px 14px">'
+            +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
+            +'<span style="font-size:12px;font-weight:700;white-space:nowrap">'+fd(c.date)+'</span>'
+            +'<span style="font-size:10px;font-weight:700;color:#fff;background:'+tcol+';padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.03em">'+esc(c.commentType)+'</span>'
+            +'<span style="flex:1"></span>'
+            +(c.author?'<span style="font-size:11px;color:var(--text3)">'+esc(c.author)+'</span>':'')
+            +(canEditHistorie()?'<button class="btn btn-sm" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();openCommentModal(this.dataset.eid,this.dataset.cid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>':'')
+            +(canEditHistorie()?'<button class="btn btn-sm" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();deleteHistorieComment(this.dataset.eid,this.dataset.cid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>':'')
+            +'</div>'
+            +'<div style="font-size:12.5px;color:var(--text2)">'+esc(c.note)+'</div>'
+            +'</div>';
+          return;
+        }
+        var ev=item.data;
         var eid='ev'+emp.id+'x'+idx;
         var overallAvg=(DIMS.reduce(function(a,d){return a+(ev[d.key]||0);},0)/DIMS.length).toFixed(1);
         var avgCol=overallAvg>=7?'var(--teal-dark)':overallAvg>=4?'var(--purple)':'var(--amber-dark)';
         html+='<div style="background:rgba(32,106,114,0.07);border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden">';
-        html+='<div class="sess-hdr" data-eid="'+eid+'" onclick="toggleSessCard(this.dataset.eid)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;cursor:pointer;user-select:none">';
+        html+='<div class="sess-hdr" data-eid="'+eid+'" onclick="toggleSessCard(this.dataset.eid)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:44px;cursor:pointer;user-select:none">';
         html+='<span style="font-size:12px;font-weight:700;white-space:nowrap">'+fd(ev.date)+'</span>';
         html+='<span style="flex:1"></span>';
         html+='<span style="font-size:13px;font-weight:700;color:'+avgCol+'">Ø '+overallAvg+'/10</span>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();openCoachingEval(this.dataset.eid,this.dataset.vid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();deleteHistorieEval(this.dataset.eid,this.dataset.vid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>';
         html+='<span id="arr-'+eid+'" style="color:var(--text3);font-size:12px;flex-shrink:0;transition:transform .2s">▾</span></div>';
         html+='<div id="body-'+eid+'" style="display:none;border-top:1px solid var(--border)">';
         ['skill','will','result'].forEach(function(cat){
@@ -7285,6 +7372,82 @@ function renderTab(){
 
       html+='<button class="btn btn-primary btn-sm" style="width:auto;margin-top:12px" onclick="saveEmpZiele()"><i class="ti ti-check"></i> Ziele speichern</button>';
       html+='</div>'; // close KPI card
+
+      // ── Provisionsvereinbarung (mitarbeiterspezifisch) ──
+      (function(){
+        var pv=(emp.provisionSettings)||{};
+        function pvNum(key,def){return pv[key]!=null?pv[key]:def;}
+        var m1=pv.monat1||{}, m2=pv.monat2||{}, m3=pv.monat3plus||{};
+        function pvMonatNum(mObj,key,def){return mObj[key]!=null?mObj[key]:def;}
+        html+='<div class="card"><div class="card-title"><i class="ti ti-cash"></i> Provisionsvereinbarung</div>';
+        html+='<p style="font-size:12px;color:var(--text2);margin-bottom:14px;line-height:1.6">Grundlage für die Berechnung der Spalten "Abzug" und "Provision" im Reiter Provision. Gültig ab dem hinterlegten Datum, ergänzend zum Arbeitsvertrag.</p>';
+
+        html+='<div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.06em;margin-bottom:8px">GÜLTIGKEIT</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px">';
+        html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+        html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Gültig ab</div>';
+        html+='<input type="date" id="pv-gueltigAb" value="'+(pv.gueltigAb||'')+'" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:13px">';
+        html+='</div></div>';
+
+        html+='<div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.06em;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">BASISPROVISION (§2 ABS. 1)</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr;gap:8px;margin-bottom:16px">';
+        html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+        html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Pro qualifizierender Optimierung</div>';
+        html+='<div style="display:flex;align-items:center;gap:6px"><input type="number" id="pv-basisProOpt" value="'+pvNum('basisProOpt',1.00)+'" step="0.10" min="0" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;text-align:center"><span style="font-size:12px;font-weight:600;color:var(--text2)">€</span></div>';
+        html+='</div></div>';
+
+        html+='<div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.06em;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">UMSATZABHÄNGIGE PROVISION (§2 ABS. 2) — DIVISOREN</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">';
+        [{lbl:'OEM',id:'divOEM',def:10000},{lbl:'Upsells',id:'divUpsell',def:20000},{lbl:'WKA',id:'divWka',def:20000}].forEach(function(f){
+          html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+          html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">'+f.lbl+'</div>';
+          html+='<input type="number" id="pv-'+f.id+'" value="'+pvNum(f.id,f.def)+'" step="1000" min="1" style="width:100%;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;text-align:center">';
+          html+='</div>';
+        });
+        html+='</div>';
+
+        html+='<div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.06em;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">§3 KPI-VORGABEN JE BESCHÄFTIGUNGSMONAT</div>';
+        [{key:'monat1',label:'Kalendermonat 1',obj:m1,defs:{optH:2.00,crOem:45,tw:20,sy:30,my:10,oemAnteil:60}},
+         {key:'monat2',label:'Kalendermonat 2',obj:m2,defs:{optH:2.50,crOem:50,tw:20,sy:40,my:20,oemAnteil:80}},
+         {key:'monat3plus',label:'Ab Kalendermonat 3',obj:m3,defs:{optH:3.50,crOem:55,tw:15,sy:40,my:20,oemAnteil:80}}
+        ].forEach(function(mset){
+          html+='<div style="font-size:11px;font-weight:700;color:#206A72;margin:10px 0 6px">'+mset.label+'</div>';
+          html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">';
+          [{lbl:'Opt./Std. (mind.)',f:'optH',unit:'',step:0.1},
+           {lbl:'CR OEM (mind.)',f:'crOem',unit:'%'},
+           {lbl:'TW-Anteil (max.)',f:'tw',unit:'%'},
+           {lbl:'SY-Anteil (mind.)',f:'sy',unit:'%'},
+           {lbl:'MY-Anteil (mind.)',f:'my',unit:'%'},
+           {lbl:'OEM-Anteil (mind.)',f:'oemAnteil',unit:'%'}
+          ].forEach(function(fld){
+            html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:8px 10px">';
+            html+='<div style="font-size:10px;font-weight:600;color:var(--text2);margin-bottom:5px">'+fld.lbl+'</div>';
+            html+='<div style="display:flex;align-items:center;gap:5px"><input type="number" id="pv-'+mset.key+'-'+fld.f+'" value="'+pvMonatNum(mset.obj,fld.f,mset.defs[fld.f])+'" step="'+(fld.step||1)+'" min="0" style="flex:1;min-width:0;padding:4px 6px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:13px;font-weight:700;text-align:center">'+(fld.unit?'<span style="font-size:11px;font-weight:600;color:var(--text2)">'+fld.unit+'</span>':'')+'</div>';
+            html+='</div>';
+          });
+          html+='</div>';
+        });
+
+        html+='<div style="font-size:10px;font-weight:700;color:var(--text2);letter-spacing:.06em;margin-bottom:8px;padding-top:12px;border-top:1px solid var(--border)">§4/§5 REDUZIERUNG</div>';
+        html+='<div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:8px">';
+        html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+        html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Reduzierung je nicht erfüllter KPI</div>';
+        html+='<div style="display:flex;align-items:center;gap:6px"><input type="number" id="pv-reduktionProKpi" value="'+pvNum('reduktionProKpi',20)+'" step="5" min="0" max="100" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;text-align:center"><span style="font-size:12px;font-weight:600;color:var(--text2)">%</span></div>';
+        html+='</div>';
+        html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+        html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Mindestprovision</div>';
+        html+='<div style="display:flex;align-items:center;gap:6px"><input type="number" id="pv-mindestprovision" value="'+pvNum('mindestprovision',20)+'" step="5" min="0" max="100" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;text-align:center"><span style="font-size:12px;font-weight:600;color:var(--text2)">%</span></div>';
+        html+='</div>';
+        html+='<div style="background:var(--glass);border:1px solid var(--glass-edge);border-radius:var(--r-md);backdrop-filter:var(--glass-blur);-webkit-backdrop-filter:var(--glass-blur);box-shadow:0 10px 24px rgba(15,61,66,0.06);padding:10px 12px">';
+        html+='<div style="font-size:11px;font-weight:600;color:var(--text2);margin-bottom:6px">Mindestleistung ab Monat 2</div>';
+        html+='<div style="display:flex;align-items:center;gap:6px"><input type="number" id="pv-mindestleistungOptH" value="'+pvNum('mindestleistungOptH',2.50)+'" step="0.1" min="0" style="flex:1;padding:5px 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);font-size:14px;font-weight:700;text-align:center"><span style="font-size:11px;font-weight:600;color:var(--text2)">Opt/Std</span></div>';
+        html+='</div>';
+        html+='</div>';
+
+        html+='<button class="btn btn-primary btn-sm" style="width:auto;margin-top:12px" data-eid="'+emp.id+'" onclick="saveProvisionSettings(this.dataset.eid)"><i class="ti ti-check"></i> Provisionsvereinbarung speichern</button>';
+        html+='<span id="pv-save-status" style="font-size:11px;color:var(--text3);margin-left:10px"></span>';
+        html+='</div>'; // close Provisionsvereinbarung card
+      })();
     }
 
     if(true){
@@ -7824,7 +7987,650 @@ function renderEinstellungen(){
 // ── ACTIONS ──
 function setEvalDate(date){window._evalDate=date;renderTab();}
 
-function openCoachingEval(empId){
+var BEWERTUNGSHISTORIE_ADMINS=['Peter Rode','Niklas Hojdem','Dogoro Dembele','Kathrin Steininger'];
+function canEditHistorie(){
+  var myName=null;
+  if(typeof currentCoach!=='undefined'&&currentCoach)myName=currentCoach.name;
+  else if(typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof appUsers!=='undefined'){
+    var matchUser=appUsers.find(function(u){return u.email===currentAuthUser.email;});
+    if(matchUser)myName=matchUser.name;
+  }
+  return myName&&BEWERTUNGSHISTORIE_ADMINS.indexOf(myName)>=0;
+}
+function deleteHistorieComment(empId,commentId){
+  if(!canEditHistorie())return;
+  if(!confirm('Diesen Kommentar wirklich löschen?'))return;
+  var list=reviews[empId]||[];
+  var idx=list.findIndex(function(r){return r.id===commentId;});
+  if(idx<0)return;
+  list.splice(idx,1);
+  sb.from('reviews').delete().eq('id',commentId).then(function(){renderTab();}).catch(function(){renderTab();});
+}
+function deleteHistorieEval(empId,evalId){
+  if(!canEditHistorie())return;
+  if(!confirm('Diese Bewertung wirklich löschen? Dies kann nicht rückgängig gemacht werden.'))return;
+  var list=reviews[empId]||[];
+  var idx=list.findIndex(function(r){return r.id===evalId;});
+  if(idx<0)return;
+  list.splice(idx,1);
+  sb.from('reviews').delete().eq('id',evalId).then(function(){renderTab();}).catch(function(){renderTab();});
+}
+function openCommentModal(empId,editCommentId){
+  var emp=employees.find(function(e){return e.id===empId;});
+  var existingComment=editCommentId?(reviews[empId]||[]).find(function(r){return r.id===editCommentId;}):null;
+  var overlay=document.createElement('div');
+  overlay.id='commentModal';
+  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:center;justify-content:center;padding:16px';
+
+  var box=document.createElement('div');
+  box.style.cssText='background:rgba(255,255,255,0.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-radius:14px;padding:24px 28px;width:100%;max-width:640px;max-height:92vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18)';
+
+  var hdr=document.createElement('div');
+  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:18px';
+  hdr.innerHTML='<div style="font-size:17px;font-weight:700">'+(existingComment?'Kommentar bearbeiten':'Kommentar hinzufügen')+'</div>';
+  var closeBtn=document.createElement('button');
+  closeBtn.textContent='×';
+  closeBtn.style.cssText='background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1';
+  closeBtn.onclick=function(){overlay.remove();};
+  hdr.appendChild(closeBtn);
+  box.appendChild(hdr);
+
+  var curName='Unbekannt';
+  if(typeof currentCoach!=='undefined'&&currentCoach)curName=currentCoach.name;
+  else if(typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof appUsers!=='undefined'){
+    var matchUser=appUsers.find(function(u){return u.email===currentAuthUser.email;});
+    if(matchUser)curName=matchUser.name;
+  }
+
+  var sec1=document.createElement('div');
+  sec1.style.cssText='font-size:11px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec1.textContent='① Wer & Wann';
+  box.appendChild(sec1);
+  var sec1body=document.createElement('div');
+  sec1body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
+  sec1body.innerHTML='<label style="font-size:12px;font-weight:600;color:var(--text2)">Verfasser</label>'
+    +'<div style="font-size:13px;margin-top:4px;color:var(--text)">'+esc(curName)+'</div>'
+    +'<label style="font-size:12px;font-weight:600;color:var(--text2);margin-top:10px;display:block">Datum</label>'
+    +'<input type="date" id="comment-date" value="'+(existingComment?existingComment.date:today())+'" style="display:block;margin-top:4px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:220px">';
+  box.appendChild(sec1body);
+
+  var sec2=document.createElement('div');
+  sec2.style.cssText='font-size:11px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec2.textContent='② Art des Kommentars';
+  box.appendChild(sec2);
+  var sec2body=document.createElement('div');
+  sec2body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
+  var pillWrap=document.createElement('div');
+  pillWrap.style.cssText='display:flex;gap:8px;margin-top:6px';
+  var commentType=existingComment?existingComment.commentType:'diverses';
+  ['skill','will','result','diverses'].forEach(function(t){
+    var p=document.createElement('div');
+    p.textContent=t.charAt(0).toUpperCase()+t.slice(1);
+    p.dataset.type=t;
+    var setActive=function(){
+      pillWrap.querySelectorAll('div').forEach(function(el){el.style.background='#fff';el.style.borderColor='var(--border2)';el.style.color='var(--text2)';});
+      p.style.background='#164e54';p.style.borderColor='#164e54';p.style.color='#fff';
+      commentType=t;
+    };
+    p.style.cssText='padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;background:#fff';
+    p.onclick=setActive;
+    if(t===commentType)setActive();
+    pillWrap.appendChild(p);
+  });
+  sec2body.appendChild(pillWrap);
+  box.appendChild(sec2body);
+
+  var sec3=document.createElement('div');
+  sec3.style.cssText='font-size:11px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
+  sec3.textContent='③ Kommentar';
+  box.appendChild(sec3);
+  var sec3body=document.createElement('div');
+  sec3body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:6px';
+  var textarea=document.createElement('textarea');
+  textarea.id='comment-text';
+  textarea.placeholder='z.B. Kommt regelmäßig zu spät zum Stand-up...';
+  if(existingComment)textarea.value=existingComment.note;
+  textarea.style.cssText='display:block;margin-top:4px;width:100%;font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);min-height:100px;resize:vertical;font-family:inherit';
+  sec3body.appendChild(textarea);
+  box.appendChild(sec3body);
+
+  var footer=document.createElement('div');
+  footer.style.cssText='display:flex;justify-content:flex-end;gap:8px;margin-top:6px';
+  var cancelBtn=document.createElement('button');
+  cancelBtn.className='btn';
+  cancelBtn.textContent='Abbrechen';
+  cancelBtn.onclick=function(){overlay.remove();};
+  var saveBtn=document.createElement('button');
+  saveBtn.className='btn btn-primary';
+  saveBtn.textContent='Speichern';
+  saveBtn.textContent=existingComment?'Speichern':'Speichern';
+  saveBtn.onclick=function(){
+    var txt=document.getElementById('comment-text').value.trim();
+    if(!txt){alert('Bitte einen Kommentar eingeben.');return;}
+    var dateVal=document.getElementById('comment-date').value||today();
+    if(!reviews[empId])reviews[empId]=[];
+    if(existingComment){
+      existingComment.date=dateVal;
+      existingComment.commentType=commentType;
+      existingComment.note=txt;
+      // TODO: Supabase-Update analog ergaenzen, sobald Tabellen-Spalte vorhanden
+    } else {
+      reviews[empId].push({
+        id:'comment_'+Date.now(),
+        date:dateVal,
+        isComment:true,
+        commentType:commentType,
+        note:txt,
+        author:curName
+      });
+      // TODO: Supabase-Persistenz analog zu reviews-Speicherung ergaenzen, sobald Tabellen-Spalte vorhanden
+    }
+    overlay.remove();
+    var infoModalOpen=document.getElementById('coachingInfoModal')&&!document.getElementById('coachingInfoModal').classList.contains('hidden');
+    if(infoModalOpen){openCoachingInfoModal(empId);}
+    else{renderTab();}
+  };
+  footer.appendChild(cancelBtn);
+  footer.appendChild(saveBtn);
+  box.appendChild(footer);
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+}
+// ── PROVISION: komplett eigenstaendige Tabelle, unabhaengig von buildOverviewTab (keine geteilte Zustandsvariable) ──
+var provisionMode='year'; // 'month' | 'year' | 'custom'
+var provisionCustomMonth=today().slice(0,7);
+function setProvisionCustomMonth(val){provisionMode='custom';provisionCustomMonth=val;if(view==='provisionTeam')renderMain();else renderTab();}
+function setProvisionMode(m){provisionMode=m;if(view==='provisionTeam')renderMain();else renderTab();}
+// ── Provisionsberechnung nach der Provisionsvereinbarung (§2-§5) ──
+function beschaeftigungsmonat(emp,monthKey){
+  if(!emp.startDate)return 1;
+  var start=new Date(emp.startDate+'T00:00:00');
+  var target=new Date(monthKey+'-01T00:00:00');
+  var diff=(target.getFullYear()-start.getFullYear())*12+(target.getMonth()-start.getMonth())+1;
+  return Math.max(1,diff);
+}
+function provisionKpiSetFor(pv,bm){
+  if(bm===1)return pv.monat1||{};
+  if(bm===2)return pv.monat2||{};
+  return pv.monat3plus||{};
+}
+var PROVISION_DEFAULTS={
+  basisProOpt:1.00,divOEM:10000,divUpsell:20000,divWka:20000,
+  reduktionProKpi:20,mindestprovision:20,mindestleistungOptH:2.50,
+  monat1:{optH:2.00,crOem:45,tw:20,sy:30,my:10,oemAnteil:60},
+  monat2:{optH:2.50,crOem:50,tw:20,sy:40,my:20,oemAnteil:80},
+  monat3plus:{optH:3.50,crOem:55,tw:15,sy:40,my:20,oemAnteil:80}
+};
+function calculateProvision(emp,monthKey,row,dayCount){
+  // Solange fuer diesen Mitarbeiter noch keine individuelle Vereinbarung gespeichert wurde,
+  // greifen automatisch die Standardwerte aus der Provisionsvereinbarung (Stand 01/2026)
+  var pv=(emp.provisionSettings&&Object.keys(emp.provisionSettings).length)?emp.provisionSettings:PROVISION_DEFAULTS;
+  var convTW=row.convTW||0, convYes=row.convYes||0, convSY=row.convSY||0, convMY=row.convMY||0;
+  var ups=row.ups_yes||0, wka=row.wka_gesamt_yes||0;
+  var convOEM=row.convOEM||0, optGes=row.optGesamt||(convOEM+ups+wka)||0;
+  var margeOEM=row.margeOEM||0, margeUpsell=row.margeUpsell||0, margeWKA=row.margeWKA||0;
+  var margeGesamt=row.margeGesamt||row.margin||0;
+  // Opt./Std. konsistent mit der Tabelle berechnen (Opt.Gesamt / tatsaechliche Arbeitsstunden),
+  // nicht aus einem ggf. unzuverlaessigen Rohfeld - Fallback auf row.optPerH falls dayCount fehlt
+  var optPerH;
+  if(dayCount!=null){
+    var hoursPerDayCalc=(emp.hours||40)/5;
+    var totalHoursCalc=hoursPerDayCalc*dayCount;
+    optPerH=totalHoursCalc>0?optGes/totalHoursCalc:0;
+  } else {
+    optPerH=row.optPerH||0;
+  }
+  var crOEM=row.crOEM||0, crTW=row.crTeilweise||0, crSY=row.crSuperYes||0, crMY=row.crMegaYes||0;
+  var anteilOem=optGes>0?(convOEM/optGes*100):0;
+
+  // §2 Abs. 1 - Basisprovision (Convertible Hardware existiert aktuell nicht im System, daher nicht enthalten)
+  var qualifizierendeOpt=convTW+convYes+convSY+convMY+ups+wka;
+  var basis=qualifizierendeOpt*(pv.basisProOpt||0);
+
+  // §2 Abs. 2 - Umsatzabhaengige Provision
+  // "Prozentsatz X" ist eine Prozent-ZAHL (z.B. 3 = 3%), daher fuer die Multiplikation durch 100 teilen
+  var pctOem=pv.divOEM?(margeGesamt/pv.divOEM)/100:0;
+  var pctUps=pv.divUpsell?(margeGesamt/pv.divUpsell)/100:0;
+  var pctWka=pv.divWka?(margeGesamt/pv.divWka)/100:0;
+  var provOem=margeOEM*pctOem;
+  var provUps=margeUpsell*pctUps;
+  var provWka=margeWKA*pctWka;
+  var umsatz=provOem+provUps+provWka;
+
+  var regulaer=basis+umsatz;
+
+  // §3/§4 - KPI-Pruefung je Beschaeftigungsmonat
+  var bm=beschaeftigungsmonat(emp,monthKey);
+  var kpiSet=provisionKpiSetFor(pv,bm);
+  var checks=[
+    {label:'Opt./Std.',ist:optPerH,ziel:kpiSet.optH,dir:'gte'},
+    {label:'CR OEM',ist:crOEM,ziel:kpiSet.crOem,dir:'gte'},
+    {label:'TW-Anteil',ist:crTW,ziel:kpiSet.tw,dir:'lte'},
+    {label:'SY-Anteil',ist:crSY,ziel:kpiSet.sy,dir:'gte'},
+    {label:'MY-Anteil',ist:crMY,ziel:kpiSet.my,dir:'gte'},
+    {label:'OEM-Anteil',ist:anteilOem,ziel:kpiSet.oemAnteil,dir:'gte'}
+  ];
+  var fehlendeKpis=checks.filter(function(c){
+    if(c.ziel==null)return false;
+    return c.dir==='gte'?c.ist<c.ziel:c.ist>c.ziel;
+  });
+
+  var reduktionProKpi=(pv.reduktionProKpi!=null?pv.reduktionProKpi:20)/100;
+  var mindestprovisionPct=(pv.mindestprovision!=null?pv.mindestprovision:20)/100;
+  var reduktionGesamt=Math.min(fehlendeKpis.length*reduktionProKpi,1-mindestprovisionPct);
+  var provisionNachKpi=regulaer*(1-reduktionGesamt);
+
+  // §5 - Mindestleistung ab Beschaeftigungsmonat 2
+  var mindestleistung=pv.mindestleistungOptH!=null?pv.mindestleistungOptH:2.5;
+  var finalProvision=provisionNachKpi;
+  var mindestleistungGreift=(bm>=2&&optPerH<mindestleistung);
+  if(mindestleistungGreift){
+    finalProvision=regulaer*mindestprovisionPct;
+  }
+
+  var abzug=regulaer-finalProvision;
+  return {basis:basis,umsatz:umsatz,regulaer:regulaer,abzug:abzug,provision:finalProvision,fehlendeKpis:fehlendeKpis.map(function(c){return c.label;}),mindestleistungGreift:mindestleistungGreift,beschaeftigungsmonat:bm};
+}
+function renderProvisionTeam(){
+  var ma=document.getElementById('mainArea');if(!ma)return;
+  var h='<div class="content">';
+  h+=buildGlobalBannerHtml(employees.filter(function(e){return !e.isPureCoach;}));
+  h+=buildProvisionTeamTable();
+  h+='</div>';
+  ma.innerHTML=h;
+}
+function buildProvisionTeamTable(){
+  function stackCell(main,sub){
+    var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
+    return '<div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.15">'
+      +'<span>'+main+'</span>'
+      +'<span style="font-size:11px;color:var(--text3);margin-top:1px;'+(hasSubValue?'':'visibility:hidden;')+'">'+(hasSubValue?sub:'0')+'</span>'
+      +'</div>';
+  }
+  function stackCellLeft(main,sub){
+    var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
+    return '<div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">'
+      +'<span>'+main+'</span>'
+      +'<span style="font-size:11px;font-weight:400;color:var(--text3);margin-top:1px;'+(hasSubValue?'':'visibility:hidden;')+'">'+(hasSubValue?sub:'0')+'</span>'
+      +'</div>';
+  }
+  function fc(v,t,dir){if(t==null)return '';return(dir==='lte'?v<=t:v>=t)?'color:var(--text)':'color:var(--red);font-weight:700';}
+  function urlaubKrankTage(empId,monthKey){
+    var rec=(zielStore[monthKey]||{})[empId];
+    var urlaub=0,krank=0;
+    if(rec&&rec.arbeitstage){
+      Object.keys(rec.arbeitstage).forEach(function(ds){
+        if(rec.arbeitstage[ds]==='urlaub')urlaub++;
+        else if(rec.arbeitstage[ds]==='krank')krank++;
+      });
+    }
+    return {urlaub:urlaub,krank:krank};
+  }
+  var visible=employees.filter(function(e){return !e.isPureCoach&&e.active!==false;});
+  var selectedEmps=provisionTeamSelectedIds?visible.filter(function(e){return provisionTeamSelectedIds.indexOf(e.id)>=0;}):visible;
+  var isAll=!provisionTeamSelectedIds||provisionTeamSelectedIds.length===visible.length;
+  var selLabel=isAll?'Alle Mitarbeiter':(selectedEmps.length===1?selectedEmps[0].name:selectedEmps.length+' Mitarbeiter ausgewählt');
+  var yr=today().slice(0,4), curMk=today().slice(0,7);
+
+  var h='<div class="card">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  h+='<div class="card-title" style="margin:0"><i class="ti ti-cash"></i> Provision <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+selLabel+'</span></div>';
+  h+='<div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">';
+  h+='<div style="position:relative" id="provisionTeamEmpDropdownWrap">';
+  h+='<button class="btn btn-sm" style="height:34px;padding:0 12px;font-weight:500" onclick="toggleProvisionTeamDropdown()"><i class="ti ti-users"></i> '+selLabel+' <i class="ti ti-chevron-down" style="font-size:11px"></i></button>';
+  if(provisionTeamDropdownOpen){
+    h+='<div style="position:absolute;top:38px;left:0;z-index:20;background:var(--bg-solid);border:1px solid var(--border2);border-radius:10px;box-shadow:0 10px 24px rgba(15,61,66,0.14);width:260px;padding:10px 4px;display:flex;flex-direction:column">';
+    h+='<div style="padding:0 8px 6px"><div style="display:flex;align-items:center;gap:6px;background:var(--bg2);border-radius:6px;padding:6px 8px">'
+      +'<i class="ti ti-search" style="font-size:13px;color:var(--text3)"></i>'
+      +'<input placeholder="Mitarbeiter suchen…" value="'+esc(provisionTeamSearchQuery)+'" oninput="provisionTeamSearchQuery=this.value;filterProvisionTeamEmpList(this.value)" style="border:none;background:none;outline:none;font-size:12.5px;width:100%;color:var(--text)">'
+      +'</div></div>';
+    h+='<div id="provisionTeamEmpScrollList" style="max-height:160px;overflow-y:auto;padding-top:4px">';
+    var ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+    var sortedVisible=visible.slice().sort(function(a,b){
+      var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
+      return ra-rb||a.name.localeCompare(b.name);
+    });
+    sortedVisible.forEach(function(e){
+      var checked=isAll||selectedEmps.indexOf(e)>=0;
+      h+='<label class="emp-opt-row" data-search="'+esc(e.name).toLowerCase()+'" style="display:grid;grid-template-columns:20px 38px 1fr;align-items:center;gap:8px;padding:5px 12px;font-size:12.5px;cursor:pointer;border-radius:6px;white-space:nowrap" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'transparent\'">'
+        +'<input type="checkbox" '+(checked?'checked':'')+' onchange="toggleProvisionTeamEmpId(\''+e.id+'\')" style="cursor:pointer;margin:0">'
+        +'<span style="font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.02em">'+e.role+'</span>'
+        +'<span>'+esc(e.name)+'</span>'
+        +'</label>';
+    });
+    h+='</div>';
+    var _visIds=visible.map(function(e){return e.id;});
+    h+='<div style="border-top:1px solid var(--border);margin:4px 0"></div>';
+    h+='<div style="padding:2px 8px 2px;display:flex;flex-wrap:wrap;gap:2px 6px">';
+    h+='<span onclick="setProvisionTeamSelectAll(['+_visIds.map(function(id){return '\''+id+'\'';}).join(',')+'])" style="font-size:11px;font-weight:600;color:var(--text2);padding:3px 6px;cursor:pointer;border-radius:5px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'transparent\'">Alle</span>';
+    h+='<span onclick="setProvisionTeamSelectNone()" style="font-size:11px;font-weight:600;color:var(--text2);padding:3px 6px;cursor:pointer;border-radius:5px" onmouseover="this.style.background=\'var(--bg2)\'" onmouseout="this.style.background=\'transparent\'">Keine</span>';
+    h+='</div></div>';
+  }
+  h+='</div>';
+  h+='<div style="display:flex;border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;height:34px">';
+  [{k:'month',l:'Monat'},{k:'year',l:'Jahr'}].forEach(function(it){
+    h+='<button style="padding:0 10px;height:100%;font-size:11.5px;font-weight:500;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;background:'+(provisionMode===it.k?'#164e54':'transparent')+';color:'+(provisionMode===it.k?'#fff':'var(--text2)')+'" onclick="setProvisionMode(\''+it.k+'\')">'+it.l+'</button>';
+  });
+  h+='</div>';
+  h+='<input type="month" value="'+provisionCustomMonth+'" onchange="setProvisionCustomMonth(this.value)" style="height:34px;width:128px;padding:0 8px;border:1px solid '+(provisionMode==='custom'?'#164e54':'var(--border2)')+';border-radius:var(--r-md);font-size:11.5px;font-family:inherit;color:var(--text);background:#fff;cursor:pointer">';
+  h+='</div></div>';
+
+  // Alle Zeilen aller ausgewaehlten Mitarbeiter zusammenstellen (Mitarbeiter + Monat je Zeile)
+  var allRows=[];
+  selectedEmps.forEach(function(emp){
+    var rowsAll=(performance[emp.id]||[]).filter(function(x){return (x.date||'').slice(0,4)===yr;});
+    var grouped=groupPerfRows(rowsAll,'month');
+    var rows=provisionMode==='month'?grouped.filter(function(g){return g.key===curMk;}):(provisionMode==='custom'?grouped.filter(function(g){return g.key===provisionCustomMonth;}):grouped);
+    rows.forEach(function(g){allRows.push({emp:emp,g:g});});
+  });
+  allRows.sort(function(a,b){return a.emp.name.localeCompare(b.emp.name)||b.g.key.localeCompare(a.g.key);});
+  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumGesamtAkt=0,sumTotalHoursAll=0;
+
+  if(!allRows.length){
+    h+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-file-upload" style="font-size:26px;display:block;margin-bottom:8px"></i>Keine Daten für diesen Zeitraum</div>';
+  } else {
+    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse;table-layout:fixed"><thead><tr>';
+    ['Mitarbeiter','Monat','Krankheitstage','Urlaubstage','Akt./Std.','OEM','Upsells','WKA','Opt. Ges.','Opt./Std.','CR OEM','CR TW','CR SY/MY','CR SY','CR MY','Anteil OEM','Marge Ges.','Abzug','Provision'].forEach(function(lbl,i){
+      h+='<th style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%);padding:9px 14px;text-align:'+(i<=1?'left':'right')+';font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:'+(i===0?'150px':i===1?'130px':'80px')+'">'+lbl+'</th>';
+    });
+    h+='</tr></thead><tbody>';
+    allRows.forEach(function(item,ridx){
+      var emp=item.emp, g=item.g, row=g.row;
+      var convOEM=row.convOEM||0, ups=row.ups_yes||0, wka=row.wka_gesamt_yes||0;
+      var optGes=row.optGesamt||(convOEM+ups+wka)||0;
+      var marge=row.margeGesamt||row.margin||0;
+      var crOEM=Math.round(row.crOEM||0), crTW=Math.round(row.crTeilweise||0), crSY=Math.round(row.crSuperYes||0), crMY=Math.round(row.crMegaYes||0);
+      var crSyMy=crSY+crMY;
+      var anteilOem=optGes>0?Math.round(convOEM/optGes*100):0;
+      var abwTage=urlaubKrankTage(emp.id,g.key);
+      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
+      var hoursPerDay=(emp.hours||40)/5;
+      var rowTotalHours=hoursPerDay*g.count;
+      var gesamtAktivitaeten=row.gesamtAktivitaeten||row.oem_aktivitaeten||0;
+      var aktPerHour_num=rowTotalHours>0?gesamtAktivitaeten/rowTotalHours:0;
+      var aktProStd=aktPerHour_num.toFixed(1);
+      var optPerH_num=rowTotalHours>0?optGes/rowTotalHours:0;
+      var optProStd=optPerH_num.toFixed(1);
+      var calc=calculateProvision(emp,g.key,row,g.count);
+      var rowPv=(emp.provisionSettings&&Object.keys(emp.provisionSettings).length)?emp.provisionSettings:PROVISION_DEFAULTS;
+      var rowBm=beschaeftigungsmonat(emp,g.key);
+      var rowKpiSet=provisionKpiSetFor(rowPv,rowBm);
+      var abzug, provision, provisionTitle='', abzugPct=null, provisionPct=null;
+      if(calc.provision===null){
+        abzug='—';provision='<span style="font-size:10.5px;color:var(--text3);font-weight:400">Keine Vereinbarung</span>';
+      } else {
+        abzug='−€'+Math.round(calc.abzug).toLocaleString('de-DE');
+        provision='€'+Math.round(calc.provision).toLocaleString('de-DE');
+        provisionPct=calc.regulaer>0?Math.round(calc.provision/calc.regulaer*100):100;
+        abzugPct=100-provisionPct;
+        provisionTitle=' title="Regulär: €'+Math.round(calc.regulaer).toLocaleString('de-DE')
+          +' (Basis €'+Math.round(calc.basis).toLocaleString('de-DE')+' + Umsatz €'+Math.round(calc.umsatz).toLocaleString('de-DE')+')'
+          +(calc.mindestleistungGreift?' · Mindestleistung unterschritten (§5)':'')
+          +(calc.fehlendeKpis.length?' · Nicht erfüllte KPIs: '+calc.fehlendeKpis.join(', '):' · Alle KPIs erfüllt')+'"';
+      }
+      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;
+      sumRawTw+=rawTw;sumRawYes+=rawYes;sumRawSy+=rawSy;sumRawMy+=rawMy;sumMarge+=marge;
+      sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0);
+      sumGesamtAkt+=gesamtAktivitaeten;sumTotalHoursAll+=rowTotalHours;
+      var rowBg=ridx%2===1?'background:rgba(32,106,114,0.07);':'';
+      h+='<tr class="perf-data-row" style="'+rowBg+'">'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap">'+esc(emp.name)+'<div style="font-size:11px;color:var(--text3);font-weight:400">'+emp.role+'</div></td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap">'+stackCellLeft(g.label,g.count+' Einsatztage')+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.krank,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.urlaub,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600">'+stackCell(aktProStd,gesamtAktivitaeten)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(convOEM/optGes*100)+'%':'—'),(optGes>0?convOEM:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(ups/optGes*100)+'%':'—'),(optGes>0?ups:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(wka/optGes*100)+'%':'—'),(optGes>0?wka:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(optGes,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);border-left:2px solid var(--border2);background:rgba(32,106,114,0.05);text-align:right;'+fc(optPerH_num,rowKpiSet.optH,'gte')+'">'+stackCell(optProStd,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;font-weight:600;'+fc(crOEM,rowKpiSet.crOem,'gte')+'">'+stackCell(crOEM+'%',convOEM)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crTW,rowKpiSet.tw,'lte')+'">'+stackCell(crTW+'%',rawTw)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right">'+stackCell(crSyMy+'%',rawSy+rawMy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crSY,rowKpiSet.sy,'gte')+'">'+stackCell(crSY+'%',rawSy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crMY,rowKpiSet.my,'gte')+'">'+stackCell(crMY+'%',rawMy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:rgba(32,106,114,0.05);text-align:right;'+fc(anteilOem,rowKpiSet.oemAnteil,'gte')+'">'+stackCell(anteilOem+'%',convOEM)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text)">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+(marge/optGes).toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--red)"'+provisionTitle+'>'+stackCell(abzug,(abzugPct!==null?abzugPct+'%':null))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;color:var(--teal-dark)"'+provisionTitle+'>'+stackCell(provision,(provisionPct!==null?provisionPct+'%':null))+'</td>'
+        +'</tr>';
+    });
+    if(allRows.length>=1){
+      var n=allRows.length;
+      var sumCrOEM=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumCrTW=(sumRawTw+sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawTw/(sumRawTw+sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrSY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawSy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrMY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawMy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrSyMy=sumCrSY+sumCrMY;
+      var sumAnteilOem=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumAktPerStd=sumTotalHoursAll>0?(sumGesamtAkt/sumTotalHoursAll):0;
+      var sumOptPerStd=sumTotalHoursAll>0?(sumOptGes/sumTotalHoursAll):0;
+      var sumMargeProOpt=sumOptGes>0?(sumMarge/sumOptGes):0;
+      var sumAbzugPct=(sumAbzug+sumProvision)>0?Math.round(sumAbzug/(sumAbzug+sumProvision)*100):0;
+      var sumProvisionPct=100-sumAbzugPct;
+      h+='<tr class="perf-sum-row" style="background:#0c3b40;color:#fff">'
+        +'<td style="padding:13px 14px;font-weight:700" colspan="2">Σ Summe</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumKrank,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumUrlaub,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),sumGesamtAkt)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumOEM:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumUps:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumWka/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumWka:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptGes,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptPerStd.toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',sumOEM)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',sumRawTw)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',sumRawSy+sumRawMy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',sumRawSy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',sumRawMy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',sumOEM)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#ffb3b3">'+stackCell('−€'+Math.round(sumAbzug).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#7ED2DB">'+stackCell('€'+Math.round(sumProvision).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
+        +'</tr>';
+      h+='<tr class="perf-avg-row" style="background:rgba(32,106,114,0.14)">'
+        +'<td style="padding:13px 14px;font-weight:700" colspan="2">Ø Durchschnitt</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumKrank/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumUrlaub/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),Math.round(sumGesamtAkt/n))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(n>0?(sumOEM/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(n>0?(sumUps/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumWka/sumOptGes*100)+'%':'—'),(n>0?(sumWka/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptPerStd.toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',(sumOEM/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',(sumRawTw/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',((sumRawSy+sumRawMy)/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',(sumRawSy/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',(sumRawMy/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',(sumOEM/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge/n).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--red)">'+stackCell('−€'+Math.round(sumAbzug/n).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--teal-dark)">'+stackCell('€'+Math.round(sumProvision/n).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
+        +'</tr>';
+    }
+    h+='</tbody></table></div>';
+  }
+  h+='</div>';
+  return h;
+}
+function buildProvisionTable(empId){
+  var emp=employees.find(function(e){return e.id===empId;});
+  if(!emp)return '<div class="card">Mitarbeiter nicht gefunden</div>';
+  function stackCell(main,sub){
+    var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
+    return '<div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.15">'
+      +'<span>'+main+'</span>'
+      +'<span style="font-size:11px;color:var(--text3);margin-top:1px;'+(hasSubValue?'':'visibility:hidden;')+'">'+(hasSubValue?sub:'0')+'</span>'
+      +'</div>';
+  }
+  function stackCellLeft(main,sub){
+    var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
+    return '<div style="display:flex;flex-direction:column;align-items:flex-start;line-height:1.15">'
+      +'<span>'+main+'</span>'
+      +'<span style="font-size:11px;font-weight:400;color:var(--text3);margin-top:1px;'+(hasSubValue?'':'visibility:hidden;')+'">'+(hasSubValue?sub:'0')+'</span>'
+      +'</div>';
+  }
+  function fc(v,t,dir){if(t==null)return '';return(dir==='lte'?v<=t:v>=t)?'color:var(--text)':'color:var(--red);font-weight:700';}
+  function urlaubKrankTage(empId,monthKey){
+    var rec=(zielStore[monthKey]||{})[empId];
+    var urlaub=0,krank=0;
+    if(rec&&rec.arbeitstage){
+      Object.keys(rec.arbeitstage).forEach(function(ds){
+        if(rec.arbeitstage[ds]==='urlaub')urlaub++;
+        else if(rec.arbeitstage[ds]==='krank')krank++;
+      });
+    }
+    return {urlaub:urlaub,krank:krank};
+  }
+  var yr=today().slice(0,4), curMk=today().slice(0,7);
+  var rowsAll=(performance[empId]||[]).filter(function(x){return (x.date||'').slice(0,4)===yr;});
+  var grouped=groupPerfRows(rowsAll,'month'); // ein Eintrag je Monat, neueste zuerst
+  var rows=provisionMode==='month'?grouped.filter(function(g){return g.key===curMk;}):(provisionMode==='custom'?grouped.filter(function(g){return g.key===provisionCustomMonth;}):grouped);
+  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumAktivitaeten=0,sumGesamtAkt=0,sumTotalHoursAll=0;
+
+  var h='<div class="card">';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
+  h+='<div class="card-title" style="margin:0"><i class="ti ti-cash"></i> Provision</div>';
+  h+='<div style="display:flex;align-items:center;gap:8px">';
+  h+='<div style="display:flex;border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden;height:34px">';
+  [{k:'month',l:'Monat'},{k:'year',l:'Jahr'}].forEach(function(it){
+    h+='<button style="padding:0 10px;height:100%;font-size:11.5px;font-weight:500;border:none;cursor:pointer;font-family:inherit;white-space:nowrap;background:'+(provisionMode===it.k?'#164e54':'transparent')+';color:'+(provisionMode===it.k?'#fff':'var(--text2)')+'" onclick="setProvisionMode(\''+it.k+'\')">'+it.l+'</button>';
+  });
+  h+='</div>';
+  h+='<input type="month" value="'+provisionCustomMonth+'" onchange="setProvisionCustomMonth(this.value)" style="height:34px;width:128px;padding:0 8px;border:1px solid '+(provisionMode==='custom'?'#164e54':'var(--border2)')+';border-radius:var(--r-md);font-size:11.5px;font-family:inherit;color:var(--text);background:#fff;cursor:pointer">';
+  h+='</div></div>';
+
+  if(!rows.length){
+    h+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-file-upload" style="font-size:26px;display:block;margin-bottom:8px"></i>Keine Daten für diesen Zeitraum</div>';
+  } else {
+    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse;table-layout:fixed"><thead><tr>';
+    ['Monat','Krankheitstage','Urlaubstage','Akt./Std.','OEM','Upsells','WKA','Opt. Ges.','Opt./Std.','CR OEM','CR TW','CR SY/MY','CR SY','CR MY','Anteil OEM','Marge Ges.','Abzug','Provision'].forEach(function(lbl,i){
+      h+='<th style="background:linear-gradient(180deg,#0c3b40 0%,#164e54 100%);padding:9px 14px;text-align:'+(i===0?'left':'right')+';font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:'+(i===0?'150px':'80px')+'">'+lbl+'</th>';
+    });
+    h+='</tr></thead><tbody>';
+    rows.forEach(function(g,ridx){
+      var row=g.row;
+      var convOEM=row.convOEM||0, ups=row.ups_yes||0, wka=row.wka_gesamt_yes||0;
+      var optGes=row.optGesamt||(convOEM+ups+wka)||0;
+      var marge=row.margeGesamt||row.margin||0;
+      var crOEM=Math.round(row.crOEM||0), crTW=Math.round(row.crTeilweise||0), crSY=Math.round(row.crSuperYes||0), crMY=Math.round(row.crMegaYes||0);
+      var crSyMy=crSY+crMY;
+      var anteilOem=optGes>0?Math.round(convOEM/optGes*100):0;
+      var abwTage=urlaubKrankTage(empId,g.key);
+      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
+      var hoursPerDay=(emp.hours||40)/5;
+      var rowTotalHours=hoursPerDay*g.count;
+      var gesamtAktivitaeten=row.gesamtAktivitaeten||row.oem_aktivitaeten||0;
+      var aktPerHour_num=rowTotalHours>0?gesamtAktivitaeten/rowTotalHours:0;
+      var aktProStd=aktPerHour_num.toFixed(1);
+      var optPerH_num=rowTotalHours>0?optGes/rowTotalHours:0;
+      var optProStd=optPerH_num.toFixed(1);
+      var calc=calculateProvision(emp,g.key,row,g.count);
+      var rowPv=(emp.provisionSettings&&Object.keys(emp.provisionSettings).length)?emp.provisionSettings:PROVISION_DEFAULTS;
+      var rowBm=beschaeftigungsmonat(emp,g.key);
+      var rowKpiSet=provisionKpiSetFor(rowPv,rowBm);
+      var abzug, provision, provisionTitle='', abzugPct=null, provisionPct=null;
+      if(calc.provision===null){
+        abzug='—';provision='<span style="font-size:10.5px;color:var(--text3);font-weight:400">Keine Vereinbarung</span>';
+      } else {
+        abzug='−€'+Math.round(calc.abzug).toLocaleString('de-DE');
+        provision='€'+Math.round(calc.provision).toLocaleString('de-DE');
+        provisionPct=calc.regulaer>0?Math.round(calc.provision/calc.regulaer*100):100;
+        abzugPct=100-provisionPct;
+        provisionTitle=' title="Regulär: €'+Math.round(calc.regulaer).toLocaleString('de-DE')
+          +' (Basis €'+Math.round(calc.basis).toLocaleString('de-DE')+' + Umsatz €'+Math.round(calc.umsatz).toLocaleString('de-DE')+')'
+          +(calc.mindestleistungGreift?' · Mindestleistung unterschritten (§5)':'')
+          +(calc.fehlendeKpis.length?' · Nicht erfüllte KPIs: '+calc.fehlendeKpis.join(', '):' · Alle KPIs erfüllt')+'"';
+      }
+      var margeOEM=row.margeOEM||0;
+      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;
+      sumRawTw+=rawTw;sumRawYes+=rawYes;sumRawSy+=rawSy;sumRawMy+=rawMy;sumMarge+=marge;
+      sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0);sumAktivitaeten+=optPerH_num;
+      sumGesamtAkt+=gesamtAktivitaeten;sumTotalHoursAll+=rowTotalHours;
+      var rowBg=ridx%2===1?'background:rgba(32,106,114,0.07);':'';
+      h+='<tr class="perf-data-row" style="'+rowBg+'">'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap">'+stackCellLeft(g.label,g.count+' Einsatztage')+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.krank,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.urlaub,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600">'+stackCell(aktProStd,gesamtAktivitaeten)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(convOEM/optGes*100)+'%':'—'),(optGes>0?convOEM:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(ups/optGes*100)+'%':'—'),(optGes>0?ups:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--text)">'+stackCell((optGes>0?Math.round(wka/optGes*100)+'%':'—'),(optGes>0?wka:'—'))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(optGes,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);border-left:2px solid var(--border2);background:rgba(32,106,114,0.05);text-align:right;'+fc(optPerH_num,rowKpiSet.optH,'gte')+'">'+stackCell(optProStd,null)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;font-weight:600;'+fc(crOEM,rowKpiSet.crOem,'gte')+'">'+stackCell(crOEM+'%',convOEM)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crTW,rowKpiSet.tw,'lte')+'">'+stackCell(crTW+'%',rawTw)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right">'+stackCell(crSyMy+'%',rawSy+rawMy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crSY,rowKpiSet.sy,'gte')+'">'+stackCell(crSY+'%',rawSy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);background:rgba(32,106,114,0.05);text-align:right;'+fc(crMY,rowKpiSet.my,'gte')+'">'+stackCell(crMY+'%',rawMy)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:rgba(32,106,114,0.05);text-align:right;'+fc(anteilOem,rowKpiSet.oemAnteil,'gte')+'">'+stackCell(anteilOem+'%',convOEM)+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text)">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+(marge/optGes).toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;color:var(--red)"'+provisionTitle+'>'+stackCell(abzug,(abzugPct!==null?abzugPct+'%':null))+'</td>'
+        +'<td style="padding:16px 14px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;color:var(--teal-dark)"'+provisionTitle+'>'+stackCell(provision,(provisionPct!==null?provisionPct+'%':null))+'</td>'
+        +'</tr>';
+    });
+    if(rows.length>1){
+      var n=rows.length;
+      var sumCrOEM=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumCrTW=(sumRawTw+sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawTw/(sumRawTw+sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrSY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawSy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrMY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawMy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
+      var sumCrSyMy=sumCrSY+sumCrMY;
+      var sumAnteilOem=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumAktPerStd=sumTotalHoursAll>0?(sumGesamtAkt/sumTotalHoursAll):0;
+      var sumOptPerStd=sumTotalHoursAll>0?(sumOptGes/sumTotalHoursAll):0;
+      var sumMargeProOpt=sumOptGes>0?(sumMarge/sumOptGes):0;
+      var sumAbzugPct=(sumAbzug+sumProvision)>0?Math.round(sumAbzug/(sumAbzug+sumProvision)*100):0;
+      var sumProvisionPct=100-sumAbzugPct;
+      h+='<tr class="perf-sum-row" style="background:#0c3b40;color:#fff">'
+        +'<td style="padding:13px 14px;font-weight:700" colspan="1">Σ Summe</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumKrank,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumUrlaub,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),sumGesamtAkt)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumOEM:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumUps:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumWka/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumWka:'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptGes,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptPerStd.toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',sumOEM)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',sumRawTw)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',sumRawSy+sumRawMy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',sumRawSy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',sumRawMy)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',sumOEM)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#ffb3b3">'+stackCell('−€'+Math.round(sumAbzug).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#7ED2DB">'+stackCell('€'+Math.round(sumProvision).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
+        +'</tr>';
+      h+='<tr class="perf-avg-row" style="background:rgba(32,106,114,0.14)">'
+        +'<td style="padding:13px 14px;font-weight:700">Ø Durchschnitt</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumKrank/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumUrlaub/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),Math.round(sumGesamtAkt/n))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(n>0?(sumOEM/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(n>0?(sumUps/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumWka/sumOptGes*100)+'%':'—'),(n>0?(sumWka/n).toFixed(1):'—'))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumOptPerStd.toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',(sumOEM/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',(sumRawTw/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',((sumRawSy+sumRawMy)/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',(sumRawSy/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',(sumRawMy/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',(sumOEM/n).toFixed(1))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge/n).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--red)">'+stackCell('−€'+Math.round(sumAbzug/n).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--teal-dark)">'+stackCell('€'+Math.round(sumProvision/n).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
+        +'</tr>';
+    }
+    h+='</tbody></table></div>';
+  }
+  h+='</div>';
+  return h;
+}
+function openCoachingEval(empId,editEvalId){
   var DIMS=[
     {key:'einwand',label:'Einwandsbehandlung',cat:'skill'},
     {key:'bedarf',label:'Bedarfsanalyse',cat:'skill'},
@@ -7841,7 +8647,8 @@ function openCoachingEval(empId){
   ];
   var CC={skill:{col:'#0c3b40',bg:'rgba(12,59,64,0.08)',l:'Skill'},will:{col:'#164e54',bg:'rgba(22,78,84,0.12)',l:'Will'},result:{col:'#1d6169',bg:'rgba(29,97,105,0.16)',l:'Result'}};
   var existing=(reviews[empId]||[]).filter(function(r){return r.einwand!==undefined;});
-  var last=existing.length?existing.sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null;
+  var editingEntry=editEvalId?existing.find(function(r){return r.id===editEvalId;}):null;
+  var last=editingEntry||(existing.length?existing.sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null);
 
   // Build modal via DOM API - no onclick strings needed
   var overlay=document.createElement('div');
@@ -7854,7 +8661,7 @@ function openCoachingEval(empId){
   // Header
   var hdr=document.createElement('div');
   hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:18px';
-  hdr.innerHTML='<div style="font-size:17px;font-weight:700">Mitarbeiterentwicklung bewerten</div>';
+  hdr.innerHTML='<div style="font-size:17px;font-weight:700">'+(editingEntry?'Bewertung bearbeiten':'Mitarbeiterentwicklung bewerten')+'</div>';
   var closeBtn=document.createElement('button');
   closeBtn.textContent='×';
   closeBtn.style.cssText='background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1';
@@ -7877,7 +8684,7 @@ function openCoachingEval(empId){
   var dateInput=document.createElement('input');
   dateInput.type='date';
   dateInput.id='cev-date';
-  dateInput.value=today();
+  dateInput.value=editingEntry?editingEntry.date:today();
   dateInput.style.cssText='display:block;margin-top:4px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:180px';
   dateWrap.appendChild(dateLabel);
   dateWrap.appendChild(dateInput);
@@ -7939,6 +8746,7 @@ function openCoachingEval(empId){
   noteArea.id='cev-note';
   noteArea.rows=2;
   noteArea.placeholder='Beobachtungen, Schwerpunkte...';
+  if(editingEntry&&editingEntry.note)noteArea.value=editingEntry.note;
   noteArea.style.cssText='display:block;margin-top:4px;width:100%;box-sizing:border-box;font-size:12px;padding:8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);resize:vertical';
   noteWrap.appendChild(noteLabel);
   noteWrap.appendChild(noteArea);
@@ -7951,7 +8759,7 @@ function openCoachingEval(empId){
   var saveBtn=document.createElement('button');
   saveBtn.className='btn btn-primary';
   saveBtn.style.flex='1';
-  saveBtn.innerHTML='&#10003; Bewertung speichern';
+  saveBtn.innerHTML=editingEntry?'&#10003; Änderungen speichern':'&#10003; Bewertung speichern';
   saveBtn.onclick=function(){saveCoachEval(empId);};
   var cancelBtn=document.createElement('button');
   cancelBtn.className='btn';
@@ -9166,6 +9974,45 @@ function saveEmpEinstellungen(){
   // Hinweis: "location" wird aktuell nur lokal gehalten (kein Feld in employees-Tabelle)
 }
 var _savingEmpZiele=false;
+var _savingProvisionSettings=false;
+function saveProvisionSettings(empId){
+  if(_savingProvisionSettings)return;
+  var emp=employees.find(function(e){return e.id===empId;});
+  if(!emp)return;
+  function val(id){var el=document.getElementById(id);return el?parseFloat(el.value)||0:0;}
+  function dateVal(id){var el=document.getElementById(id);return el?el.value:null;}
+  var settings={
+    gueltigAb:dateVal('pv-gueltigAb'),
+    basisProOpt:val('pv-basisProOpt'),
+    divOEM:val('pv-divOEM'),
+    divUpsell:val('pv-divUpsell'),
+    divWka:val('pv-divWka'),
+    reduktionProKpi:val('pv-reduktionProKpi'),
+    mindestprovision:val('pv-mindestprovision'),
+    mindestleistungOptH:val('pv-mindestleistungOptH'),
+    monat1:{optH:val('pv-monat1-optH'),crOem:val('pv-monat1-crOem'),tw:val('pv-monat1-tw'),sy:val('pv-monat1-sy'),my:val('pv-monat1-my'),oemAnteil:val('pv-monat1-oemAnteil')},
+    monat2:{optH:val('pv-monat2-optH'),crOem:val('pv-monat2-crOem'),tw:val('pv-monat2-tw'),sy:val('pv-monat2-sy'),my:val('pv-monat2-my'),oemAnteil:val('pv-monat2-oemAnteil')},
+    monat3plus:{optH:val('pv-monat3plus-optH'),crOem:val('pv-monat3plus-crOem'),tw:val('pv-monat3plus-tw'),sy:val('pv-monat3plus-sy'),my:val('pv-monat3plus-my'),oemAnteil:val('pv-monat3plus-oemAnteil')}
+  };
+  emp.provisionSettings=settings;
+  _savingProvisionSettings=true;
+  var statusEl=document.getElementById('pv-save-status');
+  if(statusEl)statusEl.textContent='Speichere...';
+  sb.from('employees').update({provision_settings:settings}).eq('id',empId).then(function(res){
+    _savingProvisionSettings=false;
+    if(res.error){
+      if(statusEl)statusEl.textContent='Fehler: Spalte "provision_settings" fehlt evtl. in der employees-Tabelle (siehe Konsole)';
+      console.error('saveProvisionSettings error:',res.error);
+    } else {
+      if(statusEl){statusEl.textContent='Gespeichert ✓';setTimeout(function(){statusEl.textContent='';},2500);}
+      logAdminAction&&logAdminAction('provision_settings','Provisionsvereinbarung geändert: '+emp.name);
+    }
+  }).catch(function(err){
+    _savingProvisionSettings=false;
+    if(statusEl)statusEl.textContent='Fehler beim Speichern';
+    console.error('saveProvisionSettings exception:',err);
+  });
+}
 function saveEmpZiele(){
   if(_savingEmpZiele)return;
   var emp=employees.find(function(e){return e.id===selectedEmp;});
@@ -9263,7 +10110,11 @@ function saveInlineCallBewertung(empId){
     hinweis:hinweis?hinweis.value.trim():''
   };
   _savingCallBewertung=true;
-  sb.from('call_ratings').insert(payload).select().single().then(function(res){
+  var isEditing=!!_editingCallRatingId;
+  var upsertCall=isEditing
+    ? sb.from('call_ratings').update(payload).eq('id',_editingCallRatingId).select().single()
+    : sb.from('call_ratings').insert(payload).select().single();
+  upsertCall.then(function(res){
     if(res.error){_savingCallBewertung=false;alert('Fehler beim Speichern: '+res.error.message);return;}
     var r=res.data;
     var scoreRows=Object.keys(scores).map(function(k){
@@ -9275,15 +10126,30 @@ function saveInlineCallBewertung(empId){
         status:r.status,b2b:r.b2b,abschlussArt:r.abschluss_art||'',einwand:r.einwand||'',hinweis:r.hinweis||'',scores:scores
       };
       if(!callRatings[selectedEmp])callRatings[selectedEmp]=[];
-      callRatings[selectedEmp].unshift(entry);
+      if(isEditing){
+        var idx=callRatings[selectedEmp].findIndex(function(x){return x.id===r.id;});
+        if(idx>=0)callRatings[selectedEmp][idx]=entry;else callRatings[selectedEmp].unshift(entry);
+      } else {
+        callRatings[selectedEmp].unshift(entry);
+      }
       var e0=employees.find(function(x){return x.id===selectedEmp;});
       var avgScore=Object.keys(scores).length?(Object.values(scores).reduce(function(a,b){return a+b;},0)/Object.keys(scores).length).toFixed(1):null;
-      logActivity('qa','created','Neuen Call bewertet'+(avgScore?' (Ø '+avgScore+'/4)':''),selectedEmp,e0?e0.name+' · '+fd(r.date):'');
-      _cbScores={};
+      logActivity('qa',isEditing?'updated':'created',(isEditing?'Call-Bewertung bearbeitet':'Neuen Call bewertet')+(avgScore?' (Ø '+avgScore+'/4)':''),selectedEmp,e0?e0.name+' · '+fd(r.date):'');
+      _cbScores={};_editingCallRatingId=null;
       closeModal('qaBewertungModal');
       renderTab();
     };
-    if(scoreRows.length){
+    if(isEditing){
+      sb.from('call_rating_scores').delete().eq('call_rating_id',r.id).then(function(){
+        if(scoreRows.length){
+          sb.from('call_rating_scores').insert(scoreRows).then(function(res2){
+            _savingCallBewertung=false;
+            if(res2.error)alert('Bewertung gespeichert, aber die Einzel-Scores konnten NICHT gespeichert werden: '+res2.error.message);
+            afterScores();
+          });
+        } else { _savingCallBewertung=false; afterScores(); }
+      });
+    } else if(scoreRows.length){
       sb.from('call_rating_scores').insert(scoreRows).then(function(res2){
         _savingCallBewertung=false;
         if(res2.error)alert('Bewertung gespeichert, aber die Einzel-Scores konnten NICHT gespeichert werden: '+res2.error.message);
@@ -9417,11 +10283,17 @@ function openCoachingInfoModal(empId){
   h+='<div style="display:flex;align-items:center;gap:10px;margin-top:6px"><button class="btn btn-sm" onclick="saveCoachingInfoNotiz(\''+empId+'\')"><i class="ti ti-device-floppy"></i> Notiz speichern</button><span id="coachingInfoNotizStatus" style="font-size:11px;color:var(--text3)"></span></div>';
   h+='</div>';
 
-  h+='<div style="font-size:11px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px">③ Verlauf</div>';
+  h+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px">'
+    +'<span style="font-size:11px;font-weight:700;color:#206A72;text-transform:uppercase;letter-spacing:.04em">③ Verlauf</span>'
+    +'<button class="btn btn-sm" onclick="openCommentModal(\''+empId+'\')"><i class="ti ti-message-plus"></i> Kommentar</button>'
+    +'</div>';
   h+='<div style="border-left:2px solid var(--border2);padding-left:14px">';
-  // Sessions und persoenliche Bestwerte zu einer gemeinsamen, chronologisch sortierten Zeitleiste zusammenfuehren
+  // Sessions, persoenliche Bestwerte UND Kommentare zu einer gemeinsamen, chronologisch sortierten Zeitleiste zusammenfuehren
+  var infoComments=(reviews[empId]||[]).filter(function(r){return r.isComment;});
+  var commentTypeColInfo={skill:'#0c3b40',will:'#164e54',result:'#1d6169',diverses:'#5c7070'};
   var combinedTl=timeline.map(function(p){return {kind:'session',date:p.date,p:p};})
     .concat(bestEvents.map(function(ev){return {kind:'record',date:ev.date,label:ev.label};}))
+    .concat(infoComments.map(function(c){return {kind:'comment',date:c.date,c:c};}))
     .sort(function(a,b){return b.date.localeCompare(a.date);});
   if(!combinedTl.length){
     h+='<div style="text-align:center;color:var(--text3);padding:20px 0"><i class="ti ti-history" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Sessions vorhanden</div>';
@@ -9430,6 +10302,21 @@ function openCoachingInfoModal(empId){
     h+='<div style="position:absolute;left:5px;top:6px;bottom:6px;width:2px;background:var(--border)"></div>';
     combinedTl.forEach(function(item,idx){
       var dt=new Date(item.date+'T00:00:00');
+      if(item.kind==='comment'){
+        var cc=item.c;
+        var ccol=commentTypeColInfo[cc.commentType]||'#5c7070';
+        h+='<div style="position:relative;padding-bottom:18px">';
+        h+='<div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);background:'+ccol+';display:flex;align-items:center;justify-content:center;font-size:7px;color:#fff"><i class="ti ti-message-2"></i></div>';
+        h+='<div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase">'+dowShort[dt.getDay()]+', '+dt.getDate()+'. '+mNamesShort[dt.getMonth()]+'</div>';
+        h+='<div style="display:flex;align-items:center;gap:6px;margin-top:2px">'
+          +'<i class="ti ti-message-2" style="color:'+ccol+';font-size:14px"></i>'
+          +'<span style="font-size:10px;font-weight:700;color:#fff;background:'+ccol+';padding:1px 8px;border-radius:10px;text-transform:uppercase;letter-spacing:.03em">'+esc(cc.commentType)+'</span>'
+          +(cc.author?'<span style="font-size:10.5px;color:var(--text3)">'+esc(cc.author)+'</span>':'')
+          +'</div>';
+        h+='<div style="font-size:12.5px;color:var(--text2);margin-top:3px">'+esc(cc.note)+'</div>';
+        h+='</div>';
+        return;
+      }
       if(item.kind==='record'){
         h+='<div style="position:relative;padding-bottom:18px">';
         h+='<div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;border:2px solid #fff;box-shadow:0 0 0 1px var(--border);background:#174C52;display:flex;align-items:center;justify-content:center"></div>';
@@ -9650,17 +10537,34 @@ function renderLastContinueBox(empId,boxId){
     +'<div style="font-size:12px;color:rgba(255,255,255,0.85);margin-top:2px">'+last.cont+'</div>'
     +'<div style="font-size:11px;color:rgba(255,255,255,0.6);margin-top:3px">Wurde daran gearbeitet?</div></div></div>';
 }
-function openQaBewertungModal(empId){
+function deleteHistorieCallRating(empId,ratingId){
+  if(!canEditHistorie())return;
+  if(!confirm('Diese Call-Bewertung wirklich löschen? Dies kann nicht rückgängig gemacht werden.'))return;
+  var list=callRatings[empId]||[];
+  var idx=list.findIndex(function(r){return r.id===ratingId;});
+  if(idx<0)return;
+  list.splice(idx,1);
+  sb.from('call_rating_scores').delete().eq('call_rating_id',ratingId).then(function(){
+    sb.from('call_ratings').delete().eq('id',ratingId).then(function(){renderTab();}).catch(function(){renderTab();});
+  }).catch(function(){
+    sb.from('call_ratings').delete().eq('id',ratingId).then(function(){renderTab();}).catch(function(){renderTab();});
+  });
+}
+var _editingCallRatingId=null;
+function openQaBewertungModal(empId,editRatingId){
   if(empId)selectedEmp=empId;
   _cbScores={};
+  _editingCallRatingId=editRatingId||null;
+  var editingRating=editRatingId?((callRatings[selectedEmp]||[]).find(function(r){return r.id===editRatingId;})):null;
   var dateEl=document.getElementById('cb-date');
-  if(dateEl)dateEl.value=today();
-  ['cb-auftrag','cb-bewerter','cb-einwand','cb-hinweis'].forEach(function(id){
-    var el=document.getElementById(id);if(el)el.value='';
+  if(dateEl)dateEl.value=editingRating?editingRating.date:today();
+  var fieldMap={'cb-auftrag':'auftragsnr','cb-bewerter':'bewertetVon','cb-einwand':'einwand','cb-hinweis':'hinweis'};
+  Object.keys(fieldMap).forEach(function(id){
+    var el=document.getElementById(id);if(el)el.value=editingRating?(editingRating[fieldMap[id]]||''):'';
   });
-  var statusEl=document.getElementById('cb-status');if(statusEl)statusEl.value='nein';
-  var b2bEl=document.getElementById('cb-b2b');if(b2bEl)b2bEl.value='B2C';
-  var artEl=document.getElementById('cb-abschlussart');if(artEl)artEl.value='';
+  var statusEl=document.getElementById('cb-status');if(statusEl)statusEl.value=editingRating?editingRating.status:'nein';
+  var b2bEl=document.getElementById('cb-b2b');if(b2bEl)b2bEl.value=editingRating?editingRating.b2b:'B2C';
+  var artEl=document.getElementById('cb-abschlussart');if(artEl)artEl.value=editingRating?(editingRating.abschlussArt||''):'';
   var box=document.getElementById('qaScoringSection');
   if(box){
     var uniCol='#174C52',uniBg='rgba(23,76,82,0.10)';
@@ -9682,9 +10586,17 @@ function openQaBewertungModal(empId){
       h+='</div>';
     });
     box.innerHTML=h;
+    if(editingRating&&editingRating.scores){
+      Object.keys(editingRating.scores).forEach(function(k){setCbScore(k,editingRating.scores[k]);});
+    }
   }
+  var modalTitleEl=document.querySelector('#qaBewertungModal .modal-title');
+  if(modalTitleEl)modalTitleEl.innerHTML='<i class="ti ti-phone-plus" style="color:var(--purple)"></i> '+(editingRating?'Call-Bewertung bearbeiten':'Neuen Call bewerten');
   var saveBtn=document.getElementById('qaSaveBtn');
-  if(saveBtn)saveBtn.dataset.eid=selectedEmp;
+  if(saveBtn){
+    saveBtn.dataset.eid=selectedEmp;
+    saveBtn.innerHTML=editingRating?'<i class="ti ti-device-floppy"></i> Änderungen speichern':'<i class="ti ti-device-floppy"></i> Bewertung speichern';
+  }
   openModal('qaBewertungModal');
 }
 function openNeuesCoachingModal(empId){

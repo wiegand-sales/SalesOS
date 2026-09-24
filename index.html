@@ -8348,17 +8348,17 @@ function calculateProvision(emp,monthKey,row,dayCount){
   var convOEM=row.convOEM||0, optGes=row.optGesamt||(convOEM+ups+wka)||0;
   var margeOEM=row.margeOEM||0, margeUpsell=row.margeUpsell||0, margeWKA=row.margeWKA||0;
   var margeGesamt=row.margeGesamt||row.margin||0;
-  // Opt./Std. konsistent mit der Tabelle berechnen (Opt.Gesamt / tatsaechliche Arbeitsstunden),
-  // nicht aus einem ggf. unzuverlaessigen Rohfeld - Fallback auf row.optPerH falls dayCount fehlt
-  var optPerH;
-  if(dayCount!=null){
-    var hoursPerDayCalc=(emp.hours||40)/5;
-    var totalHoursCalc=hoursPerDayCalc*dayCount;
-    optPerH=totalHoursCalc>0?optGes/totalHoursCalc:0;
-  } else {
-    optPerH=row.optPerH||0;
-  }
-  var crOEM=row.crOEM||0, crTW=row.crTeilweise||0, crSY=row.crSuperYes||0, crMY=row.crMegaYes||0;
+  // Opt./Std. konsistent mit der Tabelle berechnen: echte tagesgenaue Arbeitsstunden
+  // (Wochenarbeitszeiten je Wochentag), nicht die grobe "Stunden/5 * Tage"-Naeherung
+  var monthDatesCalc=(performance[emp.id]||[]).filter(function(x){return (x.date||'').slice(0,7)===monthKey;}).map(function(x){return x.date;});
+  var totalHoursCalc=totalWorkHoursForMonth(emp,monthKey,monthDatesCalc);
+  var optPerH=totalHoursCalc>0?optGes/totalHoursCalc:0;
+  var notSOemCalc=row.notSuccessful||0;
+  var oemDenomCalc=convOEM+notSOemCalc;
+  var crOEM=oemDenomCalc>0?(convOEM/oemDenomCalc*100):0;
+  var crTW=(convTW+convYes+convSY+convMY)>0?(convTW/(convTW+convYes+convSY+convMY)*100):0;
+  var crSY=(convYes+convSY+convMY)>0?(convSY/(convYes+convSY+convMY)*100):0;
+  var crMY=(convYes+convSY+convMY)>0?(convMY/(convYes+convSY+convMY)*100):0;
   var anteilOem=optGes>0?(convOEM/optGes*100):0;
 
   // §2 Abs. 1 - Basisprovision (Convertible Hardware existiert aktuell nicht im System, daher nicht enthalten)
@@ -8502,7 +8502,7 @@ function buildProvisionTeamTable(){
     rows.forEach(function(g){allRows.push({emp:emp,g:g});});
   });
   allRows.sort(function(a,b){return a.emp.name.localeCompare(b.emp.name)||b.g.key.localeCompare(a.g.key);});
-  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumGesamtAkt=0,sumTotalHoursAll=0;
+  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumGesamtAkt=0,sumTotalHoursAll=0,sumNotSOem=0;
 
   if(!allRows.length){
     h+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-file-upload" style="font-size:26px;display:block;margin-bottom:8px"></i>Keine Daten für diesen Zeitraum</div>';
@@ -8517,11 +8517,16 @@ function buildProvisionTeamTable(){
       var convOEM=row.convOEM||0, ups=row.ups_yes||0, wka=row.wka_gesamt_yes||0;
       var optGes=row.optGesamt||(convOEM+ups+wka)||0;
       var marge=row.margeGesamt||row.margin||0;
-      var crOEM=Math.round(row.crOEM||0), crTW=Math.round(row.crTeilweise||0), crSY=Math.round(row.crSuperYes||0), crMY=Math.round(row.crMegaYes||0);
-      var crSyMy=crSY+crMY;
+      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
+      var notSOemVal=row.notSuccessful||0;
+      var oemDenomVal=convOEM+notSOemVal;
+      var crOEM=oemDenomVal>0?Math.round(convOEM/oemDenomVal*100):0;
+      var crTW=(rawTw+rawYes+rawSy+rawMy)>0?Math.round(rawTw/(rawTw+rawYes+rawSy+rawMy)*100):0;
+      var crSY=(rawYes+rawSy+rawMy)>0?Math.round(rawSy/(rawYes+rawSy+rawMy)*100):0;
+      var crMY=(rawYes+rawSy+rawMy)>0?Math.round(rawMy/(rawYes+rawSy+rawMy)*100):0;
+      var crSyMy=(rawYes+rawSy+rawMy)>0?Math.round((rawSy+rawMy)/(rawYes+rawSy+rawMy)*100):0;
       var anteilOem=optGes>0?Math.round(convOEM/optGes*100):0;
       var abwTage=urlaubKrankTage(emp.id,g.key);
-      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
       var monthDates=(performance[emp.id]||[]).filter(function(x){return (x.date||'').slice(0,7)===g.key;}).map(function(x){return x.date;});
       var rowTotalHours=totalWorkHoursForMonth(emp,g.key,monthDates);
       var gesamtAktivitaeten=row.gesamtAktivitaeten||row.oem_aktivitaeten||0;
@@ -8546,7 +8551,7 @@ function buildProvisionTeamTable(){
           +(calc.mindestleistungGreift?' · Mindestleistung unterschritten (§5)':'')
           +(calc.fehlendeKpis.length?' · Nicht erfüllte KPIs: '+calc.fehlendeKpis.join(', '):' · Alle KPIs erfüllt')+'"';
       }
-      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;
+      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;sumNotSOem+=notSOemVal;
       sumRawTw+=rawTw;sumRawYes+=rawYes;sumRawSy+=rawSy;sumRawMy+=rawMy;sumMarge+=marge;
       sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0);
       sumGesamtAkt+=gesamtAktivitaeten;sumTotalHoursAll+=rowTotalHours;
@@ -8575,7 +8580,7 @@ function buildProvisionTeamTable(){
     });
     if(allRows.length>=1){
       var n=allRows.length;
-      var sumCrOEM=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumCrOEM=(sumOEM+sumNotSOem)>0?Math.round(sumOEM/(sumOEM+sumNotSOem)*100):0;
       var sumCrTW=(sumRawTw+sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawTw/(sumRawTw+sumRawYes+sumRawSy+sumRawMy)*100):0;
       var sumCrSY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawSy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
       var sumCrMY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawMy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
@@ -8665,7 +8670,7 @@ function buildProvisionTable(empId){
   var rowsAll=(performance[empId]||[]).filter(function(x){return (x.date||'').slice(0,4)===yr;});
   var grouped=groupPerfRows(rowsAll,'month'); // ein Eintrag je Monat, neueste zuerst
   var rows=provisionMode==='month'?grouped.filter(function(g){return g.key===curMk;}):(provisionMode==='custom'?grouped.filter(function(g){return g.key===provisionCustomMonth;}):grouped);
-  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumAktivitaeten=0,sumGesamtAkt=0,sumTotalHoursAll=0;
+  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumAktivitaeten=0,sumGesamtAkt=0,sumTotalHoursAll=0,sumNotSOem=0;
 
   var h='<div class="card">';
   h+='<div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:12px">';
@@ -8692,11 +8697,16 @@ function buildProvisionTable(empId){
       var convOEM=row.convOEM||0, ups=row.ups_yes||0, wka=row.wka_gesamt_yes||0;
       var optGes=row.optGesamt||(convOEM+ups+wka)||0;
       var marge=row.margeGesamt||row.margin||0;
-      var crOEM=Math.round(row.crOEM||0), crTW=Math.round(row.crTeilweise||0), crSY=Math.round(row.crSuperYes||0), crMY=Math.round(row.crMegaYes||0);
-      var crSyMy=crSY+crMY;
+      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
+      var notSOemVal=row.notSuccessful||0;
+      var oemDenomVal=convOEM+notSOemVal;
+      var crOEM=oemDenomVal>0?Math.round(convOEM/oemDenomVal*100):0;
+      var crTW=(rawTw+rawYes+rawSy+rawMy)>0?Math.round(rawTw/(rawTw+rawYes+rawSy+rawMy)*100):0;
+      var crSY=(rawYes+rawSy+rawMy)>0?Math.round(rawSy/(rawYes+rawSy+rawMy)*100):0;
+      var crMY=(rawYes+rawSy+rawMy)>0?Math.round(rawMy/(rawYes+rawSy+rawMy)*100):0;
+      var crSyMy=(rawYes+rawSy+rawMy)>0?Math.round((rawSy+rawMy)/(rawYes+rawSy+rawMy)*100):0;
       var anteilOem=optGes>0?Math.round(convOEM/optGes*100):0;
       var abwTage=urlaubKrankTage(empId,g.key);
-      var rawTw=row.convTW||0, rawYes=row.convYes||0, rawSy=row.convSY||0, rawMy=row.convMY||0;
       var monthDates=rowsAll.filter(function(x){return (x.date||'').slice(0,7)===g.key;}).map(function(x){return x.date;});
       var rowTotalHours=totalWorkHoursForMonth(emp,g.key,monthDates);
       var gesamtAktivitaeten=row.gesamtAktivitaeten||row.oem_aktivitaeten||0;
@@ -8722,7 +8732,7 @@ function buildProvisionTable(empId){
           +(calc.fehlendeKpis.length?' · Nicht erfüllte KPIs: '+calc.fehlendeKpis.join(', '):' · Alle KPIs erfüllt')+'"';
       }
       var margeOEM=row.margeOEM||0;
-      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;
+      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;sumNotSOem+=notSOemVal;
       sumRawTw+=rawTw;sumRawYes+=rawYes;sumRawSy+=rawSy;sumRawMy+=rawMy;sumMarge+=marge;
       sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0);sumAktivitaeten+=optPerH_num;
       sumGesamtAkt+=gesamtAktivitaeten;sumTotalHoursAll+=rowTotalHours;
@@ -8750,7 +8760,7 @@ function buildProvisionTable(empId){
     });
     if(rows.length>1){
       var n=rows.length;
-      var sumCrOEM=sumOptGes>0?Math.round(sumOEM/sumOptGes*100):0;
+      var sumCrOEM=(sumOEM+sumNotSOem)>0?Math.round(sumOEM/(sumOEM+sumNotSOem)*100):0;
       var sumCrTW=(sumRawTw+sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawTw/(sumRawTw+sumRawYes+sumRawSy+sumRawMy)*100):0;
       var sumCrSY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawSy/(sumRawYes+sumRawSy+sumRawMy)*100):0;
       var sumCrMY=(sumRawYes+sumRawSy+sumRawMy)>0?Math.round(sumRawMy/(sumRawYes+sumRawSy+sumRawMy)*100):0;

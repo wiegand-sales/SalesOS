@@ -108,6 +108,14 @@ body.sb-collapsed .sb-rail{border-right:none;}
 .sform select,.sform input{height:30px;padding:4px 10px;font-size:12.5px;}
 .btn-danger{background:var(--red-bg);color:var(--red);border-color:var(--red);}
 /* TABS */
+/* Performance-Tabelle: alle Kennzahl-Spalten gleich breit, lange Spaltenköpfe dürfen umbrechen */
+.perf-tbl th{white-space:normal!important;line-height:1.25;vertical-align:middle;padding-left:8px!important;padding-right:8px!important}
+/* Mitarbeiter-Kopf: Reiter als Schalter */
+#empTabBar.emp-seg{display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:11px;padding:2px;height:34px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+#empTabBar.emp-seg .tab{height:28px;padding:0 13px;border-radius:9px;display:flex;align-items:center;font-size:13px;font-weight:500;color:var(--text2);background:transparent;white-space:nowrap}
+#empTabBar.emp-seg .tab.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#empTabBar.emp-seg .tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.55)}
+.emp-seg-badge{font-size:10.5px;font-weight:700;background:#F08566;color:#fff;border-radius:8px;padding:0 6px;line-height:16px;margin-left:6px}
 .tab-bar{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none;padding:0 24px 10px;display:flex;gap:3px;flex-shrink:0;}
 .tab{padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--text2);border-bottom:none;transition:all .12s;white-space:nowrap;}
 .tab.active{color:var(--purple-dark);background:var(--s-tint-strong);}
@@ -5986,8 +5994,8 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
       var arrow=active?(overviewPerfSortDir==='asc'?' ▲':' ▼'):'';
       return '<th style="background:#EFECE5;padding:9px 10px;text-align:left;font-size:10px;font-weight:700;color:'+(active?'#F7B39A':'#fff')+';text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;cursor:pointer;user-select:none'+(extraStyle||'')+'" onclick="setOverviewPerfSort(\''+key+'\')">'+label+arrow+'</th>';
     }
-    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse"><thead><tr>'
-      +sortTh('Mitarbeiter','name',';width:170px')
+    h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table class="perf-tbl" style="width:100%;min-width:1400px;border-collapse:collapse;table-layout:fixed"><thead><tr>'
+      +sortTh('Mitarbeiter','name',';width:160px')
       +sortTh(firstColLabel,'period',';width:120px')
       +[['Akt./Std.','aktPerH'],['NE','notR'],['NM','notP'],['NErr','notS'],['OEM','convOEM'],['Upsells','ups'],['WKA','wka_gesamt_yes'],['Opt. Ges.','optGes'],['Opt./Std.','optPerH2'],['CR OEM','crOEM'],['CR TW','crTW'],['CR Yes','crYes'],['CR SY/MY','crSyMy'],['CR SY','crSY'],['CR MY','crMY'],['Anteil OEM','anteilOEM']].map(function(cc){
         return sortTh(cc[0],cc[1],';text-align:right');
@@ -5995,7 +6003,7 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
       +[['Marge Ges.','marge']].map(function(cc){
         return sortTh(cc[0],cc[1],';text-align:right');
       }).join('')
-      +'<th style="background:#EFECE5;padding:9px 10px;text-align:right;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:1%">Aktion</th>'
+      +'<th style="background:#EFECE5;padding:9px 10px;text-align:right;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:150px">Aktion</th>'
       +'</tr></thead><tbody>';
     // Zwei Werte gestapelt (Hauptwert oben, Anzahl klein darunter) statt "Wert (Anzahl)" in einer Zeile.
     // Rendert die zweite Zeile IMMER (auch als unsichtbaren Platzhalter), damit alle Zellen einer
@@ -6041,7 +6049,7 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;'+fc(crMY,rowEmpT.crMegaYes.val,rowEmpT.crMegaYes.dir)+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR MY = MY / (Yes+SY+MY)\',\'MY\','+my+',\'Yes+SY+MY\','+(yes+sy+my)+',\'CR MY\',\''+crMY+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crMY+'%',my)+'</td>'
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:var(--s-tint);text-align:right;'+fc(Math.round(optGes>0?convOEM/optGes*100:0),rowEmpT.anteilOEM.val,rowEmpT.anteilOEM.dir)+';cursor:help" onmouseenter="showInfoTooltip(event,\'Anteil OEM = Opt.OEM / Opt.Ges.\',\'Opt.OEM\','+convOEM+',\'Opt.Ges.\','+optGes+',\'Anteil OEM\',\''+(optGes>0?Math.round(convOEM/optGes*100):0)+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell((optGes>0?Math.round(convOEM/optGes*100):0)+'%',null)+'</td>'
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text);cursor:help" onmouseenter="showBreakdownTooltip(event,\'Marge Ges. Aufschlüsselung\',\'€'+Math.round(margeOEMVal).toLocaleString('de-DE')+'\',\'€'+Math.round(margeUpsVal).toLocaleString('de-DE')+'\',\'€'+Math.round(margeWkaVal).toLocaleString('de-DE')+'\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+Math.round(marge/optGes).toLocaleString('de-DE'):'—'))+'</td>'
-        +(rowEmp.id==='__agg__'?'<td style="padding:16px 10px;border-bottom:1px solid var(--border)"></td>':'<td style="padding:16px 10px;border-bottom:1px solid var(--border);white-space:nowrap"><div style="display:flex;gap:6px;justify-content:flex-end">'+(hideMemberCol?'':'<button class="btn btn-sm btn-primary" onclick="event.stopPropagation();openSessionModal(\''+rowEmp.id+'\')"><i class="ti ti-calendar-plus"></i> Planen</button>')+'<button class="btn btn-sm" title="Info" aria-label="Info" style="width:30px;padding:0;justify-content:center" onclick="event.stopPropagation();openCoachingInfoModal(\''+rowEmp.id+'\')"><i class="ti ti-info-circle"></i></button></div></td>')
+        +(rowEmp.id==='__agg__'?'<td style="padding:16px 10px;border-bottom:1px solid var(--border)"></td>':'<td style="padding:16px 10px;border-bottom:1px solid var(--border);white-space:nowrap"><div style="display:flex;gap:6px;justify-content:flex-end">'+(hideMemberCol?'':'<button class="btn btn-sm btn-primary" style="height:34px;padding:0 12px" onclick="event.stopPropagation();openSessionModal(\''+rowEmp.id+'\')"><i class="ti ti-calendar-plus"></i> Planen</button>')+'<button class="btn btn-sm" title="Info" aria-label="Info" style="width:34px;height:34px;padding:0;justify-content:center" onclick="event.stopPropagation();openCoachingInfoModal(\''+rowEmp.id+'\')"><i class="ti ti-info-circle"></i></button></div></td>')
         +'</tr>';
       sumAkt+=akt;sumNotR+=notR;sumNotP+=notP;sumNotS+=notS;sumNotROem+=notROem;sumNotPOem+=notPOem;sumNotSOem+=notSOem;sumConvOEM+=convOEM;sumTw+=tw;sumYes+=yes;sumSy+=sy;sumMy+=my;sumTotalHours+=rowTotalHours;
       sumUps+=ups;sumWka+=wka_gesamt_yes;sumOptGes+=optGes;sumMarge+=marge;
@@ -6673,24 +6681,40 @@ function renderEmpDetail(){
   var c=COLORS[emp.color%COLORS.length];
   var p=protocols[emp.id]||[];
   var tc=openTaskCount(emp.id);
+  // Kopf als Box: oben Name und Infos, darunter Reiter als Schalter und rechts zwei Symbol-Knöpfe auf einer Linie
+  var _cc={};p.forEach(function(x){if(x.status!=='geplant'&&x.coachId)_cc[x.coachId]=(_cc[x.coachId]||0)+1;});
+  var _mcId=Object.keys(_cc).sort(function(x,y){return _cc[y]-_cc[x];})[0];
+  var _mc=_mcId?employees.find(function(e){return String(e.id)===String(_mcId);}):null;
+  // Hinweise im Kopf: letzte Session und letzte QA-Bewertung (koralle, wenn überfällig)
+  var _hT=today(),_dd=function(d){return Math.round((new Date(_hT+'T00:00:00')-new Date(d+'T00:00:00'))/86400000);};
+  var _lastS=p.filter(function(x){return x.status!=='geplant'&&x.date<=_hT;}).map(function(x){return x.date;}).sort().pop();
+  var _lastQ=(callRatings[emp.id]||[]).map(function(x){return x.date;}).sort().pop();
+  function _hint(txt,warn){return '<span style="height:34px;display:flex;align-items:center;gap:7px;padding:0 12px;border-radius:10px;font-size:12.5px;white-space:nowrap;'+(warn?'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A':'background:#fff;border:1px solid #E4E0D6;color:var(--text2)')+'"><span style="width:8px;height:8px;border-radius:50%;background:'+(warn?'#F08566':'#3a3833')+'"></span>'+txt+'</span>';}
+  var _hints='';
+  if(_lastS){var _ds=_dd(_lastS);_hints+=_hint(_ds===0?'Letzte Session <b>heute</b>':'Letzte Session vor <b>'+_ds+' '+(_ds===1?'Tag':'Tagen')+'</b>',_ds>30);}
+  else _hints+=_hint('<b>Noch keine Session</b>',true);
+  if(_lastQ){var _dq=_dd(_lastQ),_wq=Math.round(_dq/7);_hints+=_hint(_dq<7?'QA-Bewertung <b>diese Woche</b>':'<b>'+_wq+' Wo.</b> ohne QA',_dq>60);}
+  else _hints+=_hint('<b>Noch keine QA</b>',true);
+  var _meta=[esc(emp.role||''),esc(emp.phase||''),emp.startDate?'seit '+emp.startDate.split('-').reverse().join('.'):'',_mc?'Coach '+esc(_mc.name.split(' ')[0]):''].filter(Boolean).join(' · ');
   document.getElementById('mainArea').innerHTML=
-    '<div class="topbar"><div class="tb-left">'
-    +'<div class="av" style="width:40px;height:40px;font-size:17px;background:'+c.bg+';color:'+c.text+'">'+ini(emp.name)+'</div>'
-    +'<div><div class="tb-name">'+esc(emp.name)+'</div><div class="tb-meta">'+emp.role+' · '+emp.phase+(emp.startDate?' · Start '+fd(emp.startDate):'')+' · '+p.length+' Session'+(p.length!==1?'s':'')+'</div></div>'
-    +'</div><div style="display:flex;gap:8px">'
-    +'<button class="btn btn-primary" data-eid="'+emp.id+'" onclick="exportEmpSummary(this.dataset.eid)"><i class="ti ti-file-description"></i> Zusammenfassung (PDF)</button>'
-    +'<button class="btn" onclick="window.print()"><i class="ti ti-printer"></i> Print</button></div></div>'
-    +'<div class="tab-bar" id="empTabBar">'
+    '<div style="padding:22px 24px 8px;flex-shrink:0"><div style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:16px;padding:16px;box-shadow:0 12px 30px rgba(40,32,15,0.06)">'
+    +'<div style="display:flex;align-items:center;gap:12px">'
+    +'<div style="width:40px;height:40px;border-radius:11px;background:#EFECE5;border:1px solid #E4E0D6;color:var(--text);font-size:14px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0">'+ini(emp.name)+'</div>'
+    +'<div style="min-width:0"><div style="font-size:18px;font-weight:800;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(emp.name)+'</div><div style="font-size:12.5px;color:var(--text2);line-height:1.3">'+_meta+'</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-top:14px">'
+    +'<div class="emp-seg" id="empTabBar">'
     +'<div class="tab" data-tab="performance" onclick="switchTab(\'performance\')">KPI Performance</div>'
     +'<div class="tab" data-tab="call-performance" onclick="switchTab(\'call-performance\')">QA Performance</div>'
-    +'<div class="tab" data-tab="provision" onclick="switchTab(\'provision\')">Provision</div>'
-    +'<div class="tab" data-tab="timeline" onclick="switchTab(\'timeline\')">Timeline</div>'
     +'<div class="tab" data-tab="session" onclick="switchTab(\'session\')">Coaching Sessions</div>'
     +'<div class="tab" data-tab="coaching-eval" onclick="switchTab(\'coaching-eval\')">Development</div>'
-    +'<div class="tab" data-tab="tasks" onclick="switchTab(\'tasks\')" id="tasksTabBtn">Task'+(tc>0?' <span style="background:var(--purple);color:#fff;border-radius:20px;font-size:10px;font-weight:600;padding:1px 6px">'+tc+'</span>':'')+'</div>'
-    +'<div class="tab" data-tab="solidroad" onclick="switchTab(\'solidroad\')">SolidRoad</div>'
+    +'<div class="tab" data-tab="tasks" onclick="switchTab(\'tasks\')" id="tasksTabBtn">Task'+(tc>0?'<span class="emp-seg-badge">'+tc+'</span>':'')+'</div>'
     +'<div class="tab" data-tab="emp-settings" onclick="switchTab(\'emp-settings\')">Einstellungen</div>'
     +'</div>'
+    +'<span style="margin-left:auto;display:flex;gap:6px">'+_hints+'</span>'
+    +'<span style="display:flex;gap:8px">'
+    +'<button class="btn btn-primary" title="Zusammenfassung (PDF)" aria-label="Zusammenfassung (PDF)" data-eid="'+emp.id+'" onclick="exportEmpSummary(this.dataset.eid)" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-file-description" style="font-size:16px"></i></button>'
+    +'<button class="btn" title="Drucken" aria-label="Drucken" onclick="window.print()" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-printer" style="font-size:16px"></i></button>'
+    +'</span></div></div></div>'
     +'<div class="content" id="tabContent"></div>';
   renderTabBar();
   renderTab();
@@ -6700,7 +6724,8 @@ function renderTabBar(){
   var bar=document.getElementById('empTabBar');
   if(!bar)return;
   var hid=typeof hiddenTabsForRole==='function'?hiddenTabsForRole():[];
-  if(hid.indexOf(activeTab)>=0){ activeTab='performance'; setTimeout(renderTab,0); }
+  // Reiter Provision, Timeline und SolidRoad gibt es auf Mitarbeiterebene nicht mehr
+  if(hid.indexOf(activeTab)>=0||['provision','timeline','solidroad'].indexOf(activeTab)>=0){ activeTab='performance'; setTimeout(renderTab,0); }
   bar.querySelectorAll('.tab').forEach(function(el){ el.style.display=hid.indexOf(el.dataset.tab)>=0?'none':''; });
   bar.querySelectorAll('.tab').forEach(function(el){
     el.classList.toggle('active',el.dataset.tab===activeTab);
@@ -6728,6 +6753,44 @@ var ITEM_LABELS={
   struktur:'Struktur',kontrolle:'Gesprächskontrolle',klarheit:'Klarheit',fragequalitaet:'Fragequalität',
   naechsteschritte:'Zusammenfassung & nächste Schritte'
 };
+// ── „Aktuelle Bewertung im Detail“ (Entwurf C): Gesamt oben, je Kriterium ein vierstufiger Balken ──
+function callDetailBodyHtml(call){
+  var sc=call.scores||{};
+  function f1(x){return x.toFixed(1).replace('.',',');}
+  function cAvg(cat){var v=cat.items.map(function(k){return sc[k]||0;}).filter(function(x){return x>0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:null;}
+  var all=[];CALL_CATS.forEach(function(c){all=all.concat(c.items);});
+  var rated=all.filter(function(k){return sc[k]>0;}).length;
+  var ts=totalScore(call);
+  var einw=CALL_CATS.find(function(c){return c.key==='einwand';}),absch=CALL_CATS.find(function(c){return c.key==='abschluss';});
+  var h='<div style="display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding:14px 0 12px;margin-bottom:6px;border-bottom:1px solid var(--border)">'
+    +'<div><div style="font-size:40px;font-weight:300;line-height:1">'+(rated?Math.round(ts)+' %':'–')+'</div><div style="font-size:12.5px;color:var(--text3);font-weight:600">Gesamtpunktzahl</div></div>';
+  [einw,absch].forEach(function(c){if(!c)return;var a=cAvg(c);h+='<div><div style="font-size:28px;font-weight:300;line-height:1.05">'+(a!=null?f1(a):'–')+'</div><div style="font-size:12.5px;color:var(--text3);font-weight:600">'+esc(c.short||c.label)+' ('+Math.round(c.weight*100)+' %)</div></div>';});
+  h+='<div style="margin-left:auto;display:flex;gap:14px;font-size:12px;color:var(--text2);flex-wrap:wrap">'
+    +'<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#3a3833;margin-right:5px;vertical-align:-1px"></i>bewertet</span>'
+    +'<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#F08566;margin-right:5px;vertical-align:-1px"></i>schwach (1)</span>'
+    +'<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#E4E0D6;margin-right:5px;vertical-align:-1px"></i>offen bis 4</span>'
+    +'<span style="font-weight:600">'+rated+' von '+all.length+' Kriterien bewertet</span></div></div>';
+  if(!rated)h+='<div style="background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px">Für diesen Call wurden keine Einzelpunkte gespeichert. Über „Neuen Call bewerten“ bzw. Bearbeiten in der Historie kannst du die Punkte nachtragen.</div>';
+  CALL_CATS.forEach(function(cat){
+    var a=cAvg(cat);
+    h+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">'+esc(cat.label)+' · '+Math.round(cat.weight*100)+' %'
+      +'<span style="margin-left:auto;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:0;text-transform:none;'+(a!=null&&a<2?'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A':'background:#fff;border:1px solid #E4E0D6;color:var(--text2)')+'">Ø '+(a!=null?f1(a):'–')+'</span></div>';
+    cat.items.forEach(function(k){
+      var v=sc[k]||0;
+      h+='<div style="display:grid;grid-template-columns:minmax(180px,260px) 1fr 52px;align-items:center;gap:14px;height:34px;border-bottom:1px solid #eae7e0">'
+        +'<span style="font-size:13.5px;color:var(--text)">'+esc(ITEM_LABELS[k]||k)+'</span>'
+        +'<span style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">'+[1,2,3,4].map(function(n){return '<i style="display:block;height:10px;border-radius:5px;background:'+(v&&n<=v?(v===1?'#F08566':'#3a3833'):'#E4E0D6')+'"></i>';}).join('')+'</span>'
+        +'<span style="text-align:right;font-size:14px;font-weight:600;color:'+(v===1?'#B5513A':v?'var(--text)':'var(--text3)')+'">'+(v?v+' / 4':'–')+'</span></div>';
+    });
+  });
+  var meta=[];
+  if(call.auftragsnr)meta.push('Auftrag '+esc(call.auftragsnr));
+  if(call.bewertetVon)meta.push('bewertet von '+esc(call.bewertetVon));
+  if(call.einwand)meta.push('Einwand: '+esc(call.einwand));
+  if(call.hinweis)meta.push('Hinweis: '+esc(call.hinweis));
+  if(meta.length)h+='<div style="padding:12px 0 0;font-size:12.5px;color:var(--text2)">'+meta.join(' · ')+'</div>';
+  return h;
+}
 function catAvg(rat,cat){
   var vals=cat.items.map(function(k){return rat.scores&&rat.scores[k]?rat.scores[k]:0;}).filter(function(v){return v>0;});
   if(!vals.length)return 0;
@@ -7079,33 +7142,7 @@ function renderTab(){
     html+='</div>';
     html+='<div id="callDetailBody" style="display:none;border-top:1px solid var(--border);padding:0 17px 14px">';
     if(showCall){
-      CALL_CATS.forEach(function(cat){
-        var catVals=cat.items.map(function(k){return showCall.scores&&showCall.scores[k]?showCall.scores[k]:0;}).filter(function(v){return v>0;});
-        var catAvgVal=catVals.length?catVals.reduce(function(a,b){return a+b;},0)/catVals.length:0;
-        html+='<div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin-top:12px">';
-        html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-          +'<span style="font-size:11.5px;font-weight:700;color:'+cat.col+'">'+cat.label.toUpperCase()+' ('+Math.round(cat.weight*100)+'%)</span>'
-          +'<span style="font-size:11px;font-weight:700;color:#fff;background:'+cat.col+';padding:2px 10px;border-radius:10px">Ø '+catAvgVal.toFixed(1)+'</span>'
-          +'</div>';
-        cat.items.forEach(function(k,idx){
-          var v=showCall.scores&&showCall.scores[k]?showCall.scores[k]:0;
-          html+='<div style="'+(idx>0?'margin-top:10px':'')+'">';
-          html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
-            +'<span style="font-size:12.5px;color:var(--text2);font-weight:500">'+ITEM_LABELS[k]+'</span>'
-            +'<span style="font-size:12px;font-weight:700;color:'+cat.col+'">'+v+'</span>'
-            +'</div>';
-          html+='<div style="height:8px;background:#fff;border:1px solid var(--border2);border-radius:5px;overflow:hidden">'
-            +'<div style="height:100%;width:'+Math.max(2,v/4*100)+'%;border-radius:5px;background:linear-gradient(90deg,#F7B39A,'+cat.col+')"></div>'
-            +'</div>';
-          html+='</div>';
-        });
-        html+='</div>';
-      });
-      var ts0=totalScore(showCall);var tc0=ts0>=75?'var(--teal-dark)':ts0>=50?'var(--amber-dark)':'var(--red)';
-      html+='<div style="padding:14px 0 0;font-size:11px;color:var(--text3);margin-top:4px">';
-      html+='Score: <strong style="color:'+tc0+'">'+ts0.toFixed(0)+'</strong>/100';
-      if(showCall.einwand)html+=' · Einwand: <em>'+showCall.einwand+'</em>';
-      html+='</div>';
+      html+=callDetailBodyHtml(showCall);
     } else {
       html+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-phone" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Bewertung vorhanden</div>';
     }
@@ -7120,30 +7157,36 @@ function renderTab(){
       html+='<div style="display:flex;flex-direction:column;gap:6px">';
       callRat.forEach(function(r,rdx){
         var cardId='cr'+emp.id+'x'+rdx;
-        var ts=totalScore(r);var tcol=ts>=75?'var(--teal-dark)':ts>=50?'var(--amber-dark)':'var(--red)';
-        html+='<div style="background:var(--s-tint);border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden">';
-        html+='<div class="sess-hdr" data-eid="'+cardId+'" onclick="toggleSessCard(this.dataset.eid)" style="display:flex;align-items:center;gap:10px;padding:16px 14px;cursor:pointer;user-select:none;font-size:13px">';
-        html+='<span style="font-size:13px;font-weight:700;white-space:nowrap">'+fd(r.date)+'</span>';
-        html+='<span style="font-size:13px;color:var(--text2);background:var(--bg-solid);padding:2px 8px;border-radius:20px;flex-shrink:0">'+(r.b2b||'B2C')+'</span>';
-        html+='<span style="font-size:13px;color:'+(r.status==='ja'?'var(--teal-dark)':'var(--red)')+';flex:1">'+(r.status==='ja'?'✓ Abschluss':'✗ Kein Abschluss')+(r.abschlussArt?' · Opt.: '+r.abschlussArt:'')+'</span>';
-        html+='<span style="font-size:13px;font-weight:700;color:'+tcol+';flex-shrink:0">'+ts.toFixed(0)+'</span>';
-        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();openQaBewertungModal(this.dataset.eid,this.dataset.rid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>';
-        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();deleteHistorieCallRating(this.dataset.eid,this.dataset.rid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>';
-        html+='<span id="arr-'+cardId+'" style="color:var(--text3);font-size:12px;flex-shrink:0;transition:transform .2s">▾</span></div>';
-        html+='<div id="body-'+cardId+'" style="display:none;border-top:1px solid var(--border)">';
-        CALL_CATS.forEach(function(cat){
-          var v=catAvg(r,cat);if(!v)return;
-          var bc=v>=3.5?'var(--teal-dark)':v>=2.5?'var(--purple)':v>=1.5?'var(--amber-dark)':'var(--red)';
-          html+='<div style="padding:6px 14px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px">';
-          html+='<div style="width:140px;font-size:12px;flex-shrink:0;color:'+cat.col+';font-weight:600">'+cat.label+'</div>';
-          html+='<div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden">';
-          html+='<div style="height:100%;width:'+(v/4*100)+'%;background:'+cat.col+';border-radius:3px"></div></div>';
-          html+='<div style="width:24px;text-align:right;font-size:12px;font-weight:700;color:'+bc+'">'+v.toFixed(1)+'</div>';
-          html+='</div>';
+        var hasPts=r.scores&&Object.keys(r.scores).some(function(k){return r.scores[k]>0;});
+        var ts=totalScore(r),lo=hasPts&&ts<50;
+        html+='<div>';
+        html+='<div class="sess-hdr" data-eid="'+cardId+'" onclick="toggleSessCard(this.dataset.eid)" style="display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;cursor:pointer;user-select:none">';
+        html+='<span style="width:110px;font-size:13.5px;white-space:nowrap">'+fd(r.date)+'</span>';
+        html+='<span style="font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2);white-space:nowrap">'+esc(r.b2b||'B2C')+'</span>';
+        html+=(r.status==='ja'
+          ?'<span style="font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2);white-space:nowrap">✓ Abschluss'+(r.abschlussArt?' · Opt.: '+esc(r.abschlussArt):'')+'</span>'
+          :'<span style="font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A;white-space:nowrap">✕ Kein Abschluss</span>');
+        html+='<span style="margin-left:auto;display:flex;align-items:center;gap:10px">';
+        if(hasPts)html+='<span style="width:120px;height:8px;border-radius:4px;background:#E4E0D6;overflow:hidden"><i style="display:block;height:100%;width:'+Math.max(2,Math.min(100,ts))+'%;border-radius:4px;background:'+(lo?'#F08566':'#3a3833')+'"></i></span>'
+          +'<span style="width:48px;text-align:right;font-size:14px;font-weight:600;color:'+(lo?'#B5513A':'var(--text)')+'">'+Math.round(ts)+' %</span>';
+        else html+='<span style="font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2)">keine Punkte</span>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" title="Bearbeiten" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();openQaBewertungModal(this.dataset.eid,this.dataset.rid)" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-pencil"></i></button>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" title="Löschen" data-eid="'+emp.id+'" data-rid="'+r.id+'" onclick="event.stopPropagation();deleteHistorieCallRating(this.dataset.eid,this.dataset.rid)" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-trash"></i></button>';
+        html+='<span id="arr-'+cardId+'" style="width:34px;height:34px;border-radius:var(--r-md);border:1px solid var(--border2);background:#F7F5F0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;transition:transform .2s">▾</span></span></div>';
+        html+='<div id="body-'+cardId+'" style="display:none;border:1px solid #E4E0D6;border-top:none;border-radius:0 0 10px 10px;background:#F7F5F0;margin:-1px 8px 0;padding:14px 14px 10px">';
+        if(!hasPts)html+='<div style="font-size:13px;color:var(--text2);padding:2px 0 8px">Für diesen Call wurden keine Einzelpunkte gespeichert.</div>';
+        else CALL_CATS.forEach(function(cat){
+          var v=catAvg(r,cat);
+          var rv=Math.round(v);
+          html+='<div style="display:grid;grid-template-columns:minmax(170px,220px) 1fr 48px;align-items:center;gap:14px;height:30px;border-bottom:1px solid #eae7e0;font-size:13.5px">'
+            +'<span>'+esc(cat.label)+' <span style="color:var(--text3);font-size:12px">'+Math.round(cat.weight*100)+' %</span></span>'
+            +'<span style="display:grid;grid-template-columns:repeat(4,1fr);gap:4px">'+[1,2,3,4].map(function(n){return '<i style="display:block;height:9px;border-radius:5px;background:'+(v&&n<=rv?(v<1.5?'#F08566':'#3a3833'):'#E4E0D6')+'"></i>';}).join('')+'</span>'
+            +'<span style="text-align:right;font-weight:600;color:'+(v&&v<1.5?'#B5513A':v?'var(--text)':'var(--text3)')+'">'+(v?v.toFixed(1).replace('.',','):'–')+'</span></div>';
         });
-        if(r.einwand)html+='<div style="padding:7px 14px;border-bottom:1px solid var(--border);font-size:12px;color:var(--text2)"><i class="ti ti-message-2" style="margin-right:5px"></i>'+r.einwand+'</div>';
-        if(r.hinweis)html+='<div style="padding:7px 14px;font-size:12px;color:var(--text2);font-style:italic"><i class="ti ti-notes" style="margin-right:5px"></i>'+r.hinweis+'</div>';
-        html+='<div style="padding:6px 14px;font-size:11px;color:var(--text3);border-top:1px solid var(--border)">Bewertet von: '+(r.bewertetVon||'—')+' · Auftrag: '+(r.auftragsnr||'—')+'</div>';
+        var meta=['Bewertet von '+esc(r.bewertetVon||'—'),'Auftrag '+esc(r.auftragsnr||'—')];
+        if(r.einwand)meta.push('Einwand: '+esc(r.einwand));
+        if(r.hinweis)meta.push('Hinweis: '+esc(r.hinweis));
+        html+='<div style="font-size:12.5px;color:var(--text2);margin-top:8px">'+meta.join(' · ')+'</div>';
         html+='</div></div>';
       });
       html+='</div>';
@@ -7343,51 +7386,53 @@ function renderTab(){
       html+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-clipboard-off" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Bewertungen</div>';
     } else {
       html+='<div style="display:flex;flex-direction:column;gap:6px">';
-      var commentTypeCol={skill:'#1d1c1a',will:'#F08566',result:'#F08566',diverses:'#5c7070'};
+      var CHIP='font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;white-space:nowrap;background:#fff;border:1px solid #E4E0D6;color:var(--text2)';
+      var IB='width:34px;height:34px;padding:0;justify-content:center;flex-shrink:0';
+      var ROW='display:flex;align-items:center;gap:12px;height:52px;padding:0 12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5';
       historyItems.forEach(function(item,idx){
         if(item.type==='comment'){
           var c=item.data;
-          var tcol=commentTypeCol[c.commentType]||'#5c7070';
-          html+='<div style="background:var(--s-tint);border:1px solid var(--border2);border-radius:var(--r-md);padding:10px 14px">'
-            +'<div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">'
-            +'<span style="font-size:12px;font-weight:700;white-space:nowrap">'+fd(c.date)+'</span>'
-            +'<span style="font-size:10px;font-weight:700;color:#fff;background:'+tcol+';padding:2px 9px;border-radius:10px;text-transform:uppercase;letter-spacing:.03em">'+esc(c.commentType)+'</span>'
-            +'<span style="flex:1"></span>'
-            +(c.author?'<span style="font-size:11px;color:var(--text3)">'+esc(c.author)+'</span>':'')
-            +(canEditHistorie()?'<button class="btn btn-sm" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();openCommentModal(this.dataset.eid,this.dataset.cid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>':'')
-            +(canEditHistorie()?'<button class="btn btn-sm" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();deleteHistorieComment(this.dataset.eid,this.dataset.cid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>':'')
-            +'</div>'
-            +'<div style="font-size:12.5px;color:var(--text2)">'+esc(c.note)+'</div>'
+          var cl=String(c.commentType||'diverses');cl=cl.charAt(0).toUpperCase()+cl.slice(1);
+          html+='<div style="'+ROW+'" title="'+esc(c.note||'')+'">'
+            +'<span style="width:110px;font-size:13.5px;white-space:nowrap;flex-shrink:0">'+fd(c.date)+'</span>'
+            +'<span style="'+CHIP+'">Kommentar · '+esc(cl)+'</span>'
+            +'<span style="flex:1;min-width:0;font-size:13.5px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.note||'')+'</span>'
+            +(c.author?'<span style="font-size:12.5px;color:var(--text3);white-space:nowrap">'+esc(c.author)+'</span>':'')
+            +(canEditHistorie()?'<button class="btn btn-sm" title="Bearbeiten" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();openCommentModal(this.dataset.eid,this.dataset.cid)" style="'+IB+'"><i class="ti ti-pencil"></i></button>':'')
+            +(canEditHistorie()?'<button class="btn btn-sm" title="Löschen" data-eid="'+emp.id+'" data-cid="'+c.id+'" onclick="event.stopPropagation();deleteHistorieComment(this.dataset.eid,this.dataset.cid)" style="'+IB+'"><i class="ti ti-trash"></i></button>':'')
+            +'<span style="width:34px;flex-shrink:0"></span>'
             +'</div>';
           return;
         }
         var ev=item.data;
         var eid='ev'+emp.id+'x'+idx;
-        var overallAvg=(DIMS.reduce(function(a,d){return a+(ev[d.key]||0);},0)/DIMS.length).toFixed(1);
-        var avgCol=overallAvg>=7?'var(--teal-dark)':overallAvg>=4?'var(--purple)':'var(--amber-dark)';
-        html+='<div style="background:var(--s-tint);border:1px solid var(--border2);border-radius:var(--r-md);overflow:hidden">';
-        html+='<div class="sess-hdr" data-eid="'+eid+'" onclick="toggleSessCard(this.dataset.eid)" style="display:flex;align-items:center;gap:10px;padding:10px 14px;min-height:44px;cursor:pointer;user-select:none">';
-        html+='<span style="font-size:12px;font-weight:700;white-space:nowrap">'+fd(ev.date)+'</span>';
-        html+='<span style="flex:1"></span>';
-        html+='<span style="font-size:13px;font-weight:700;color:'+avgCol+'">Ø '+overallAvg+'/10</span>';
-        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();openCoachingEval(this.dataset.eid,this.dataset.vid)" style="padding:2px 8px;height:auto"><i class="ti ti-pencil" style="font-size:12px"></i></button>';
-        if(canEditHistorie())html+='<button class="btn btn-sm" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();deleteHistorieEval(this.dataset.eid,this.dataset.vid)" style="padding:2px 8px;height:auto;color:var(--red)"><i class="ti ti-trash" style="font-size:12px"></i></button>';
-        html+='<span id="arr-'+eid+'" style="color:var(--text3);font-size:12px;flex-shrink:0;transition:transform .2s">▾</span></div>';
-        html+='<div id="body-'+eid+'" style="display:none;border-top:1px solid var(--border)">';
+        var ov=DIMS.reduce(function(a,d){return a+(ev[d.key]||0);},0)/DIMS.length;
+        var lo=ov<4;
+        html+='<div>';
+        html+='<div class="sess-hdr" data-eid="'+eid+'" onclick="toggleSessCard(this.dataset.eid)" style="'+ROW+';cursor:pointer;user-select:none">';
+        html+='<span style="width:110px;font-size:13.5px;white-space:nowrap;flex-shrink:0">'+fd(ev.date)+'</span>';
+        html+='<span style="'+CHIP+'">Mitarbeiterentwicklung</span>';
+        html+='<span style="margin-left:auto;display:flex;align-items:center;gap:10px">';
+        html+='<span style="width:120px;height:8px;border-radius:4px;background:#E4E0D6;overflow:hidden"><i style="display:block;height:100%;width:'+Math.max(2,ov*10)+'%;border-radius:4px;background:'+(lo?'#F08566':'#3a3833')+'"></i></span>';
+        html+='<span style="width:64px;text-align:right;font-size:14px;font-weight:600;white-space:nowrap;color:'+(lo?'#B5513A':'var(--text)')+'">Ø '+ov.toFixed(1).replace('.',',')+'</span>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" title="Bearbeiten" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();openCoachingEval(this.dataset.eid,this.dataset.vid)" style="'+IB+'"><i class="ti ti-pencil"></i></button>';
+        if(canEditHistorie())html+='<button class="btn btn-sm" title="Löschen" data-eid="'+emp.id+'" data-vid="'+ev.id+'" onclick="event.stopPropagation();deleteHistorieEval(this.dataset.eid,this.dataset.vid)" style="'+IB+'"><i class="ti ti-trash"></i></button>';
+        html+='<span id="arr-'+eid+'" style="width:34px;height:34px;flex-shrink:0;border-radius:var(--r-md);border:1px solid var(--border2);background:#F7F5F0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;transition:transform .2s">▾</span></span></div>';
+        html+='<div id="body-'+eid+'" style="display:none;border:1px solid #E4E0D6;border-top:none;border-radius:0 0 10px 10px;background:#F7F5F0;margin:-1px 8px 0;padding:6px 14px 10px">';
         ['skill','will','result'].forEach(function(cat){
           var cdims=DIMS.filter(function(d){return d.cat===cat;});
-          html+='<div style="padding:5px 14px;background:'+CCAT[cat].fill+'"><span style="font-size:10px;font-weight:700;color:'+CCAT[cat].col+'">'+CCAT[cat].l.toUpperCase()+'</span></div>';
+          var cav=cdims.reduce(function(a,d){return a+(ev[d.key]||0);},0)/(cdims.length||1);
+          html+='<div style="display:flex;align-items:center;gap:8px;margin:10px 0 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">'+esc(CCAT[cat].l)
+            +'<span style="margin-left:auto;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:0;text-transform:none;'+(cav<4?'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A':'background:#fff;border:1px solid #E4E0D6;color:var(--text2)')+'">Ø '+cav.toFixed(1).replace('.',',')+'</span></div>';
           cdims.forEach(function(d){
             var v=ev[d.key]||0;
-            var bc=v>=7?'var(--teal-dark)':v>=4?CCAT[cat].col:'var(--amber-dark)';
-            html+='<div style="padding:6px 14px;border-top:1px solid var(--border);display:flex;align-items:center;gap:10px">';
-            html+='<div style="width:150px;font-size:12px;flex-shrink:0">'+d.label+'</div>';
-            html+='<div style="flex:1;height:5px;background:var(--bg3);border-radius:3px;overflow:hidden"><div style="height:100%;width:'+(v*10)+'%;background:'+bc+';border-radius:3px"></div></div>';
-            html+='<div style="width:22px;text-align:right;font-size:12px;font-weight:700;color:'+bc+'">'+v+'</div>';
-            html+='</div>';
+            html+='<div style="display:grid;grid-template-columns:minmax(170px,220px) 1fr 56px;align-items:center;gap:14px;height:30px;border-bottom:1px solid #eae7e0;font-size:13.5px">'
+              +'<span>'+esc(d.label)+'</span>'
+              +'<span style="height:9px;border-radius:5px;background:#E4E0D6;overflow:hidden"><i style="display:block;height:100%;border-radius:5px;width:'+(v*10)+'%;background:'+(v&&v<4?'#F08566':'#3a3833')+'"></i></span>'
+              +'<span style="text-align:right;font-weight:600;color:'+(v&&v<4?'#B5513A':v?'var(--text)':'var(--text3)')+'">'+(v?v+' / 10':'–')+'</span></div>';
           });
         });
-        if(ev.note)html+='<div style="padding:8px 14px;font-size:12px;color:var(--text2);font-style:italic"><i class="ti ti-notes" style="margin-right:5px"></i>'+ev.note+'</div>';
+        if(ev.note)html+='<div style="font-size:12.5px;color:var(--text2);margin-top:8px">Notiz: '+esc(ev.note)+'</div>';
         html+='</div></div>';
       });
       html+='</div>';
@@ -7529,30 +7574,25 @@ function renderTab(){
     html+='<span id="topicDetailArrow" style="color:var(--text3);font-size:13px;transition:transform .2s">▾</span>';
     html+='</div>';
     html+='<div id="topicDetailBody" style="display:none;border-top:1px solid var(--border);padding:0 17px 14px">';
+    // Entwurf A: Skill, Will, Result nebeneinander, je Thema ein kurzer Balken mit Anzahl, Summe statt Ø
+    var _tMax=1;SDIMS.forEach(function(d){_tMax=Math.max(_tMax,tc[d.key]||0);});
+    html+='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;margin-top:14px">';
     ['skill','will','result'].forEach(function(cat){
       var cdims=SDIMS.filter(function(d){return d.cat===cat;});
-      var catVals=cdims.map(function(d){return tc[d.key]||0;}).filter(function(v){return v>0;});
-      var catAvgVal=catVals.length?catVals.reduce(function(a,b){return a+b;},0)/catVals.length:0;
-      html+='<div style="background:var(--bg);border-radius:10px;padding:14px 16px;margin-top:12px">';
-      html+='<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">'
-        +'<span style="font-size:11.5px;font-weight:700;color:'+SCCAT[cat].col+'">'+SCCAT[cat].l.toUpperCase()+'</span>'
-        +'<span style="font-size:11px;font-weight:700;color:#fff;background:'+SCCAT[cat].col+';padding:2px 10px;border-radius:10px">Ø '+catAvgVal.toFixed(1)+'</span>'
-        +'</div>';
-      cdims.forEach(function(d,idx){
+      var sum=cdims.reduce(function(a,d){return a+(tc[d.key]||0);},0);
+      html+='<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:12px 14px">';
+      html+='<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><b style="font-size:14px;font-weight:700">'+SCCAT[cat].l+'</b>'
+        +'<span style="margin-left:auto;font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2)">'+sum+' ×</span></div>';
+      cdims.forEach(function(d){
         var v=tc[d.key]||0;
-        var pct=Math.round(v/maxVal*100);
-        html+='<div style="'+(idx>0?'margin-top:10px':'')+'">';
-        html+='<div style="display:flex;justify-content:space-between;margin-bottom:4px">'
-          +'<span style="font-size:12.5px;color:var(--text2);font-weight:500">'+d.key+'</span>'
-          +'<span style="font-size:12px;font-weight:700;color:'+(v===0?'var(--text3)':SCCAT[cat].col)+'">'+v+'</span>'
-          +'</div>';
-        html+='<div style="height:8px;background:#fff;border:1px solid var(--border2);border-radius:5px;overflow:hidden">'
-          +'<div style="height:100%;width:'+(v===0?2:Math.max(2,pct))+'%;border-radius:5px;background:linear-gradient(90deg,#F7B39A,'+SCCAT[cat].col+');opacity:'+(v===0?0.3:1)+'"></div>'
-          +'</div>';
-        html+='</div>';
+        html+='<div style="display:grid;grid-template-columns:minmax(110px,140px) 1fr 26px;align-items:center;gap:10px;height:32px;font-size:13.5px">'
+          +'<span style="white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(d.key)+'</span>'
+          +'<span style="height:10px;border-radius:5px;background:#E4E0D6;overflow:hidden"><i style="display:block;height:100%;border-radius:5px;background:#3a3833;width:'+(v/_tMax*100)+'%"></i></span>'
+          +'<span style="text-align:right;font-weight:'+(v?600:500)+';color:'+(v?'var(--text)':'var(--text3)')+'">'+v+'</span></div>';
       });
       html+='</div>';
     });
+    html+='</div>';
     html+='</div></div>';
 
     // ── Geplante Coachings ──
@@ -7583,15 +7623,6 @@ function renderTab(){
     if(!completedSessions.length){
       html+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-calendar-off" style="font-size:26px;display:block;margin-bottom:8px"></i>Noch keine Coachings erfasst<div style="margin-top:10px"><button class="btn btn-sm btn-primary" data-eid="'+emp.id+'" onclick="openNeuesCoachingModal(this.dataset.eid)"><i class="ti ti-plus"></i> Jetzt erfassen</button></div></div>';
     } else {
-      html+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;table-layout:fixed;border-collapse:collapse"><thead><tr>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:12%">Datum</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:12%">Inhalt</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:var(--purple);text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:11%">Impact</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#F7B39A;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2)">Start</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#F4A6A6;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2)">Stop</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#FBD38D;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2)">Continue</th>'
-        +'<th style="background:#EFECE5;padding:9px 14px;text-align:left;font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2)">Notizen</th>'
-        +'</tr></thead><tbody>';
       var _fullPerfHist=(performance[emp.id]||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
       var empT=empTargets(emp);
       function _histImpactWindow(centerDate,daysBefore,daysAfter,fkey){
@@ -7600,37 +7631,43 @@ function renderTab(){
         var vals=rows.map(function(p){return p[fkey];}).filter(function(v){return v!==undefined&&v!==null;});
         return vals.length?(vals.reduce(function(a,b){return a+b;},0)/vals.length):null;
       }
-      var clampStyle='display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-overflow:ellipsis;height:34px';
+      var CHIP='font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;white-space:nowrap;';
+      html+='<div style="display:flex;flex-direction:column;gap:6px">';
       completedSessions.forEach(function(s,idx){
-        var RM={Teilweise:{c:'var(--amber)'},Yes:{c:'var(--teal)'},'Super Yes':{c:'var(--purple)'},'Mega Yes':{c:'var(--blue)'}};
-        var rm=s.rating?RM[s.rating]:null;
+        var cid='chs'+emp.id+'x'+idx;
+        var planned=s.status==='geplant';
         var _dur=sessionDuration(s.uhrzeit,s.endUhrzeit);
-        var rowBg=idx%2===1?'background:var(--s-tint);':'';
-        var tdStyle='padding:16px 14px;font-size:13px;border-bottom:1px solid var(--border);vertical-align:top;height:1px';
-        html+='<tr style="'+rowBg+'">';
-        html+='<td style="'+tdStyle+';white-space:nowrap">';
-        html+='<div style="font-weight:600">'+fd(s.date)+'</div>';
-        html+='<div style="height:15px;font-size:11px;color:var(--text3);margin-top:2px">'+(s.uhrzeit?'<i class="ti ti-clock" style="font-size:10px"></i> '+s.uhrzeit+(s.endUhrzeit?'–'+s.endUhrzeit:'')+(_dur?' ('+formatDuration(_dur)+')':''):'')+'</div>';
-        html+='</td>';
-        html+='<td style="'+tdStyle+';color:var(--text2)"><div style="'+clampStyle+'">'+(s.type||'Session')+(s.topics&&s.topics.length?' · '+s.topics.join(', '):'')+'</div><div style="height:16px;color:'+(rm?rm.c:'var(--text3)')+';font-size:11px;font-weight:700;margin-top:2px">'+(rm?s.rating:'')+'</div></td>';
-        html+=(function(){
-          if(!s.focusMetric)return '<td style="'+tdStyle+';color:var(--text3);text-align:center">—</td>';
-          var before=_histImpactWindow(s.date,14,0,s.focusMetric);
-          var after=_histImpactWindow(s.date,0,14,s.focusMetric);
+        var coach=s.coachId?employees.find(function(e){return e.id===s.coachId;}):null;
+        var F=[['Start',s.start],['Stop',s.stop],['Continue',s.cont],['Notizen',s.notes]].map(function(f){return [f[0],(f[1]&&String(f[1]).trim())?String(f[1]).trim():''];});
+        // Wirkung (Ziel-KPI 14 Tage vor/nach)
+        var imp='';
+        if(s.focusMetric){
+          var before=_histImpactWindow(s.date,14,0,s.focusMetric),after=_histImpactWindow(s.date,0,14,s.focusMetric);
           var delta=(before!==null&&after!==null)?(after-before):null;
-          if(delta===null)return '<td style="'+tdStyle+';color:var(--text3)"><div style="font-size:10px;color:var(--text3)">'+focusMetricLabel(s.focusMetric)+'</div>—</td>';
-          var dir=(empT[s.focusMetric]&&empT[s.focusMetric].dir)||'gte';
-          var good=dir==='lte'?delta<0:delta>0;
-          var arrow=delta>0?'↑':delta<0?'↓':'→';
-          return '<td style="'+tdStyle+'"><div style="font-size:10px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+focusMetricLabel(s.focusMetric)+'</div><div style="font-weight:700;color:'+(good?'var(--teal-dark)':'var(--red)')+'">'+arrow+' '+(delta>0?'+':'')+delta.toFixed(1)+'</div></td>';
-        })();
-        html+='<td style="'+tdStyle+';color:var(--text)"><div style="'+clampStyle+'">'+(s.start&&s.start.trim()?s.start:'<span style="color:var(--text3)">—</span>')+'</div></td>';
-        html+='<td style="'+tdStyle+';color:var(--text)"><div style="'+clampStyle+'">'+(s.stop&&s.stop.trim()?s.stop:'<span style="color:var(--text3)">—</span>')+'</div></td>';
-        html+='<td style="'+tdStyle+';color:var(--text)"><div style="'+clampStyle+'">'+(s.cont&&s.cont.trim()?s.cont:'<span style="color:var(--text3)">—</span>')+'</div></td>';
-        html+='<td style="'+tdStyle+';color:var(--text2);font-style:italic"><div style="'+clampStyle+'">'+(s.notes&&s.notes.trim()?esc(s.notes):'<span style="color:var(--text3);font-style:normal">—</span>')+'</div></td>';
-        html+='</tr>';
+          if(delta===null)imp='<span style="'+CHIP+'background:#fff;border:1px solid #E4E0D6;color:var(--text2)">Ziel: '+esc(focusMetricLabel(s.focusMetric))+'</span>';
+          else{var dir=(empT[s.focusMetric]&&empT[s.focusMetric].dir)||'gte';var good=dir==='lte'?delta<0:delta>0;
+            imp='<span style="'+CHIP+(good?'background:#E6EFE9;border:1px solid transparent;color:#2f6b52':'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A')+'">'+esc(focusMetricLabel(s.focusMetric))+' '+(delta>0?'+':'')+delta.toFixed(1).replace('.',',')+'</span>';}
+        }
+        html+='<div>';
+        html+='<div onclick="toggleSessCard(\''+cid+'\')" style="display:flex;align-items:center;gap:12px;height:56px;padding:0 12px;border:1px solid '+(planned?'rgba(240,133,102,0.45)':'#E4E0D6')+';border-radius:10px;background:'+(planned?'#FDF0EB':'#EFECE5')+';cursor:pointer;user-select:none">';
+        html+='<div style="width:150px;flex-shrink:0;line-height:1.25"><div style="font-size:13.5px;font-weight:600">'+fd(s.date)+'</div><div style="font-size:12px;color:var(--text3)">'+(s.uhrzeit?s.uhrzeit+(s.endUhrzeit?'–'+s.endUhrzeit:'')+(_dur?' · '+formatDuration(_dur):''):'ohne Uhrzeit')+'</div></div>';
+        html+='<div style="flex:1;min-width:0;line-height:1.3"><div style="font-size:14px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(s.type||'Session')+(s.topics&&s.topics.length?' · '+esc(s.topics.join(', ')):'')+'</div>'
+          +'<div style="font-size:12.5px;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(coach?'Coach '+esc(coach.name):'')+(s.rating?(coach?' · ':'')+esc(s.rating):'')+'</div></div>';
+        if(planned)html+='<span style="'+CHIP+'background:#fff;border:1px solid rgba(240,133,102,0.55);color:#B5513A">geplant</span>';
+        html+=imp;
+        html+='<span style="display:flex;gap:4px" title="Start · Stop · Continue · Notizen">'+F.map(function(f){var on=!!f[1];return '<i style="font-style:normal;width:24px;height:24px;border-radius:7px;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;border:1px solid '+(on?'#3a3833':'#E4E0D6')+';background:'+(on?'#3a3833':'#F7F5F0')+';color:'+(on?'#fff':'var(--text3)')+'" title="'+f[0]+(on?' ausgefüllt':' leer')+'">'+f[0].charAt(0)+'</i>';}).join('')+'</span>';
+        html+='<span id="arr-'+cid+'" style="width:34px;height:34px;flex-shrink:0;border-radius:var(--r-md);border:1px solid var(--border2);background:#F7F5F0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;transition:transform .2s">▾</span>';
+        html+='</div>';
+        var filled=F.filter(function(f){return f[1];});
+        html+='<div id="body-'+cid+'" style="display:none;border:1px solid #E4E0D6;border-top:none;border-radius:0 0 10px 10px;background:#F7F5F0;margin:-1px 8px 0;padding:4px 14px">';
+        if(!filled.length)html+='<div style="font-size:13px;color:var(--text3);min-height:44px;display:flex;align-items:center">Kein Rückblick und keine Notiz erfasst.</div>';
+        filled.forEach(function(f,fi){
+          html+='<div style="display:grid;grid-template-columns:120px 1fr;gap:12px;align-items:center;min-height:44px;padding:6px 0;'+(fi<filled.length-1?'border-bottom:1px solid #eae7e0;':'')+'font-size:13.5px;line-height:1.5">'
+            +'<span style="font-size:12.5px;font-weight:700;color:var(--text2)">'+f[0]+'</span><span style="color:var(--text);white-space:pre-wrap">'+esc(f[1])+'</span></div>';
+        });
+        html+='</div></div>';
       });
-      html+='</tbody></table></div>';
+      html+='</div>';
     }
     html+='</div>'; // Ende Historie-Karte
 
@@ -8336,8 +8373,6 @@ var PERM_ROWS=[
   {key:'coaching',label:'Coaching-Sessions & Aufgaben',group:'Bereiche',tables:['protocols','tasks'],tabs:['session','tasks']},
   {key:'qa',label:'QA-Bewertungen',group:'Bereiche',tables:['call_ratings','call_rating_scores'],tabs:['call-performance']},
   {key:'dev',label:'Development / Halbjahresgespräch',group:'Bereiche',tables:['reviews','review_kpis'],tabs:['coaching-eval']},
-  {key:'timeline',label:'Timeline & Dokumente',group:'Bereiche',tables:['employee_documents','employee_history'],tabs:['timeline']},
-  {key:'solidroad',label:'SolidRoad',group:'Bereiche',tables:['solidroad_simulations'],tabs:['solidroad']},
   {key:'activity',label:'Aktivitäten',group:'Bereiche',seeOnly:true,nav:['nav-coaching-activity']},
   {key:'stammdaten',label:'Mitarbeiter anlegen & Stammdaten',group:'Verwaltung',tables:['employees'],tabs:['emp-settings']},
   {key:'settings',label:'Einstellungen',group:'Verwaltung',adminOnly:true}

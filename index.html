@@ -46,7 +46,13 @@ body.sb-collapsed .sb-rail{border-right:none;}
 .rl-btn.on{background:#fff;color:var(--text);box-shadow:0 0 0 1px #E4E0D6,0 2px 6px rgba(40,32,15,.06);}
 .rl-btn.on:before{content:"";position:absolute;left:-13px;top:10px;bottom:10px;width:3px;border-radius:0 3px 3px 0;background:#F08566;}
 .rl-soft{background:#ECE9E1;color:var(--text);}
-#coachingInfoModal .rl-btn.on:before,#sessionPlanenModal .rl-btn.on:before,#qaBewertungModal .rl-btn.on:before,#neuesCoachingModal .rl-btn.on:before,#addEmpModal .rl-btn.on:before{left:-9px;}
+#coachingInfoModal .rl-btn.on:before,#sessionPlanenModal .rl-btn.on:before,#qaBewertungModal .rl-btn.on:before,#neuesCoachingModal .rl-btn.on:before,#addEmpModal .rl-btn.on:before,#addTaskModal .rl-btn.on:before,#empSetModal .rl-btn.on:before,#commentModal .rl-btn.on:before,#perfPopModal .rl-btn.on:before,#cevModal .rl-btn.on:before,#commentModal .rl-btn.on:before{left:-9px;}
+/* Ein Popup für alles: Bereiche oben, Abschnitte unter dem Strich (gleiche Größe, aktiv nur dezent hinterlegt) */
+.rl-btn.rl-sub.on{background:#EFECE5!important;box-shadow:none!important;}
+.rl-btn.rl-sub.on:before{display:none!important;}
+.pu-seg{display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;padding:2px;margin-left:auto;margin-right:8px}
+.pu-seg span{height:28px;padding:0 12px;border-radius:8px;display:flex;align-items:center;font-size:12.5px;font-weight:500;color:var(--text2);cursor:pointer;white-space:nowrap}
+.pu-seg span.on{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
 #aeBody table{min-width:0!important;table-layout:auto!important;}
 #aeBody th,#aeBody td{width:auto!important;}
 #aeBody td input[type=time]{min-width:0;width:100%;max-width:120px;}
@@ -110,6 +116,17 @@ body.sb-collapsed .sb-rail{border-right:none;}
 /* TABS */
 /* Performance-Tabelle: alle Kennzahl-Spalten gleich breit, lange Spaltenköpfe dürfen umbrechen */
 .perf-tbl th{white-space:normal!important;line-height:1.25;vertical-align:middle;padding-left:8px!important;padding-right:8px!important}
+/* Eingabefelder in Popups: gleiche Höhe wie die Auswahllisten (38 px) */
+.modal-ov input:not([type=checkbox]):not([type=radio]):not([type=range]):not([type=color]),
+#cevModal input:not([type=checkbox]):not([type=radio]):not([type=range]),
+#commentModal input:not([type=checkbox]):not([type=radio]):not([type=range]){height:38px;box-sizing:border-box;padding-top:0;padding-bottom:0}
+.modal-ov td input:not([type=checkbox]):not([type=radio]):not([type=range]){height:auto;padding-top:revert;padding-bottom:revert}
+/* Flächen in Popups: kein zusätzlicher Abstand unter dem letzten Feld */
+#espBody td input:not([type=checkbox]):not([type=radio]){height:auto}
+#espBody table{min-width:0!important;table-layout:auto!important}#espBody th,#espBody td{width:auto!important;padding-left:8px!important;padding-right:8px!important}
+#espBody td input[type=time]{min-width:0;width:100%;max-width:118px}
+#espBody>div>*:last-child{margin-bottom:0!important}
+#ncSecNew>div[style*="#EFECE5"]>*:last-child,#spSecNew>div[style*="#EFECE5"]>*:last-child,#qaSecBew>div[style*="#EFECE5"]>*:last-child{margin-bottom:0!important}
 /* Mitarbeiter-Kopf: Reiter als Schalter */
 #empTabBar.emp-seg{display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:11px;padding:2px;height:34px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
 #empTabBar.emp-seg .tab{height:28px;padding:0 13px;border-radius:9px;display:flex;align-items:center;font-size:13px;font-weight:500;color:var(--text2);background:transparent;white-space:nowrap}
@@ -323,7 +340,13 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 /* MODAL */
 .modal-ov{position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:200;display:flex;align-items:flex-start;justify-content:center;padding-top:7vh;}
 /* Alle Popups: gleiche Breite, beginnen auf derselben Hoehe */
-.modal-ov>.modal{width:680px!important;max-width:95vw!important;max-height:86vh!important;}
+.modal-ov>.modal{width:860px!important;max-width:95vw!important;max-height:86vh!important;}
+/* Gemeinsames Popup: in jedem Bereich gleich breit und gleich hoch */
+#perfPopModal>.modal,#coachingInfoModal>.modal,#neuesCoachingModal>.modal,#sessionPlanenModal>.modal,#qaBewertungModal>.modal,#addTaskModal>.modal,#empSetModal>.modal,#cevModal>div,#commentModal>div{height:86vh!important;max-height:86vh!important;}
+/* Gemeinsames Popup: Inhalt läuft unten weich aus, Fußleiste wie in der Übersicht */
+.pu-rail+div>div:first-child{-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)}
+.pu-footbar{display:flex;align-items:center;justify-content:flex-end;gap:8px;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:6px;min-height:52px;box-sizing:border-box}
+.pu-footbar .btn{height:34px!important}
 .modal-ov.hidden{display:none;}
 .modal{background:#F7F5F0;border:1px solid #E4E0D6;backdrop-filter:none;-webkit-backdrop-filter:none;border-radius:16px;padding:24px;width:640px;max-width:95vw;max-height:85vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18);}
 .modal-title{font-size:16px;font-weight:600;margin-bottom:16px;}
@@ -508,12 +531,49 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
   </div>
 </div></div>
 
-<div class="modal-ov hidden" id="addTaskModal"><div class="modal">
-  <div class="modal-title">Aufgabe hinzufügen</div>
+<div class="modal-ov hidden" id="perfPopModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Performance</div><div id="ppHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('perfPopModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+  <div style="display:flex;min-height:0;flex:1">
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Wichtigste KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecB');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-star"></i><span class="rl-tip" style="left:48px">Wichtigste KPIs</span></button><button class="rl-btn" type="button" aria-label="Verlauf" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecV');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-chart-bar"></i><span class="rl-tip" style="left:48px">Verlauf</span></button><button class="rl-btn" type="button" aria-label="Marge" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecM');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-currency-euro"></i><span class="rl-tip" style="left:48px">Marge</span></button><button class="rl-btn" type="button" aria-label="KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecK');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-table"></i><span class="rl-tip" style="left:48px">KPIs</span></button></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
+      <div id="ppBody" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px"></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="var e=_puEmp||selectedEmp;closeModal('perfPopModal');selectedEmp=e;view='emp';activeTab='performance';renderSidebar();renderMain();"><i class="ti ti-arrow-right"></i> Zur KPI Performance</button><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('perfPopModal')">Schließen</button></div>
+    </div>
+  </div>
+</div></div>
+<div class="modal-ov hidden" id="empSetModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Einstellungen</div><div id="esHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeEmpSetModal()" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+  <div style="display:flex;min-height:0;flex:1">
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Stammdaten &amp; Provisionsvereinbarung" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('espSec1');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-id"></i><span class="rl-tip" style="left:48px">Stammdaten &amp; Provisionsvereinbarung</span></button><button class="rl-btn" type="button" aria-label="Letzte Änderungen" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('espSec2');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Letzte Änderungen</span></button></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
+      <div id="espScroll" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px">
+        <div id="espSec1" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Stammdaten &amp; Provisionsvereinbarung<span id="espLast" style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)"></span></div><div id="espBody"></div><div style="display:flex;justify-content:flex-end;margin-top:2px"><button class="btn btn-primary" type="button" id="espSave" style="height:36px;width:auto" onclick="saveEmpSetModal()"><i class="ti ti-check"></i> Änderungen speichern</button></div></div>
+        <div id="espSec2" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:4px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Letzte Änderungen <span id="espHistN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="var e=_esEmp;closeEmpSetModal();selectedEmp=e;view='emp';activeTab='emp-settings';renderSidebar();renderMain();">Alle in Einstellungen</button></div><div id="espHist"></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeEmpSetModal()">Schließen</button></div>
+    </div>
+  </div>
+  <div id="espToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased;z-index:5"></div>
+</div></div>
+<div class="modal-ov hidden" id="addTaskModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Aufgabe hinzufügen</div><div id="atHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('addTaskModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+  <div style="display:flex;min-height:0;flex:1">
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Aufgabe" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('atSec1');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-square-plus"></i><span class="rl-tip" style="left:48px">Aufgabe</span></button><button class="rl-btn" type="button" aria-label="Offene Aufgaben" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('atSec2');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-calendar-due"></i><span class="rl-tip" style="left:48px">Offene Aufgaben</span></button><button class="rl-btn" type="button" aria-label="Zuletzt erledigt" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('atSec3');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-circle-check"></i><span class="rl-tip" style="left:48px">Zuletzt erledigt</span></button></div>
+    <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
+      <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px">
+        <div id="atSec1" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Aufgabe</div>
   <div style="margin-bottom:10px"><label>Aufgabentitel</label><input type="text" id="taskText" placeholder="z.B. Pitch-Skript lesen – pages 1 to 9"></div>
   <div style="margin-bottom:10px"><label>Beschreibung</label><textarea id="taskDesc" placeholder="Was soll der Mitarbeiter tun..." style="min-height:80px"></textarea></div>
   <div class="f3"><div><label>Priorität</label><select id="taskPrio"><option value="high">Hoch</option><option value="medium" selected>Mittel</option><option value="low">Niedrig</option></select></div><div><label>Fälligkeitsdatum</label><input type="date" id="taskDue"></div><div><label>Quelle</label><input type="text" id="taskQuelle" placeholder="Session 10.06"></div></div>
-  <div class="modal-actions"><button class="btn" onclick="closeModal('addTaskModal')">Abbrechen</button><button class="btn btn-primary" onclick="saveNewTask()"><i class="ti ti-check"></i> Aufgabe hinzufügen</button></div>
+          <div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="saveNewTask()"><i class="ti ti-check"></i> Aufgabe hinzufügen</button></div>
+        </div>
+        <div id="atSec2" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Offene Aufgaben <span id="atOpenN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span></div><div id="atOpen"></div></div>
+        <div id="atSec3" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Zuletzt erledigt <span style="font-weight:500;color:var(--text3);font-size:12.5px">die letzten drei</span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="closeModal('addTaskModal');view='emp';activeTab='tasks';renderSidebar();renderMain();">Alle im Reiter „Task“</button></div><div id="atDone"></div></div>
+      </div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('addTaskModal')">Schließen</button></div>
+    </div>
+  </div>
+  <div id="atToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;gap:12px;align-items:center;z-index:5;white-space:nowrap;-webkit-font-smoothing:antialiased"><span id="atToastMsg"></span><span style="color:#F7B39A;cursor:pointer" onclick="atUndo()">Rückgängig</span></div>
 </div></div>
 
 <div class="modal-ov hidden" id="ratingModal"><div class="modal">
@@ -546,16 +606,17 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 
 
 <!-- SESSION PLANEN MODAL -->
-<div class="modal-ov hidden" id="coachingInfoModal"><div class="modal" style="max-height:86vh;overflow:hidden;padding:0;width:680px;display:flex;flex-direction:column;background:#EEEDE9">
+<div class="modal-ov hidden" id="coachingInfoModal"><div class="modal" style="max-height:86vh;overflow:hidden;padding:0;width:860px;display:flex;flex-direction:column;background:#EEEDE9">
   <div id="coachingInfoModalBody" style="display:flex;flex-direction:column;min-height:0;flex:1;max-height:86vh"></div>
 </div></div>
-<div class="modal-ov hidden" id="sessionPlanenModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">
-  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Session planen</div><div id="sessionHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('sessionPlanenModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+<div class="modal-ov hidden" id="sessionPlanenModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Coaching</div><div id="sessionHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('sessionPlanenModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
   <div style="display:flex;min-height:0;flex:1">
-    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Wer & Wann" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('spSecWer');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-users"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span><span class="rl-tip" style="left:48px">Wer & Wann</span></button><button class="rl-btn" type="button" aria-label="Was für ein Coaching" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('spSecWas');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-message-circle"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span class="rl-tip" style="left:48px">Was für ein Coaching</span></button><button class="rl-btn" type="button" aria-label="Kontext" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('spSecKon');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-notes"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span class="rl-tip" style="left:48px">Kontext</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="openHistorieFromSession()"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button></div>
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Session planen" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('spSecNew');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-pencil"></i><span class="rl-tip" style="left:48px">Session planen</span></button><button class="rl-btn" type="button" aria-label="Geplante Sessions" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('spSecList');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-calendar-event"></i><span class="rl-tip" style="left:48px">Geplante Sessions</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="openHistorieFromSession()"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button></div>
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">
-        <div id="spSecWer" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Wer &amp; Wann</div>
+        <div id="spSecNew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Session planen</div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Wer &amp; Wann</div>
     <div style="position:relative;margin-bottom:10px">
       <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere für Gruppencoaching)</span></label>
       <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between" onclick="toggleSessionEmpDropdown()">
@@ -571,7 +632,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
     </div>
     <div style="margin-top:10px"><label>Coach</label><select id="sessionCoach"></select></div>
         </div>
-        <div id="spSecWas" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Was für ein Coaching</div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Was für ein Coaching</div>
     <div class="f2" style="margin-bottom:10px">
       <div><label>Kategorie</label><select id="sessionKategorie" onchange="onCoachingCategoryChange('sessionKategorie','sessionTyp')"></select></div>
       <div><label>Art des Coachings</label><select id="sessionTyp"></select></div>
@@ -600,14 +661,15 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       </div>
     </div>
         </div>
-        <div id="spSecKon" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Kontext</div>
-    <div id="lastContinueBox"></div>
-    <div><label>Anlass / Notiz für den Coach</label><textarea id="sessionNotiz" placeholder="Warum wird diese Session eingeplant? Was soll der Coach beachten..."></textarea></div>
-        </div>
+<div id="lastContinueBox" style="display:none"></div>
+<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:0 0 8px"><span>Anlass / Notiz für den Coach</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Warum wird die Session eingeplant?</span></div><textarea id="sessionNotiz" placeholder="Warum wird diese Session eingeplant? Was soll der Coach beachten..." style="min-height:72px;resize:vertical"></textarea>
+<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="sessionSpeichernNeu()"><i class="ti ti-check"></i> Session planen</button></div></div>
+        <div id="spSecList" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Geplante Sessions <span id="spListN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="var e=selectedEmp;closeModal('sessionPlanenModal');selectedEmp=e;view='emp';activeTab='session';renderSidebar();renderMain();">Alle in Coaching Sessions</button></div><div id="spList"></div></div>
       </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('sessionPlanenModal')">Abbrechen</button><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="sessionSpeichernNeu()"><i class="ti ti-check"></i> Session planen</button></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('sessionPlanenModal')">Schließen</button></div>
     </div>
   </div>
+  <div id="spToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased;z-index:5"></div>
 </div></div>
 
 <!-- GRUPPENSESSION ABARBEITEN MODAL -->
@@ -621,13 +683,14 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 </div></div>
 
 <!-- NEUES COACHING ERFASSEN (ehem. "Neue Session erfassen", jetzt Pop-up) -->
-<div class="modal-ov hidden" id="neuesCoachingModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">
-  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="ncHdKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Neue Session erfassen</div><div id="ncHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('neuesCoachingModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+<div class="modal-ov hidden" id="neuesCoachingModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="ncHdKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Coaching</div><div id="ncHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('neuesCoachingModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
   <div style="display:flex;min-height:0;flex:1">
-    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Wer & Wann" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ncSecWer');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-users"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span><span class="rl-tip" style="left:48px">Wer & Wann</span></button><button class="rl-btn" type="button" aria-label="Was für ein Coaching" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ncSecWas');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-message-circle"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span class="rl-tip" style="left:48px">Was für ein Coaching</span></button><button class="rl-btn" type="button" aria-label="Rückblick & Kontext" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ncSecKon');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-repeat"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span class="rl-tip" style="left:48px">Rückblick & Kontext</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openCoachingInfoModal(e)"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button><button class="rl-btn" type="button" aria-label="Session planen" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openSessionModal(e)"><i class="ti ti-calendar-plus"></i><span class="rl-tip" style="left:48px">Session planen</span></button><button class="rl-btn" type="button" aria-label="Neuen Call bewerten" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openQaBewertungModal(e)"><i class="ti ti-phone"></i><span class="rl-tip" style="left:48px">Neuen Call bewerten</span></button></div>
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Neue Session" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ncSecNew');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-pencil"></i><span class="rl-tip" style="left:48px">Neue Session</span></button><button class="rl-btn" type="button" aria-label="Letzte Sessions" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ncSecList');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-list"></i><span class="rl-tip" style="left:48px">Letzte Sessions</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openCoachingInfoModal(e)"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button><button class="rl-btn" type="button" aria-label="Session planen" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openSessionModal(e)"><i class="ti ti-calendar-plus"></i><span class="rl-tip" style="left:48px">Session planen</span></button><button class="rl-btn" type="button" aria-label="Neuen Call bewerten" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');openQaBewertungModal(e)"><i class="ti ti-phone"></i><span class="rl-tip" style="left:48px">Neuen Call bewerten</span></button></div>
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">
-        <div id="ncSecWer" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Wer &amp; Wann</div>
+        <div id="ncSecNew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Neue Session<span id="ncFrom" style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)"></span></div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Wer &amp; Wann</div>
     <div style="position:relative;margin-bottom:10px">
       <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere für Gruppencoaching)</span></label>
       <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between" onclick="toggleNcEmpDropdown()">
@@ -642,7 +705,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       <div><label>Ende</label><input type="time" id="sess-end-time" value=""></div>
     </div>
         </div>
-        <div id="ncSecWas" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Was für ein Coaching</div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Was für ein Coaching</div>
     <div class="f2" style="margin-bottom:10px">
       <div><label>Kategorie</label><select id="sess-category" onchange="onCoachingCategoryChange('sess-category','sess-type')"></select></div>
       <div><label>Art des Coachings</label><select id="sess-type"></select></div>
@@ -654,35 +717,43 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       </div>
     </div>
         </div>
-        <div id="ncSecKon" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Rückblick &amp; Kontext</div>
-          <div id="ncLastContinueBox"></div>
-<div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px"><span style="width:22px;height:22px;border-radius:7px;background:#fff;border:1px solid #E4E0D6;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-player-play"></i></span>Start <span style="font-weight:500;color:var(--text3);font-size:12px">Was soll neu begonnen werden?</span></div><textarea id="sess-start" rows="2" style="resize:vertical"></textarea></div><div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px"><span style="width:22px;height:22px;border-radius:7px;background:#fff;border:1px solid #E4E0D6;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-player-stop"></i></span>Stop <span style="font-weight:500;color:var(--text3);font-size:12px">Was soll aufgehört werden?</span></div><textarea id="sess-stop" rows="2" style="resize:vertical"></textarea></div><div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px"><span style="width:22px;height:22px;border-radius:7px;background:#fff;border:1px solid #E4E0D6;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-repeat"></i></span>Continue <span style="font-weight:500;color:var(--text3);font-size:12px">Was soll beibehalten werden?</span></div><textarea id="sess-cont" rows="2" style="resize:vertical"></textarea></div><div style="margin-bottom:10px"><div style="display:flex;align-items:center;gap:8px;font-size:13px;font-weight:700;color:var(--text);margin-bottom:5px"><span style="width:22px;height:22px;border-radius:7px;background:#fff;border:1px solid #E4E0D6;display:flex;align-items:center;justify-content:center;font-size:13px"><i class="ti ti-notes"></i></span>Notizen <span style="font-weight:500;color:var(--text3);font-size:12px">Beobachtungen &amp; Vereinbarungen</span></div><textarea id="sess-note" rows="2" style="resize:vertical"></textarea></div>        </div>
+<div id="ncLastContinueBox" style="display:none"></div>
+<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:0 0 8px"><span>Start</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Was soll neu begonnen werden?</span></div><textarea id="sess-start" rows="2" style="min-height:72px;resize:vertical"></textarea>
+<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:12px 0 8px"><span>Stop</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Was soll aufgehört werden?</span></div><textarea id="sess-stop" rows="2" style="min-height:72px;resize:vertical"></textarea>
+<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:12px 0 8px"><span>Continue</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Was soll beibehalten werden?</span></div><textarea id="sess-cont" rows="2" style="min-height:72px;resize:vertical"></textarea>
+<div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:12px 0 8px"><span>Notiz</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Beobachtungen &amp; Vereinbarungen</span></div><textarea id="sess-note" rows="2" style="min-height:52px;resize:vertical"></textarea>
+<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" data-eid="" id="ncSaveBtn" type="button" style="height:36px;width:auto" onclick="saveSession(document.getElementById('ncSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Session speichern</button></div></div>
+        <div id="ncSecList" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Letzte Sessions <span id="ncListN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="var e=selectedEmp;closeModal('neuesCoachingModal');selectedEmp=e;view='emp';activeTab='session';renderSidebar();renderMain();">Alle in Coaching Sessions</button></div><div id="ncList"></div></div>
       </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('neuesCoachingModal')">Abbrechen</button><button class="btn btn-primary" data-eid="" id="ncSaveBtn" type="button" style="height:36px;width:auto" onclick="saveSession(document.getElementById('ncSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Session speichern</button></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('neuesCoachingModal')">Schließen</button></div>
     </div>
   </div>
+  <div id="ncToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased;z-index:5"></div>
 </div></div>
 
 <!-- NEUEN CALL BEWERTEN -->
-<div class="modal-ov hidden" id="qaBewertungModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">
-  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="qaHdKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Neuen Call bewerten</div><div id="qaHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('qaBewertungModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
+<div class="modal-ov hidden" id="qaBewertungModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden;position:relative">
+  <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="qaHdKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Call bewerten</div><div id="qaHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('qaBewertungModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
   <div style="display:flex;min-height:0;flex:1">
-    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Call-Details" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('qaSecDet');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-phone"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">1</span><span class="rl-tip" style="left:48px">Call-Details</span></button><button class="rl-btn" type="button" aria-label="Bewertung" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('qaSecBew');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-star"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">2</span><span class="rl-tip" style="left:48px">Bewertung</span></button><button class="rl-btn" type="button" aria-label="Notiz" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('qaSecNotiz');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-notes"></i><span style="position:absolute;right:-3px;top:-3px;width:15px;height:15px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center">3</span><span class="rl-tip" style="left:48px">Notiz</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('qaBewertungModal');openCoachingInfoModal(e)"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button><button class="rl-btn" type="button" aria-label="Session planen" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('qaBewertungModal');openSessionModal(e)"><i class="ti ti-calendar-plus"></i><span class="rl-tip" style="left:48px">Session planen</span></button></div>
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Neue Bewertung" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('qaSecBew');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-pencil"></i><span class="rl-tip" style="left:48px">Neue Bewertung</span></button><button class="rl-btn" type="button" aria-label="Letzte Calls" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('qaSecList');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-list"></i><span class="rl-tip" style="left:48px">Letzte Calls</span></button><span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span><button class="rl-btn" type="button" aria-label="Coaching-Historie" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('qaBewertungModal');openCoachingInfoModal(e)"><i class="ti ti-history"></i><span class="rl-tip" style="left:48px">Coaching-Historie</span></button><button class="rl-btn" type="button" aria-label="Session planen" style="width:38px;height:38px;font-size:18px" onclick="var e=selectedEmp;closeModal('qaBewertungModal');openSessionModal(e)"><i class="ti ti-calendar-plus"></i><span class="rl-tip" style="left:48px">Session planen</span></button></div>
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">
-        <div id="qaSecDet" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Call-Details</div>
+        <div id="qaSecBew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px"><span id="qaCardTitle">Neue Bewertung</span> <span id="qaTotalTxt" style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)"></span></div>
+          <div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Call-Details</div>
           <div class="f3" style="gap:10px;margin-bottom:10px"><div><label>Datum</label><input type="date" id="cb-date"></div><div><label>Auftragsnummer</label><input type="text" id="cb-auftrag" placeholder="z.B. 438043417"></div><div><label>Bewertet von</label><input type="text" id="cb-bewerter" placeholder="Name"></div></div>
           <div class="f3" style="gap:10px;margin-bottom:10px"><div><label>Abschluss?</label><select id="cb-status"><option value="nein">Nein</option><option value="ja">Ja</option></select></div><div><label>B2B / B2C</label><select id="cb-b2b"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div><div><label>Optimierung</label><select id="cb-abschlussart"><option value="">Keine Optimierung</option><option value="TW">Opt.: TW</option><option value="Yes">Opt.: Yes</option><option value="SY">Opt.: SY</option><option value="MY">Opt.: MY</option><option value="Upsell">Opt.: Upsell</option><option value="WKA">Opt.: WKA</option></select></div></div>
-          <div><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div>
-        </div>
-        <div id="qaSecBew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Bewertung <span style="font-weight:500;color:var(--text3);font-size:12px">1–4 je Kriterium</span><span style="margin-left:auto;display:flex;gap:6px"><span id="qaCountChip" style="font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2);white-space:nowrap">0 bewertet</span><span id="qaTotalChip" style="font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;background:#1d1c1a;border:1px solid #1d1c1a;color:#fff;white-space:nowrap">Gesamt –</span></span></div>
+          <div><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div></div>
+          
           <div id="qaScoringSection"></div>
+          <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;margin:12px 0 6px">Notiz <span style="letter-spacing:0;text-transform:none;font-weight:600;color:var(--text3)">optional</span></div><textarea id="cb-hinweis" rows="2" style="min-height:56px;resize:vertical" placeholder="Beobachtungen, Verbesserungspotenzial"></textarea>
+          <div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn" type="button" id="qaCancelEdit" style="height:36px;width:auto;display:none" onclick="qaReopen(null)">Bearbeiten abbrechen</button><button class="btn btn-primary" id="qaSaveBtn" data-eid="" type="button" style="height:36px;width:auto" onclick="saveInlineCallBewertung(document.getElementById('qaSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Bewertung speichern</button></div>
         </div>
-        <div id="qaSecNotiz" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Notiz</div><label>Hinweis / Notiz</label><textarea id="cb-hinweis" rows="2" placeholder="Beobachtungen, Verbesserungspotenzial"></textarea></div>
+        <div id="qaSecList" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:4px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Letzte Calls <span id="qaListN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="var e=selectedEmp;closeModal('qaBewertungModal');selectedEmp=e;view='emp';activeTab='call-performance';renderSidebar();renderMain();">Alle in QA Performance</button></div><div id="qaList"></div></div>
       </div>
-      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('qaBewertungModal')">Abbrechen</button><button class="btn btn-primary" id="qaSaveBtn" data-eid="" type="button" style="height:36px;width:auto" onclick="saveInlineCallBewertung(document.getElementById('qaSaveBtn').dataset.eid)"><i class="ti ti-device-floppy"></i> Bewertung speichern</button></div>
+      <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('qaBewertungModal')">Schließen</button></div>
     </div>
   </div>
+  <div id="qaToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased;z-index:5"></div>
 </div></div>
 
 <!-- NEUES ZIEL -->
@@ -6049,7 +6120,7 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;'+fc(crMY,rowEmpT.crMegaYes.val,rowEmpT.crMegaYes.dir)+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR MY = MY / (Yes+SY+MY)\',\'MY\','+my+',\'Yes+SY+MY\','+(yes+sy+my)+',\'CR MY\',\''+crMY+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crMY+'%',my)+'</td>'
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:var(--s-tint);text-align:right;'+fc(Math.round(optGes>0?convOEM/optGes*100:0),rowEmpT.anteilOEM.val,rowEmpT.anteilOEM.dir)+';cursor:help" onmouseenter="showInfoTooltip(event,\'Anteil OEM = Opt.OEM / Opt.Ges.\',\'Opt.OEM\','+convOEM+',\'Opt.Ges.\','+optGes+',\'Anteil OEM\',\''+(optGes>0?Math.round(convOEM/optGes*100):0)+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell((optGes>0?Math.round(convOEM/optGes*100):0)+'%',null)+'</td>'
         +'<td style="padding:16px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text);cursor:help" onmouseenter="showBreakdownTooltip(event,\'Marge Ges. Aufschlüsselung\',\'€'+Math.round(margeOEMVal).toLocaleString('de-DE')+'\',\'€'+Math.round(margeUpsVal).toLocaleString('de-DE')+'\',\'€'+Math.round(margeWkaVal).toLocaleString('de-DE')+'\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+Math.round(marge/optGes).toLocaleString('de-DE'):'—'))+'</td>'
-        +(rowEmp.id==='__agg__'?'<td style="padding:16px 10px;border-bottom:1px solid var(--border)"></td>':'<td style="padding:16px 10px;border-bottom:1px solid var(--border);white-space:nowrap"><div style="display:flex;gap:6px;justify-content:flex-end">'+(hideMemberCol?'':'<button class="btn btn-sm btn-primary" style="height:34px;padding:0 12px" onclick="event.stopPropagation();openSessionModal(\''+rowEmp.id+'\')"><i class="ti ti-calendar-plus"></i> Planen</button>')+'<button class="btn btn-sm" title="Info" aria-label="Info" style="width:34px;height:34px;padding:0;justify-content:center" onclick="event.stopPropagation();openCoachingInfoModal(\''+rowEmp.id+'\')"><i class="ti ti-info-circle"></i></button></div></td>')
+        +(rowEmp.id==='__agg__'?'<td style="padding:16px 10px;border-bottom:1px solid var(--border)"></td>':'<td style="padding:16px 10px;border-bottom:1px solid var(--border);white-space:nowrap"><div style="display:flex;gap:6px;justify-content:flex-end">'+(hideMemberCol?'':'<button class="btn btn-sm btn-primary" style="height:34px;padding:0 12px" onclick="event.stopPropagation();openSessionModal(\''+rowEmp.id+'\')"><i class="ti ti-calendar-plus"></i> Planen</button>')+'<button class="btn btn-sm" title="Info" aria-label="Info" style="width:34px;height:34px;padding:0;justify-content:center" onclick="event.stopPropagation();openPerfPopup(\''+rowEmp.id+'\')"><i class="ti ti-info-circle"></i></button></div></td>')
         +'</tr>';
       sumAkt+=akt;sumNotR+=notR;sumNotP+=notP;sumNotS+=notS;sumNotROem+=notROem;sumNotPOem+=notPOem;sumNotSOem+=notSOem;sumConvOEM+=convOEM;sumTw+=tw;sumYes+=yes;sumSy+=sy;sumMy+=my;sumTotalHours+=rowTotalHours;
       sumUps+=ups;sumWka+=wka_gesamt_yes;sumOptGes+=optGes;sumMarge+=marge;
@@ -7871,7 +7942,7 @@ function renderTab(){
     html+='<div class="card">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">';
     html+='<div class="card-title" style="margin:0"><i class="ti ti-checklist"></i> Aufgaben</div>';
-    html+='<button class="btn btn-primary btn-sm" onclick="openModal(\'addTaskModal\')"><i class="ti ti-plus"></i> Add task</button>';
+    html+='<button class="btn btn-primary btn-sm" onclick="openAddTaskModal(selectedEmp)"><i class="ti ti-plus"></i> Add task</button>';
     html+='</div>';
     if(empTasks.length===0&&qaDue.due===0){
       html+='<div class="empty">No tasks yet. Add tasks manually or from a protocol.</div>';
@@ -8629,127 +8700,115 @@ function deleteHistorieEval(empId,evalId){
   sb.from('reviews').delete().eq('id',evalId).then(function(){renderTab();}).catch(function(){renderTab();});
 }
 function openCommentModal(empId,editCommentId){
-  var emp=employees.find(function(e){return e.id===empId;});
-  var existingComment=editCommentId?(reviews[empId]||[]).find(function(r){return r.id===editCommentId;}):null;
-  var overlay=document.createElement('div');
-  overlay.id='commentModal';
-  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:7vh 16px 16px';
-
-  var box=document.createElement('div');
-  box.style.cssText='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:16px;padding:24px 28px;width:680px;max-width:95vw;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18)';
-
-  var hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:18px';
-  hdr.innerHTML='<div style="font-size:17px;font-weight:700">'+(existingComment?'Kommentar bearbeiten':'Kommentar hinzufügen')+'</div>';
-  var closeBtn=document.createElement('button');
-  closeBtn.textContent='×';
-  closeBtn.style.cssText='background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1';
-  closeBtn.onclick=function(){overlay.remove();};
-  hdr.appendChild(closeBtn);
-  box.appendChild(hdr);
-
-  var curName='Unbekannt';
+  // Kommentar im gemeinsamen Popup: eine Kachel zum Schreiben, darunter die letzten fünf Kommentare
+  var emp=employees.find(function(e){return String(e.id)===String(empId);});
+  var old=document.getElementById('commentModal');if(old)old.remove();
+  var curName='Admin';
   if(typeof currentCoach!=='undefined'&&currentCoach)curName=currentCoach.name;
-  else if(typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof appUsers!=='undefined'){
-    var matchUser=appUsers.find(function(u){return u.email===currentAuthUser.email;});
-    if(matchUser)curName=matchUser.name;
+  else if(typeof currentAuthUser!=='undefined'&&currentAuthUser){
+    var mu=(typeof appUsers!=='undefined'?appUsers:[]).find(function(u){return u.email===currentAuthUser.email;});
+    curName=mu?mu.name:((typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'Admin');
   }
-
-  var sec1=document.createElement('div');
-  sec1.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec1.textContent='① Wer & Wann';
-  box.appendChild(sec1);
-  var sec1body=document.createElement('div');
-  sec1body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
-  sec1body.innerHTML='<label style="font-size:12px;font-weight:600;color:var(--text2)">Verfasser</label>'
-    +'<div style="font-size:13px;margin-top:4px;color:var(--text)">'+esc(curName)+'</div>'
-    +'<label style="font-size:12px;font-weight:600;color:var(--text2);margin-top:10px;display:block">Datum</label>'
-    +'<input type="date" id="comment-date" value="'+(existingComment?existingComment.date:today())+'" style="display:block;margin-top:4px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:220px">';
-  box.appendChild(sec1body);
-
-  var sec2=document.createElement('div');
-  sec2.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec2.textContent='② Art des Kommentars';
-  box.appendChild(sec2);
-  var sec2body=document.createElement('div');
-  sec2body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
-  var pillWrap=document.createElement('div');
-  pillWrap.style.cssText='display:flex;gap:8px;margin-top:6px';
-  var commentType=existingComment?existingComment.commentType:'diverses';
-  ['skill','will','result','diverses'].forEach(function(t){
-    var p=document.createElement('div');
-    p.textContent=t.charAt(0).toUpperCase()+t.slice(1);
-    p.dataset.type=t;
-    var setActive=function(){
-      pillWrap.querySelectorAll('div').forEach(function(el){el.style.background='#fff';el.style.borderColor='var(--border2)';el.style.color='var(--text2)';});
-      p.style.background='#F08566';p.style.borderColor='#F08566';p.style.color='#fff';
-      commentType=t;
-    };
-    p.style.cssText='padding:7px 16px;border-radius:20px;border:1.5px solid var(--border2);font-size:12.5px;font-weight:600;color:var(--text2);cursor:pointer;background:#fff';
-    p.onclick=setActive;
-    if(t===commentType)setActive();
-    pillWrap.appendChild(p);
-  });
-  sec2body.appendChild(pillWrap);
-  box.appendChild(sec2body);
-
-  var sec3=document.createElement('div');
-  sec3.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec3.textContent='③ Kommentar';
-  box.appendChild(sec3);
-  var sec3body=document.createElement('div');
-  sec3body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:6px';
-  var textarea=document.createElement('textarea');
-  textarea.id='comment-text';
-  textarea.placeholder='z.B. Kommt regelmäßig zu spät zum Stand-up...';
-  if(existingComment)textarea.value=existingComment.note;
-  textarea.style.cssText='display:block;margin-top:4px;width:100%;font-size:13px;padding:9px 12px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);min-height:100px;resize:vertical;font-family:inherit';
-  sec3body.appendChild(textarea);
-  box.appendChild(sec3body);
-
-  var footer=document.createElement('div');
-  footer.style.cssText='display:flex;justify-content:flex-end;gap:8px;margin-top:6px';
-  var cancelBtn=document.createElement('button');
-  cancelBtn.className='btn';
-  cancelBtn.textContent='Abbrechen';
-  cancelBtn.onclick=function(){overlay.remove();};
-  var saveBtn=document.createElement('button');
-  saveBtn.className='btn btn-primary';
-  saveBtn.textContent='Speichern';
-  saveBtn.textContent=existingComment?'Speichern':'Speichern';
-  saveBtn.onclick=function(){
-    var txt=document.getElementById('comment-text').value.trim();
-    if(!txt){alert('Bitte einen Kommentar eingeben.');return;}
-    var dateVal=document.getElementById('comment-date').value||today();
-    if(!reviews[empId])reviews[empId]=[];
-    if(existingComment){
-      existingComment.date=dateVal;
-      existingComment.commentType=commentType;
-      existingComment.note=txt;
-      saveCommentToDb(empId,existingComment,true);
-    } else {
-      var newC={
-        id:newCommentId(),
-        date:dateVal,
-        isComment:true,
-        commentType:commentType,
-        note:txt,
-        author:curName
+  var st={editId:null,type:'diverses'};
+  var CARD='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)';
+  var ov=document.createElement('div');ov.id='commentModal';ov.dataset.puShell='1';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:7vh 16px 16px';
+  ov.innerHTML='<div style="background:#EEEDE9;border:1px solid #E4E0D6;border-radius:16px;width:860px;max-width:95vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.18);position:relative">'
+    +'<div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="cmKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Kommentar hinzufügen</div>'
+    +'<div style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(emp?esc(emp.name)+(emp.role?' · '+esc(emp.role):''):'')+'</div></div>'
+    +'<button class="btn" type="button" id="cmX" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" aria-label="Schließen"><i class="ti ti-x"></i></button></div>'
+    +'<div style="display:flex;min-height:0;flex:1">'
+    +'<div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3">'
+    +'<button class="rl-btn on" type="button" aria-label="Neuer Kommentar" data-target="cmSec1" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'cmSec1\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-pencil"></i><span class="rl-tip" style="left:48px">Neuer Kommentar</span></button>'
+    +'<button class="rl-btn" type="button" aria-label="Letzte Kommentare" data-target="cmSec2" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'cmSec2\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-list"></i><span class="rl-tip" style="left:48px">Letzte Kommentare</span></button>'
+    +'</div>'
+    +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">'
+    +'<div id="cmScroll" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px">'
+    +'<div id="cmSec1" style="'+CARD+'"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px"><span id="cmTitle">Neuer Kommentar</span><span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)">von '+esc(curName)+'</span></div>'
+    +'<div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:10px"><div style="width:170px;flex-shrink:0"><label>Datum</label><input type="date" id="comment-date" value="'+today()+'"></div>'
+    +'<div style="flex:1;min-width:0"><label>Art</label><div id="cmArt" style="display:flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;padding:2px;height:38px;align-items:center"></div></div></div>'
+    +'<label>Kommentar</label><textarea id="comment-text" placeholder="z. B. Kommt regelmäßig zu spät zum Stand-up …" style="min-height:70px;resize:vertical"></textarea>'
+    +'<div style="display:flex;align-items:center;gap:10px;margin-top:12px"><label id="cmNoteWrap" style="display:flex;align-items:center;gap:8px;margin:0;cursor:pointer;font-size:13px;color:var(--text2)"><input type="checkbox" id="comment-to-note" style="width:16px;height:16px;accent-color:#3a3833;margin:0"> In die Notiz zum Mitarbeiter übernehmen</label>'
+    +'<span style="margin-left:auto;display:flex;gap:8px"><button class="btn" type="button" id="cmCancelEdit" style="height:36px;width:auto;display:none">Bearbeiten abbrechen</button>'
+    +'<button class="btn btn-primary" type="button" id="cmSave" style="height:36px;width:auto"><i class="ti ti-check"></i> <span>Kommentar speichern</span></button></span></div></div>'
+    +'<div id="cmSec2" style="'+CARD+';margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Letzte Kommentare <span id="cmN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span>'
+    +'<button class="btn" type="button" id="cmAll" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px">Alle in Development</button></div><div id="cmList"></div></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" id="cmClose" style="height:36px;width:auto">Schließen</button></div>'
+    +'</div></div>'
+    +'<div id="cmToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased"></div>'
+    +'</div>';
+  document.body.appendChild(ov);
+  var $=function(id){return document.getElementById(id);};
+  $('cmX').onclick=$('cmClose').onclick=function(){ov.remove();};
+  $('cmAll').onclick=function(){ov.remove();selectedEmp=empId;view='emp';activeTab='coaching-eval';renderSidebar();renderMain();};
+  function renderArt(){
+    $('cmArt').innerHTML=['skill','will','result','diverses'].map(function(t){var on=t===st.type;
+      return '<span data-t="'+t+'" style="flex:1;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:13px;cursor:pointer;'+(on?'background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)':'color:var(--text2);font-weight:500')+'">'+t.charAt(0).toUpperCase()+t.slice(1)+'</span>';}).join('');
+    [].slice.call($('cmArt').children).forEach(function(sp){sp.onclick=function(){st.type=sp.dataset.t;renderArt();};});
+  }
+  function toast(msg){var t=$('cmToast');if(!t)return;t.textContent=msg;t.style.display='block';clearTimeout(window._cmTT);window._cmTT=setTimeout(function(){t.style.display='none';},3000);}
+  function setEdit(c){
+    st.editId=c?c.id:null;st.type=c?(c.commentType||'diverses'):'diverses';
+    $('comment-date').value=c?c.date:today();$('comment-text').value=c?c.note:'';$('comment-to-note').checked=false;
+    $('cmTitle').textContent=c?'Kommentar bearbeiten':'Neuer Kommentar';$('cmKick').textContent=c?'Kommentar bearbeiten':'Kommentar hinzufügen';
+    $('cmSave').lastElementChild.textContent=c?'Änderung speichern':'Kommentar speichern';
+    $('cmCancelEdit').style.display=c?'':'none';$('cmNoteWrap').style.display=c?'none':'flex';
+    renderArt();
+    if(c){$('cmSec1').scrollIntoView({behavior:'smooth',block:'start'});$('comment-text').focus();}
+  }
+  function renderList(){
+    var list=(reviews[empId]||[]).filter(function(r){return r.isComment;}).slice().sort(function(a,b){return String(b.date||'').localeCompare(String(a.date||''));});
+    $('cmN').textContent='('+list.length+')';
+    var ed=canEditHistorie();
+    $('cmList').innerHTML=list.length?list.slice(0,5).map(function(c){
+      var art=String(c.commentType||'diverses');art=art.charAt(0).toUpperCase()+art.slice(1);
+      var d=c.date?c.date.slice(8,10)+'.'+c.date.slice(5,7)+'.':'';
+      return '<div title="'+esc(c.note||'')+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
+        +'<div style="width:96px;flex-shrink:0;display:flex;flex-direction:column;align-items:flex-start;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+d+'</span><span style="font-size:13.5px;font-weight:600;color:var(--text);line-height:19px">'+esc(art)+'</span></div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(c.author||'')+'</div>'
+        +'<div style="font-size:13.5px;line-height:19px;height:38px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--text)">'+esc(c.note||'')+'</div></div>'
+        +(ed?'<span style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start">'
+          +'<button class="btn" type="button" title="Bearbeiten" data-cid="'+c.id+'" data-act="edit" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-pencil"></i></button>'
+          +'<button class="btn" type="button" title="Löschen" data-cid="'+c.id+'" data-act="del" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-trash"></i></button></span>':'')
+        +'</div>';
+    }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch keine Kommentare.</div>';
+    [].slice.call($('cmList').querySelectorAll('button[data-act]')).forEach(function(b){
+      b.onclick=function(){
+        var c=(reviews[empId]||[]).find(function(r){return String(r.id)===String(b.dataset.cid);});if(!c)return;
+        if(b.dataset.act==='edit')setEdit(c);
+        else{var n0=(reviews[empId]||[]).length;deleteHistorieComment(empId,c.id);if((reviews[empId]||[]).length<n0){if(st.editId===c.id)setEdit(null);renderList();toast('Kommentar gelöscht');delete _puState['coachingInfoModal'];}}
       };
-      reviews[empId].push(newC);
-      saveCommentToDb(empId,newC,false);
+    });
+  }
+  $('cmCancelEdit').onclick=function(){setEdit(null);};
+  $('cmSave').onclick=function(){
+    var txt=$('comment-text').value.trim();
+    if(!txt){alert('Bitte einen Kommentar eingeben.');$('comment-text').focus();return;}
+    var dateVal=$('comment-date').value||today();
+    if(!reviews[empId])reviews[empId]=[];
+    if(st.editId){
+      var ex=reviews[empId].find(function(r){return String(r.id)===String(st.editId);});
+      if(ex){ex.date=dateVal;ex.commentType=st.type;ex.note=txt;saveCommentToDb(empId,ex,true);}
+      toast('Änderung gespeichert');
+    } else {
+      var nc={id:newCommentId(),date:dateVal,isComment:true,commentType:st.type,note:txt,author:curName};
+      reviews[empId].push(nc);saveCommentToDb(empId,nc,false);
+      if($('comment-to-note').checked&&emp){
+        var d=new Date();var stamp=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
+        var notiz=(emp.notes&&String(emp.notes).trim()?String(emp.notes).trim()+'\n':'')+stamp+' '+txt;
+        emp.notes=notiz;
+        sb.from('employees').update({notes:notiz}).eq('id',emp.id).then(function(res){if(res&&res.error)alert('Notiz konnte nicht gespeichert werden: '+res.error.message);});
+      }
+      toast('Kommentar gespeichert');
     }
-    overlay.remove();
-    var infoModalOpen=document.getElementById('coachingInfoModal')&&!document.getElementById('coachingInfoModal').classList.contains('hidden');
-    if(infoModalOpen){openCoachingInfoModal(empId);}
-    else{renderTab();}
+    setEdit(null);renderList();
+    delete _puState['coachingInfoModal'];
+    if(view==='emp')renderTab();
   };
-  footer.appendChild(cancelBtn);
-  footer.appendChild(saveBtn);
-  box.appendChild(footer);
-
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  var ex0=editCommentId?(reviews[empId]||[]).find(function(r){return String(r.id)===String(editCommentId);}):null;
+  setEdit(ex0||null);renderList();
+  if(!ex0)setTimeout(function(){var t=$('comment-text');if(t)t.focus();},50);
 }
 // ── PROVISION: komplett eigenstaendige Tabelle, unabhaengig von buildOverviewTab (keine geteilte Zustandsvariable) ──
 var provisionMode='year'; // 'month' | 'year' | 'custom'
@@ -9367,148 +9426,128 @@ function buildProvisionTable(empId){
   return h;
 }
 function openCoachingEval(empId,editEvalId){
+  // Entwicklung im gemeinsamen Popup: neue Bewertung (untereinander, mit Vergleich zum letzten Mal) und die letzten Bewertungen
   var DIMS=[
-    {key:'einwand',label:'Einwandsbehandlung',cat:'skill'},
-    {key:'bedarf',label:'Bedarfsanalyse',cat:'skill'},
-    {key:'produkt',label:'Produktwissen',cat:'skill'},
-    {key:'gespraech',label:'Gesprächsführung',cat:'skill'},
-    {key:'motivation',label:'Motivation',cat:'will'},
-    {key:'coach',label:'Coachability',cat:'will'},
-    {key:'zuverl',label:'Zuverlässigkeit',cat:'will'},
-    {key:'team',label:'Teamfähigkeit',cat:'will'},
-    {key:'crOEM',label:'CR OEM',cat:'result'},
-    {key:'crTW',label:'TW',cat:'result'},
-    {key:'crSY',label:'SY',cat:'result'},
-    {key:'crMY',label:'MY',cat:'result'}
+    {key:'einwand',label:'Einwandsbehandlung',cat:'skill'},{key:'bedarf',label:'Bedarfsanalyse',cat:'skill'},
+    {key:'produkt',label:'Produktwissen',cat:'skill'},{key:'gespraech',label:'Gesprächsführung',cat:'skill'},
+    {key:'motivation',label:'Motivation',cat:'will'},{key:'coach',label:'Coachability',cat:'will'},
+    {key:'zuverl',label:'Zuverlässigkeit',cat:'will'},{key:'team',label:'Teamfähigkeit',cat:'will'},
+    {key:'crOEM',label:'CR OEM',cat:'result'},{key:'crTW',label:'CR TW',cat:'result'},
+    {key:'crSY',label:'CR SY',cat:'result'},{key:'crMY',label:'CR MY',cat:'result'}
   ];
-  var CC={skill:{col:'#1d1c1a',bg:'rgba(29,28,26,0.08)',l:'Skill'},will:{col:'#F08566',bg:'rgba(29,28,26,0.12)',l:'Will'},result:{col:'#F08566',bg:'rgba(29,28,26,0.16)',l:'Result'}};
-  var existing=(reviews[empId]||[]).filter(function(r){return r.einwand!==undefined;});
-  var editingEntry=editEvalId?existing.find(function(r){return r.id===editEvalId;}):null;
-  var last=editingEntry||(existing.length?existing.sort(function(a,b){return b.date.localeCompare(a.date);})[0]:null);
-
-  // Build modal via DOM API - no onclick strings needed
-  var overlay=document.createElement('div');
-  overlay.id='cevModal';
-  overlay.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:7vh 16px 16px';
-
-  var box=document.createElement('div');
-  box.style.cssText='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:16px;padding:24px 28px;width:680px;max-width:95vw;max-height:86vh;overflow-y:auto;box-shadow:0 20px 50px rgba(0,0,0,0.18)';
-
-  // Header
-  var hdr=document.createElement('div');
-  hdr.style.cssText='display:flex;align-items:center;justify-content:space-between;margin-bottom:18px';
-  hdr.innerHTML='<div style="font-size:17px;font-weight:700">'+(editingEntry?'Bewertung bearbeiten':'Mitarbeiterentwicklung bewerten')+'</div>';
-  var closeBtn=document.createElement('button');
-  closeBtn.textContent='×';
-  closeBtn.style.cssText='background:none;border:none;font-size:22px;cursor:pointer;color:var(--text3);line-height:1';
-  closeBtn.onclick=function(){overlay.remove();};
-  hdr.appendChild(closeBtn);
-  box.appendChild(hdr);
-
-  // Date input
-  var sec1=document.createElement('div');
-  sec1.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec1.textContent='① Bewertungsdatum';
-  box.appendChild(sec1);
-  var sec1body=document.createElement('div');
-  sec1body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
-  var dateWrap=document.createElement('div');
-  dateWrap.style.marginBottom='0';
-  var dateLabel=document.createElement('label');
-  dateLabel.style.cssText='font-size:12px;font-weight:600;color:var(--text2)';
-  dateLabel.textContent='Bewertungsdatum';
-  var dateInput=document.createElement('input');
-  dateInput.type='date';
-  dateInput.id='cev-date';
-  dateInput.value=editingEntry?editingEntry.date:today();
-  dateInput.style.cssText='display:block;margin-top:4px;font-size:13px;padding:6px 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:180px';
-  dateWrap.appendChild(dateLabel);
-  dateWrap.appendChild(dateInput);
-  sec1body.appendChild(dateWrap);
-  box.appendChild(sec1body);
-
-  var sec2=document.createElement('div');
-  sec2.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec2.textContent='② Bewertung (Skill / Will / Result)';
-  box.appendChild(sec2);
-  var sec2body=document.createElement('div');
-  sec2body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:16px';
-  box.appendChild(sec2body);
-
-  // Sliders per category
-  ['skill','will','result'].forEach(function(cat){
-    var cdims=DIMS.filter(function(d){return d.cat===cat;});
-    var catDiv=document.createElement('div');
-    catDiv.style.marginBottom='16px';
-    var catHdr=document.createElement('div');
-    catHdr.style.cssText='font-size:11px;font-weight:700;color:'+CC[cat].col+';background:'+CC[cat].bg+';padding:6px 12px;border-radius:var(--r-md);margin-bottom:10px;letter-spacing:.04em';
-    catHdr.textContent=CC[cat].l.toUpperCase();
-    catDiv.appendChild(catHdr);
-    cdims.forEach(function(d){
-      var def=last&&last[d.key]!==undefined?last[d.key]:5;
-      var row=document.createElement('div');
-      row.style.cssText='display:flex;align-items:center;gap:12px;margin-bottom:10px';
-      var lbl=document.createElement('span');
-      lbl.style.cssText='width:155px;font-size:13px;flex-shrink:0';
-      lbl.textContent=d.label;
-      var slider=document.createElement('input');
-      slider.type='range';slider.min=0;slider.max=10;slider.step=1;slider.value=def;
-      slider.id='cev-'+d.key;
-      slider.style.cssText='flex:1;accent-color:'+CC[cat].col;
-      var val=document.createElement('span');
-      val.id='cevv-'+d.key;
-      val.style.cssText='width:22px;text-align:right;font-size:14px;font-weight:700;color:'+CC[cat].col;
-      val.textContent=def;
-      slider.oninput=function(){val.textContent=this.value;};
-      row.appendChild(lbl);row.appendChild(slider);row.appendChild(val);
-      catDiv.appendChild(row);
+  var CATS=[['skill','Skill'],['will','Will'],['result','Result']];
+  var emp=employees.find(function(e){return String(e.id)===String(empId);});
+  var old=document.getElementById('cevModal');if(old)old.remove();
+  var curName='Admin';
+  if(typeof currentCoach!=='undefined'&&currentCoach)curName=currentCoach.name;
+  else if(typeof currentAuthUser!=='undefined'&&currentAuthUser){
+    var mu=(typeof appUsers!=='undefined'?appUsers:[]).find(function(u){return u.email===currentAuthUser.email;});
+    curName=mu?mu.name:((typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'Admin');
+  }
+  function evals(){return (reviews[empId]||[]).filter(function(r){return r.einwand!==undefined;}).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});}
+  function avgOf(e,cat){var ks=DIMS.filter(function(d){return !cat||d.cat===cat;});return ks.reduce(function(s,d){return s+(+e[d.key]||0);},0)/ks.length;}
+  function f1(x){return x.toFixed(1).replace('.',',');}
+  var st={editId:null,cur:{},base:null};
+  var CARD='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)';
+  var BAND='font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between';
+  var ov=document.createElement('div');ov.id='cevModal';ov.dataset.puShell='1';
+  ov.style.cssText='position:fixed;top:0;left:0;right:0;bottom:0;background:rgba(0,0,0,.4);z-index:9000;display:flex;align-items:flex-start;justify-content:center;padding:7vh 16px 16px';
+  var sl='';
+  CATS.forEach(function(c,ci){
+    sl+='<div style="'+BAND+';margin:'+(ci?12:0)+'px 0 4px"><span>'+c[1]+'</span><span id="cevg-'+c[0]+'" style="letter-spacing:0;text-transform:none;color:var(--text3)"></span></div>';
+    DIMS.filter(function(d){return d.cat===c[0];}).forEach(function(d){
+      sl+='<div style="display:flex;align-items:center;gap:12px;height:36px;padding:0 10px;border-bottom:1px solid #eae7e0">'
+        +'<span style="width:150px;flex-shrink:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+d.label+'</span>'
+        +'<span id="cevl-'+d.key+'" style="width:66px;flex-shrink:0;font-size:12px;color:var(--text3)"></span>'
+        +'<input type="range" min="1" max="10" id="cev-'+d.key+'" data-k="'+d.key+'" style="flex:1;min-width:0;accent-color:#3a3833;margin:0;padding:0;height:20px;border:none;background:transparent">'
+        +'<b id="cevv-'+d.key+'" style="width:20px;text-align:right;font-size:13.5px"></b>'
+        +'<span id="cevd-'+d.key+'" style="width:30px;text-align:right;font-size:12px;font-weight:700"></span></div>';
     });
-    sec2body.appendChild(catDiv);
   });
-
-  // Note
-  var sec3=document.createElement('div');
-  sec3.style.cssText='font-size:11px;font-weight:700;color:#F08566;text-transform:uppercase;letter-spacing:.04em;margin-bottom:6px';
-  sec3.textContent='③ Notiz';
-  box.appendChild(sec3);
-  var sec3body=document.createElement('div');
-  sec3body.style.cssText='border-left:2px solid var(--border2);padding-left:14px;margin-bottom:14px';
-  var noteWrap=document.createElement('div');
-  noteWrap.style.marginBottom='0';
-  var noteLabel=document.createElement('label');
-  noteLabel.style.cssText='font-size:12px;font-weight:600;color:var(--text2)';
-  noteLabel.textContent='Notiz (optional)';
-  var noteArea=document.createElement('textarea');
-  noteArea.id='cev-note';
-  noteArea.rows=2;
-  noteArea.placeholder='Beobachtungen, Schwerpunkte...';
-  if(editingEntry&&editingEntry.note)noteArea.value=editingEntry.note;
-  noteArea.style.cssText='display:block;margin-top:4px;width:100%;box-sizing:border-box;font-size:12px;padding:8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);resize:vertical';
-  noteWrap.appendChild(noteLabel);
-  noteWrap.appendChild(noteArea);
-  sec3body.appendChild(noteWrap);
-  box.appendChild(sec3body);
-
-  // Buttons
-  var btnRow=document.createElement('div');
-  btnRow.style.cssText='display:flex;gap:10px';
-  var saveBtn=document.createElement('button');
-  saveBtn.className='btn btn-primary';
-  saveBtn.style.flex='1';
-  saveBtn.innerHTML=editingEntry?'&#10003; Änderungen speichern':'&#10003; Bewertung speichern';
-  saveBtn.onclick=function(){saveCoachEval(empId);};
-  var cancelBtn=document.createElement('button');
-  cancelBtn.className='btn';
-  cancelBtn.textContent='Abbrechen';
-  cancelBtn.onclick=function(){overlay.remove();};
-  btnRow.appendChild(saveBtn);
-  btnRow.appendChild(cancelBtn);
-  box.appendChild(btnRow);
-
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
+  sl+='<div style="'+BAND+';margin:12px 0 6px"><span>Notiz <span style="letter-spacing:0;text-transform:none;font-weight:600;color:var(--text3)">optional</span></span></div>'
+    +'<textarea id="cev-note" placeholder="Beobachtungen, Begründung, nächste Schritte …" style="min-height:56px;resize:vertical"></textarea>';
+  ov.innerHTML='<div style="background:#EEEDE9;border:1px solid #E4E0D6;border-radius:16px;width:860px;max-width:95vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.18);position:relative">'
+    +'<div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div id="cevKick" style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Mitarbeiterentwicklung</div>'
+    +'<div style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(emp?esc(emp.name)+(emp.role?' · '+esc(emp.role):''):'')+'</div></div>'
+    +'<button class="btn" type="button" id="cevX" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" aria-label="Schließen"><i class="ti ti-x"></i></button></div>'
+    +'<div style="display:flex;min-height:0;flex:1">'
+    +'<div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3">'
+    +'<button class="rl-btn on" type="button" aria-label="Neue Bewertung" data-target="cevSec1" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'cevSec1\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-pencil"></i><span class="rl-tip" style="left:48px">Neue Bewertung</span></button>'
+    +'<button class="rl-btn" type="button" aria-label="Letzte Bewertungen" data-target="cevSec2" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'cevSec2\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-list"></i><span class="rl-tip" style="left:48px">Letzte Bewertungen</span></button>'
+    +'</div>'
+    +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">'
+    +'<div id="cevScroll" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px">'
+    +'<div id="cevSec1" style="'+CARD+'"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px"><span id="cevTitle">Neue Bewertung</span><span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)">von '+esc(curName)+'</span></div>'
+    +'<div style="display:flex;gap:10px;align-items:flex-end;margin-bottom:12px"><div style="width:170px;flex-shrink:0"><label>Bewertungsdatum</label><input type="date" id="cev-date"></div>'
+    +'</div>'
+    +sl
+    +'<div style="display:flex;justify-content:flex-end;gap:8px;margin-top:12px"><button class="btn" type="button" id="cevCancelEdit" style="height:36px;width:auto;display:none">Bearbeiten abbrechen</button>'
+    +'<button class="btn btn-primary" type="button" id="cevSave" style="height:36px;width:auto"><i class="ti ti-check"></i> <span>Bewertung speichern</span></button></div></div>'
+    +'<div id="cevSec2" style="'+CARD+';margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Letzte Bewertungen <span id="cevN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span>'
+    +'<button class="btn" type="button" id="cevAll" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px">Alle in Development</button></div><div id="cevList"></div></div>'
+    +'</div>'
+    +'<div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" id="cevClose" style="height:36px;width:auto">Schließen</button></div>'
+    +'</div></div>'
+    +'<div id="cevToast" style="position:absolute;left:50%;bottom:64px;transform:translateX(-50%);background:#1d1c1a;color:#fff;font-size:13px;font-weight:600;padding:8px 14px;border-radius:10px;display:none;white-space:nowrap;-webkit-font-smoothing:antialiased"></div>'
+    +'</div>';
+  document.body.appendChild(ov);
+  var $=function(id){return document.getElementById(id);};
+  $('cevX').onclick=$('cevClose').onclick=function(){ov.remove();};
+  $('cevAll').onclick=function(){ov.remove();selectedEmp=empId;view='emp';activeTab='coaching-eval';renderSidebar();renderMain();};
+  function toast(m){var t=$('cevToast');if(!t)return;t.textContent=m;t.style.display='block';clearTimeout(window._cevTT);window._cevTT=setTimeout(function(){t.style.display='none';},3000);}
+  function refreshTop(){
+    var b=st.base;
+    DIMS.forEach(function(d){
+      var v=st.cur[d.key],lv=b?(+b[d.key]||0):null;
+      $('cevv-'+d.key).textContent=v;
+      $('cevl-'+d.key).textContent=lv!=null?'zuletzt '+lv:'';
+      var de=$('cevd-'+d.key);
+      if(lv==null){de.textContent='';}else{var dd=v-lv;de.textContent=dd>0?'+'+dd:dd<0?String(dd):'±0';de.style.color=dd>0?'#2f6b52':dd<0?'#B5513A':'var(--text3)';}
+    });
+    CATS.forEach(function(c){$('cevg-'+c[0]).textContent='Ø '+f1(avgOf(st.cur,c[0]));});
+  }
+  DIMS.forEach(function(d){$('cev-'+d.key).addEventListener('input',function(){st.cur[d.key]=+this.value;refreshTop();});});
+  function setEdit(e){
+    var list=evals();
+    st.editId=e?e.id:null;
+    if(e){var idx=list.indexOf(e);st.base=list[idx+1]||null;}else st.base=list[0]||null;
+    var src=e||st.base;
+    DIMS.forEach(function(d){st.cur[d.key]=src?(+src[d.key]||5):5;$('cev-'+d.key).value=st.cur[d.key];});
+    $('cev-date').value=e?e.date:today();$('cev-note').value=e?(e.note||''):'';
+    $('cevTitle').textContent=e?'Bewertung bearbeiten':'Neue Bewertung';$('cevKick').textContent=e?'Bewertung bearbeiten':'Mitarbeiterentwicklung';
+    $('cevSave').lastElementChild.textContent=e?'Änderung speichern':'Bewertung speichern';$('cevCancelEdit').style.display=e?'':'none';
+    refreshTop();
+    if(e)$('cevSec1').scrollIntoView({behavior:'smooth',block:'start'});
+  }
+  function renderList(){
+    var list=evals();$('cevN').textContent='('+list.length+')';
+    var ed=canEditHistorie();
+    $('cevList').innerHTML=list.length?list.slice(0,5).map(function(e,i){
+      var o=avgOf(e),prev=list[i+1]?avgOf(list[i+1]):null,dl=prev!=null?o-prev:0;
+      var d=e.date?e.date.slice(8,10)+'.'+e.date.slice(5,7)+'.':'';
+      return '<div title="'+esc(e.note||'')+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
+        +'<div style="width:96px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+d+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text)">Ø '+f1(o)+(Math.abs(dl)>=0.05?' <span style="font-size:11.5px;font-weight:700;color:'+(dl>0?'#2f6b52':'#B5513A')+'">'+(dl>0?'▲':'▼')+'</span>':'')+'</span></div>'
+        +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px">Skill '+f1(avgOf(e,'skill'))+' · Will '+f1(avgOf(e,'will'))+' · Result '+f1(avgOf(e,'result'))+'</div>'
+        +'<div style="font-size:13.5px;line-height:19px;height:38px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:'+(e.note?'var(--text)':'var(--text3)')+'">'+(e.note?esc(e.note):'Keine Notiz')+'</div></div>'
+        +(ed?'<span style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start">'
+          +'<button class="btn" type="button" title="Bearbeiten" data-vid="'+e.id+'" data-act="edit" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-pencil"></i></button>'
+          +'<button class="btn" type="button" title="Löschen" data-vid="'+e.id+'" data-act="del" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-trash"></i></button></span>':'')
+        +'</div>';
+    }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch keine Bewertungen.</div>';
+    [].slice.call($('cevList').querySelectorAll('button[data-act]')).forEach(function(b){
+      b.onclick=function(){
+        var e=evals().find(function(r){return String(r.id)===String(b.dataset.vid);});if(!e)return;
+        if(b.dataset.act==='edit')setEdit(e);
+        else{var n0=(reviews[empId]||[]).length;deleteHistorieEval(empId,e.id);if((reviews[empId]||[]).length<n0){if(st.editId===e.id)setEdit(null);else if(!st.editId)setEdit(null);renderList();toast('Bewertung gelöscht');}}
+      };
+    });
+  }
+  window._cevAfterSave=function(){var wasEdit=!!st.editId;setEdit(null);renderList();toast(wasEdit?'Änderung gespeichert':'Bewertung gespeichert');};
+  $('cevCancelEdit').onclick=function(){setEdit(null);};
+  $('cevSave').onclick=function(){saveCoachEval(empId);};
+  var e0=editEvalId?evals().find(function(r){return String(r.id)===String(editEvalId);}):null;
+  setEdit(e0||null);renderList();
 }
-
 var _savingCoachEval=false;
 function saveCoachEval(empId){
   if(_savingCoachEval)return;
@@ -9546,8 +9585,8 @@ function saveCoachEval(empId){
         var e0=employees.find(function(x){return x.id===empId;});
         logActivity('eval',existingId?'updated':'created','Mitarbeiterentwicklung bewertet',empId,(e0?e0.name:'')+' · '+fd(date));
         var modal=document.getElementById('cevModal');
-        if(modal)modal.remove();
-        renderTab();
+        if(modal&&typeof window._cevAfterSave==='function')window._cevAfterSave();else if(modal)modal.remove();
+        if(view==='emp')renderTab();
       });
     }).catch(function(err){
       _savingCoachEval=false;
@@ -9631,7 +9670,7 @@ function saveSession(empId){
       var namesTxt=empIds.map(function(id){var e=employees.find(function(x){return x.id===id;});return e?e.name:id;}).join(', ');
       logActivity('session','created','Gruppensession erfasst ('+empIds.length+' Mitarbeiter): '+(type||'Session'),null,namesTxt+(focus?' · '+focus:'')+' · '+fd(date));
       resetSessionFormFields();
-      closeModal('neuesCoachingModal');
+      ncAfterSave(true);
       if(view==='coaching')renderCoachingAnsicht();else renderTab();
     }).catch(function(err){_savingSession=false;alert('Unerwarteter Fehler: '+err.message);});
     return;
@@ -9669,7 +9708,7 @@ function saveSession(empId){
     logActivity('session',editId?'updated':'created',(editId?'Session bearbeitet':'Neue Session erfasst')+': '+(type||'Session'),singleEmpId,(empForLog?empForLog.name:'')+(focus?' · '+focus:'')+' · '+fd(date));
     _editingSessionId=null;
     resetSessionFormFields();
-    closeModal('neuesCoachingModal');
+    ncAfterSave(false);
     if(view==='coaching')renderCoachingAnsicht();else renderTab();
   }).catch(function(err){
     _savingSession=false;
@@ -9757,8 +9796,9 @@ function toggleTask(id){
   if(!t)return;
   t.done=!t.done;
   t.status=t.done?'done':'open';
+  t.completedAt=t.done?new Date().toISOString():null;
   renderTab();
-  sb.from('tasks').update({done:t.done,status:t.status}).eq('id',id).then(function(res){
+  taskDbUpdate(id,{done:t.done,status:t.status,completed_at:t.completedAt}).then(function(res){
     if(res.error){
       alert('Fehler beim Speichern: '+res.error.message+'\n\nDie Änderung ist lokal sichtbar, aber NICHT gespeichert.');
       t.done=!t.done;t.status=t.done?'done':'open';renderTab();
@@ -9774,8 +9814,9 @@ function setTaskStatus(id,newStatus){
   var oldStatus=t.status,oldDone=t.done;
   t.status=newStatus;
   t.done=(newStatus==='done');
+  t.completedAt=t.done?(t.completedAt||new Date().toISOString()):null;
   renderTab();
-  sb.from('tasks').update({status:newStatus,done:t.done}).eq('id',id).then(function(res){
+  taskDbUpdate(id,{status:newStatus,done:t.done,completed_at:t.completedAt}).then(function(res){
     if(res.error){
       alert('Fehler beim Speichern: '+res.error.message+'\n\nDie Änderung ist lokal sichtbar, aber NICHT gespeichert.');
       t.status=oldStatus;t.done=oldDone;renderTab();
@@ -9828,8 +9869,9 @@ function saveNewTask(){
     document.getElementById('taskDesc').value='';
     document.getElementById('taskDue').value='';
     var tsrc=document.getElementById('taskQuelle');if(tsrc)tsrc.value='';
-    closeModal('addTaskModal');
-    renderTab();
+    var _atm=document.getElementById('addTaskModal');
+    if(_atm&&!_atm.classList.contains('hidden')){atRender();atToast('Aufgabe hinzugefügt: '+text,null);var _tt=document.getElementById('taskText');if(_tt)_tt.focus();}
+    if(view==='emp')renderEmpDetail();else renderTab();
   }).catch(function(err){
     _savingNewTask=false;
     alert('Unerwarteter Fehler: '+err.message);
@@ -10129,6 +10171,19 @@ function esBuildHtml(emp,asPopup,html){
           {n:5,t:'Provisionsrelevante KPIs',sum:deOnly('6 Kennzahlen')+vlcOnly('3 Kennzahlen')+(mLabel?' · aktuell „'+mLabel+'“':''),body:SEG.kpi},
           {n:6,t:'Ergänzende KPI-Ziele',sum:deOnly('9 Kennzahlen')+vlcOnly('12 Kennzahlen')+' · nicht provisionsrelevant',body:SEG.erg}
         ];
+        if(asPopup==='panels'){
+          // Popup-Bereich „Einstellungen“: die sechs Abschnitte als getönte Flächen in einer Kachel
+          var pp='';
+          sections.forEach(function(sec){
+            var extra=sec.n===3?'':(sec.n===4?deOnly('Olching')+vlcOnly('weWow'):'');
+            pp+='<div id="esSec'+sec.n+'" style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px">'
+              +'<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px"><span>'+sec.t+'</span><span style="letter-spacing:0;text-transform:none;font-weight:600;color:var(--text3)">'+extra+'</span></div>'
+              +(sec.n===4?'<div style="font-size:12.5px;color:var(--text);background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);border-radius:10px;padding:10px 12px;margin-bottom:10px;line-height:1.6"><div style="font-size:10.5px;font-weight:700;color:#C9502F;letter-spacing:.08em;margin-bottom:3px">SO WIRD GERECHNET</div>'+deOnly(regelDe)+vlcOnly(regelVlc)+'</div>':'')
+              +(sec.body||'')+'</div>';
+          });
+          html=pp;
+          return;
+        }
         if(asPopup){
           // Popup „Mitarbeiter hinzufügen“: gleiche Felder, als Boxen untereinander, Titel nur als Text
           var pcard='';
@@ -10243,6 +10298,415 @@ function saveNewEmpFull(){
   }).catch(function(err){
     _savingNewEmpFull=false;if(btn){btn.disabled=false;btn.style.opacity='';}
     alert('Unerwarteter Fehler beim Anlegen: '+err.message);
+  });
+}
+// ══ Ein Popup für alles: Übersicht · Session · Call · Entwicklung · Kommentar · Task ══
+// Die bestehenden Popups bleiben mit allen Feldern und Speicherfunktionen erhalten; sie teilen sich nur eine Leiste
+// und werden beim Wechseln ausgeblendet statt geschlossen, damit Eingaben erhalten bleiben.
+var PU=[
+  {k:'pf',n:'Performance',i:'ti-chart-line',ids:['perfPopModal']},
+  {k:'ov',n:'Übersicht',i:'ti-layout-grid',ids:['coachingInfoModal']},
+  {k:'se',n:'Coaching',i:'ti-users',ids:['neuesCoachingModal','sessionPlanenModal']},
+  {k:'ca',n:'Call',i:'ti-phone',ids:['qaBewertungModal']},
+  {k:'en',n:'Mitarbeiterentwicklung',i:'ti-trending-up',ids:['cevModal']},
+  {k:'ko',n:'Kommentar',i:'ti-message-plus',ids:['commentModal']},
+  {k:'ta',n:'Task',i:'ti-checkbox',ids:['addTaskModal']},
+  {k:'es',n:'Einstellungen',i:'ti-settings',ids:['empSetModal']}
+];
+var PU_OPEN={perfPopModal:'openPerfPopup',coachingInfoModal:'openCoachingInfoModal',neuesCoachingModal:'openNeuesCoachingModal',sessionPlanenModal:'openSessionModal',
+  qaBewertungModal:'openQaBewertungModal',cevModal:'openCoachingEval',commentModal:'openCommentModal',addTaskModal:'openAddTaskModal',empSetModal:'openEmpSetModal'};
+var PU_SUBICONS={cevModal:[['ti-calendar','Datum'],['ti-adjustments-horizontal','Bewertung'],['ti-notes','Notiz']],
+  commentModal:[['ti-user','Wer & Wann'],['ti-tag','Art des Kommentars'],['ti-message-circle','Kommentar']]};
+var _puState={},_puEmp=null,_puSwitching=false,_puSeVariant='neuesCoachingModal';
+function puIsJs(id){return id==='cevModal'||id==='commentModal';}
+function puKey(id){var p=PU.find(function(x){return x.ids.indexOf(id)>=0;});return p?p.k:null;}
+function puHide(id){var e=document.getElementById(id);if(!e)return;if(puIsJs(id))e.style.display='none';else e.classList.add('hidden');}
+function puShow(id){var e=document.getElementById(id);if(!e)return;if(puIsJs(id))e.style.display='flex';else e.classList.remove('hidden');}
+function puAllIds(){return PU.reduce(function(a,p){return a.concat(p.ids);},[]);}
+function puResetAll(){
+  puAllIds().forEach(function(id){var e=document.getElementById(id);if(!e)return;if(puIsJs(id))e.remove();else e.classList.add('hidden');});
+  _puState={};
+}
+function puGo(key,variantId){
+  var p=PU.find(function(x){return x.k===key;});if(!p)return;
+  var target=variantId||(key==='se'?_puSeVariant:p.ids[0]);
+  var emp=_puEmp||selectedEmp;
+  puAllIds().forEach(function(id){if(id!==target)puHide(id);});
+  var el=document.getElementById(target);
+  if(el&&_puState[target]===String(emp)){puShow(target);puDecorate(target);return;}
+  if(el&&puIsJs(target))el.remove();
+  var fn=window[PU_OPEN[target]];if(typeof fn!=='function')return;
+  _puSwitching=true;
+  try{fn(emp);}finally{_puSwitching=false;}
+}
+function puShellify(ov,id){
+  if(ov.dataset.puShell)return;
+  var box=ov.firstElementChild;if(!box)return;
+  var kids=[].slice.call(box.children);if(kids.length<3)return;
+  var hdr=kids[0],foot=kids[kids.length-1],mid=kids.slice(1,-1);
+  var title=(hdr.firstElementChild&&hdr.firstElementChild.textContent)||'';
+  var emp=employees.find(function(e){return String(e.id)===String(_puEmp);});
+  box.style.cssText='background:#EEEDE9;border:1px solid #E4E0D6;border-radius:16px;width:860px;max-width:95vw;max-height:86vh;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 20px 50px rgba(0,0,0,0.18)';
+  box.innerHTML='';
+  var h=document.createElement('div');h.style.cssText='display:flex;align-items:center;padding:14px 16px 6px';
+  h.innerHTML='<div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">'+esc(title)+'</div>'
+    +'<div style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+(emp?esc(emp.name)+(emp.role?' · '+esc(emp.role):''):'')+'</div></div>';
+  var x=document.createElement('button');x.className='btn';x.type='button';x.setAttribute('aria-label','Schließen');
+  x.style.cssText='margin-left:auto;width:34px;height:34px;padding:0;justify-content:center';x.innerHTML='<i class="ti ti-x"></i>';
+  x.onclick=function(){ov.remove();};h.appendChild(x);box.appendChild(h);
+  var main=document.createElement('div');main.style.cssText='display:flex;min-height:0;flex:1';
+  var rail=document.createElement('div');
+  rail.style.cssText='width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3';
+  var right=document.createElement('div');right.style.cssText='flex:1;min-width:0;display:flex;flex-direction:column;min-height:0';
+  var sc=document.createElement('div');sc.style.cssText='flex:1;overflow-y:auto;padding:6px 18px 12px 14px';
+  var card=null,n=0,icons=PU_SUBICONS[id]||[];
+  mid.forEach(function(el){
+    var t=(el.textContent||'').trim();
+    if(/^[①②③④⑤⑥]/.test(t)&&el.children.length===0){
+      n++;card=document.createElement('div');card.id=id+'Sec'+n;
+      card.style.cssText='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)';
+      var ttl=t.replace(/^[①②③④⑤⑥]\s*/,'');
+      card.innerHTML='<div style="font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">'+esc(ttl)+'</div>';
+      sc.appendChild(card);
+      var ic=icons[n-1]||['ti-point',ttl];
+      var b=document.createElement('button');b.className='rl-btn'+(n===1?' on':'');b.type='button';b.setAttribute('aria-label',ttl);
+      b.style.cssText='width:38px;height:38px;font-size:18px';b.innerHTML='<i class="ti '+ic[0]+'"></i><span class="rl-tip" style="left:48px">'+esc(ttl)+'</span>';
+      b.dataset.target=card.id;
+      (function(c){b.onclick=function(){c.scrollIntoView({behavior:'smooth',block:'start'});};})(card);
+      rail.appendChild(b);
+      return;
+    }
+    el.style.borderLeft='none';el.style.paddingLeft='0';el.style.marginBottom='0';
+    (card||sc).appendChild(el);
+  });
+  if(card)card.style.marginBottom='4px';
+  // Kategorie-Überschriften (Skill/Will/Result) ruhig im Board-Schema
+  [].slice.call(sc.querySelectorAll('div')).forEach(function(d){if(d.style.padding==='6px 12px'&&d.style.letterSpacing){d.style.background='#EFECE5';d.style.color='var(--text2)';}});
+  var fw=document.createElement('div');fw.style.cssText='display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px';
+  foot.style.marginTop='0';foot.style.justifyContent='flex-end';
+  if(foot.firstElementChild&&foot.firstElementChild.onclick&&/speichern/i.test(foot.firstElementChild.textContent||''))foot.style.flexDirection='row-reverse';
+  fw.appendChild(foot);
+  right.appendChild(sc);right.appendChild(fw);main.appendChild(rail);main.appendChild(right);box.appendChild(main);
+  ov.dataset.puShell='1';
+}
+function puSpy(rail){
+  var subs=[].slice.call(rail.querySelectorAll('.rl-btn.rl-sub'));if(!subs.length)return;
+  var items=subs.map(function(b){
+    var tid=b.dataset.target;
+    if(!tid){var mm=(b.getAttribute('onclick')||'').match(/getElementById\('([^']+)'\)/);if(mm)tid=mm[1];}
+    return {b:b,id:tid};
+  }).filter(function(x){return x.id;});
+  function mark(btn){subs.forEach(function(b){b.classList.toggle('on',b===btn);});}
+  items.forEach(function(it){if(!it.b.dataset.puSpy){it.b.dataset.puSpy='1';it.b.addEventListener('click',function(){mark(it.b);});}});
+  var first=items.length?document.getElementById(items[0].id):null;if(!first)return;
+  var sc=first.parentElement;while(sc&&sc!==document.body){var oy=getComputedStyle(sc).overflowY;if(oy==='auto'||oy==='scroll')break;sc=sc.parentElement;}
+  if(!sc||sc===document.body||sc.dataset.puSpy)return;
+  sc.dataset.puSpy='1';
+  sc.addEventListener('scroll',function(){
+    var top=sc.getBoundingClientRect().top+24,cur=items[0];
+    items.forEach(function(it){var el=document.getElementById(it.id);if(el&&el.getBoundingClientRect().top<=top)cur=it;});
+    if(sc.scrollTop+sc.clientHeight>=sc.scrollHeight-4)cur=items[items.length-1];
+    mark(cur.b);
+  },{passive:true});
+}
+function puDecorate(id){
+  var m=document.getElementById(id);if(!m)return;
+  var key=puKey(id);
+  if(puIsJs(id))puShellify(m,id);
+  var rail=m.querySelector('.pu-rail');
+  if(!rail){var first=m.querySelector('.rl-btn');if(!first)return;rail=first.parentElement;rail.classList.add('pu-rail');}
+  rail.style.margin='6px 0 14px 14px';rail.style.alignSelf='stretch';
+  var top=rail.querySelector('.pu-top');
+  if(!top){
+    var kids=[].slice.call(rail.children);
+    var si=kids.findIndex(function(c){return c.tagName==='SPAN'&&c.style.height==='1px';});
+    if(si>=0)kids.slice(si).forEach(function(c){c.remove();});
+    [].slice.call(rail.querySelectorAll('.rl-btn')).forEach(function(b){
+      b.classList.add('rl-sub');b.style.width='38px';b.style.height='38px';
+      [].slice.call(b.children).forEach(function(ch){if(ch.tagName==='SPAN'&&!ch.classList.contains('rl-tip'))ch.remove();});
+    });
+    top=document.createElement('div');top.className='pu-top';top.style.cssText='display:flex;flex-direction:column;align-items:center;gap:4px';
+    rail.insertBefore(top,rail.firstChild);
+    var sep=document.createElement('span');sep.style.cssText='width:26px;height:1px;background:#E4E0D6;margin:4px 0;flex-shrink:0';
+    rail.insertBefore(sep,top.nextSibling);
+  }
+  puSpy(rail);
+  // Fußleiste in allen Bereichen wie in der Übersicht: eigene Leiste mit Rahmen
+  var right=rail.nextElementSibling;
+  var foot=right&&right.lastElementChild;
+  if(foot&&foot!==right.firstElementChild&&!foot.dataset.puFoot&&!foot.querySelector('#ciComposer')){
+    foot.dataset.puFoot='1';
+    var bar=document.createElement('div');bar.className='pu-footbar';
+    while(foot.firstChild)bar.appendChild(foot.firstChild);
+    foot.style.cssText='padding:4px 18px 14px;background:#EEEDE9';
+    foot.appendChild(bar);
+  }
+  top.innerHTML=PU.map(function(p){return '<button class="rl-btn'+(p.k===key?' on':'')+'" type="button" aria-label="'+p.n+'" style="width:38px;height:38px;font-size:18px;flex-shrink:0" onclick="puGo(\''+p.k+'\')"><i class="ti '+p.i+'"'+(p.k==='pf'?' style="color:#F08566"':'')+'></i><span class="rl-tip" style="left:48px">'+p.n+'</span></button>';}).join('');
+  // Session: Schalter „Erfassen | Planen“ im Kopf
+  if(key==='se'){
+    var modal=m.querySelector('.modal')||m.firstElementChild;var hd=modal&&modal.firstElementChild;
+    if(hd&&!hd.querySelector('.pu-seg')){
+      var seg=document.createElement('div');seg.className='pu-seg';
+      seg.innerHTML='<span data-v="neuesCoachingModal">Erfassen</span><span data-v="sessionPlanenModal">Planen</span>';
+      [].slice.call(seg.children).forEach(function(sp){sp.onclick=function(){if(sp.dataset.v!==id)puGo('se',sp.dataset.v);};});
+      var xb=hd.querySelector('button[aria-label="Schließen"]');
+      if(xb){xb.style.marginLeft='0';hd.insertBefore(seg,xb);}else hd.appendChild(seg);
+    }
+    if(hd)[].slice.call(hd.querySelectorAll('.pu-seg span')).forEach(function(sp){sp.classList.toggle('on',sp.dataset.v===id);});
+  }
+}
+// ── Bereich „Performance“: Banner mit den wichtigsten KPIs, Verlauf mit Filter, Marge, KPI-Tabelle ──
+var _ppMetric='opt',_ppPeriod='week',_ppEmp=null;
+function _ppPad(n){return (n<10?'0':'')+n;}
+function _ppIso(d){return d.getFullYear()+'-'+_ppPad(d.getMonth()+1)+'-'+_ppPad(d.getDate());}
+function _ppRanges(period){
+  var t0=today(),d=new Date(t0+'T00:00:00'),out=[];
+  if(period==='day'){
+    var c=new Date(d);
+    while(out.length<8){var dw=c.getDay();if(dw!==0&&dw!==6){var s=_ppIso(c);out.unshift({from:s,to:s,label:['So','Mo','Di','Mi','Do','Fr','Sa'][dw]});}c.setDate(c.getDate()-1);}
+  } else if(period==='week'){
+    var mon=new Date(d);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));
+    for(var i=7;i>=0;i--){var a=new Date(mon);a.setDate(a.getDate()-i*7);var b=new Date(a);b.setDate(b.getDate()+6);out.push({from:_ppIso(a),to:_ppIso(b),label:String(isoWeekOf(a).week)});}
+  } else {
+    var MN=['Jan','Feb','Mär','Apr','Mai','Jun','Jul','Aug','Sep','Okt','Nov','Dez'];
+    for(var j=7;j>=0;j--){var m=new Date(d.getFullYear(),d.getMonth()-j,1);var e=new Date(m.getFullYear(),m.getMonth()+1,0);out.push({from:_ppIso(m),to:_ppIso(e),label:MN[m.getMonth()]});}
+  }
+  return out;
+}
+function _ppOpt(s){return (s.oem||0)+(s.ups||0)+(s.wka||0);}
+function _ppOptH(emp,from,to){
+  var dates=(performance[emp.id]||[]).filter(function(x){return x.date>=from&&x.date<=to;}).map(function(x){return x.date;});
+  var h=dates.length?perfHoursForDates(emp,dates):0;var s=chartSumsForRange([emp],from,to);
+  return h>0?_ppOpt(s)/h:null;
+}
+function _ppVal(emp,key,from,to){
+  var s=chartSumsForRange([emp],from,to);
+  if(key==='marge')return s.margeGes||0;
+  if(key==='opt')return _ppOpt(s);
+  if(key==='optH')return _ppOptH(emp,from,to);
+  return chartCrFromSums(key,s);
+}
+function _ppTarget(emp,key){var T=empTargets(emp)||{};var t=T[key];if(!t||t.val==null||t.val==='')return null;return {val:+t.val,dir:t.dir||'gte'};}
+function _ppMiss(v,t){if(v==null||!t)return false;return t.dir==='lte'?v>t.val:v<t.val;}
+function _ppFmt(v,kind){if(v==null||isNaN(v))return '–';if(kind==='pct')return Math.round(v)+' %';if(kind==='eur')return '€ '+Math.round(v).toLocaleString('de-DE');if(kind==='dec')return (Math.round(v*10)/10).toFixed(1).replace('.',',');return String(Math.round(v));}
+function _ppPeriods(){
+  var t0=today(),d=new Date(t0+'T00:00:00');
+  var mon=new Date(d);mon.setDate(mon.getDate()-((mon.getDay()+6)%7));var sun=new Date(mon);sun.setDate(sun.getDate()+6);
+  var MN=['Januar','Februar','März','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember'];
+  return {day:{from:t0,to:t0,label:'Heute'},week:{from:_ppIso(mon),to:_ppIso(sun),label:'Woche (KW '+String(isoWeekOf(d).week)+')'},month:{from:t0.slice(0,8)+'01',to:t0,label:MN[d.getMonth()]}};
+}
+function _ppMargeTargets(emp){
+  var mk=today().slice(0,7),r=(typeof zielStore!=='undefined'&&zielStore[mk]&&zielStore[mk][emp.id])||{};
+  var perDay=(r.optTag||0)*(r.margeOpt||0);
+  var month=(typeof teamMonthZiel==='function')?teamMonthZiel([emp],mk,true):0;
+  return {day:perDay||null,week:perDay?perDay*5:null,month:month||null};
+}
+function ppRenderChart(){
+  var emp=employees.find(function(e){return String(e.id)===String(_ppEmp);});var el=document.getElementById('ppSecV');if(!emp||!el)return;
+  var MET=[['marge','Marge','eur'],['opt','Opt. Ges.','n'],['crOEM','CR OEM','pct'],['crTeilweise','CR TW','pct'],['crSyMy','CR SY/MY','pct'],['crMegaYes','CR MY','pct']];
+  var mt=MET.find(function(m){return m[0]===_ppMetric;})||MET[1];
+  var rs=_ppRanges(_ppPeriod),vals=rs.map(function(r){return _ppVal(emp,mt[0],r.from,r.to);});
+  var mx=Math.max.apply(null,vals.map(function(v){return v||0;}).concat([1]));
+  function seg(opts,cur,fn){return '<span style="display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;padding:2px">'+opts.map(function(o){var on=o[0]===cur;return '<span onclick="'+fn+'(\''+o[0]+'\')" style="height:30px;padding:0 11px;border-radius:8px;display:flex;align-items:center;font-size:12.5px;cursor:pointer;white-space:nowrap;'+(on?'background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)':'color:var(--text2);font-weight:500')+'">'+o[1]+'</span>';}).join('')+'</span>';}
+  var h='<div style="display:flex;align-items:center;gap:10px;margin-bottom:14px">'+seg(MET,_ppMetric,'ppSetMetric')+'<span style="margin-left:auto">'+seg([['day','Tag'],['week','Woche'],['month','Monat']],_ppPeriod,'ppSetPeriod')+'</span></div>';
+  h+='<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;align-items:end;height:150px;border-bottom:1px solid #E4E0D6;padding-bottom:4px">';
+  vals.forEach(function(v,i){var cur=i===7;h+='<div style="display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:4px"><span style="font-size:11.5px;font-weight:600;white-space:nowrap;color:'+(cur?'#B5513A':'var(--text2)')+'">'+(v!=null?_ppFmt(v,mt[2]):'–')+'</span><span style="width:100%;max-width:36px;border-radius:5px 5px 0 0;background:'+(cur?'#F08566':'#B4AC9C')+';height:'+Math.max(v?4:2,(v||0)/mx*112)+'px"></span></div>';});
+  h+='</div><div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:10px;margin-top:6px;text-align:center">'+rs.map(function(r,i){return '<div style="font-size:11.5px;color:'+(i===7?'var(--text)':'var(--text3)')+';font-weight:'+(i===7?700:500)+'">'+r.label+'</div>';}).join('')+'</div>';
+  el.innerHTML=h;
+}
+function ppSetMetric(k){_ppMetric=k;ppRenderChart();}
+function ppSetPeriod(k){_ppPeriod=k;ppRenderChart();}
+function openPerfPopup(empId){
+  var emp=employees.find(function(e){return String(e.id)===String(empId);});if(!emp)return;
+  _ppEmp=emp.id;
+  var sub=document.getElementById('ppHdSub');if(sub)sub.textContent=emp.name+(emp.role?' · '+emp.role:'');
+  var P=_ppPeriods(),CARD='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)';
+  var sM=chartSumsForRange([emp],P.month.from,P.month.to),sW=chartSumsForRange([emp],P.week.from,P.week.to),sD=chartSumsForRange([emp],P.day.from,P.day.to);
+  // 1) Banner
+  var BK=[['OPT./STD.','optH','dec','optPerH'],['CR OEM','crOEM','pct','crOEM'],['CR TW','crTeilweise','pct','crTeilweise'],['CR SY/MY','crSyMy','pct','crSyMy'],['CR MY','crMegaYes','pct','crMegaYes']];
+  var ban='<div id="ppSecB" style="border-radius:14px;padding:16px 18px;margin-bottom:14px;color:#fff;background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%)"><div style="font-size:11px;font-weight:600;letter-spacing:.09em;margin-bottom:10px">'+P.month.label.toUpperCase()+' · WICHTIGSTE KPIS</div><div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr))">';
+  BK.forEach(function(k,i){
+    var vm=_ppVal(emp,k[1],P.month.from,P.month.to),vw=_ppVal(emp,k[1],P.week.from,P.week.to),t=_ppTarget(emp,k[3]),miss=_ppMiss(vm,t);
+    var extra='Woche '+_ppFmt(vw,k[2]);
+    if(k[1]==='crMegaYes'&&t){var den=(sM.yes||0)+(sM.sy||0)+(sM.my||0),r=t.val/100,need=r<1?Math.ceil((r*den-(sM.my||0))/(1-r)):0;extra=need>0?'noch '+need+' MY':'Ziel erreicht';}
+    ban+='<div style="padding:0 14px;'+(i?'border-left:1px solid rgba(255,255,255,.25);':'padding-left:0;')+'"><div style="font-size:11px;font-weight:600;letter-spacing:.09em">'+k[0]+(miss?' <span style="display:inline-block;width:6px;height:6px;border-radius:50%;background:#fff;vertical-align:1px;margin-left:3px" title="Ziel verfehlt"></span>':'')+'</div>'
+      +'<div style="font-size:32px;font-weight:300;line-height:1.1">'+_ppFmt(vm,k[2])+'</div>'
+      +'<div style="font-size:12.5px;color:rgba(255,255,255,.9)">'+(t?'Ziel '+(t.dir==='lte'?'≤ ':'≥ ')+_ppFmt(t.val,k[2]):'—')+'</div><div style="font-size:12.5px;color:rgba(255,255,255,.9)">'+extra+'</div></div>';
+  });
+  ban+='</div></div>';
+  // 2) Verlauf (wird separat gezeichnet)
+  var verl='<div id="ppSecV" style="'+CARD+'"></div>';
+  // 3) Marge
+  var MT=_ppMargeTargets(emp);
+  var mg='<div id="ppSecM" style="'+CARD+'"><div style="font-weight:700;font-size:14px;margin-bottom:10px">Marge</div><div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px">';
+  [['day',sD,MT.day],['week',sW,MT.week],['month',sM,MT.month]].forEach(function(x){
+    var per=x[0],s=x[1],ziel=x[2],val=s.margeGes||0,opt=_ppOpt(s),avg=opt?val/opt:null,pc=ziel?Math.round(val/ziel*100):null,ok=pc!=null&&pc>=100;
+    var rs=_ppRanges(per),vs=rs.map(function(r){return chartSumsForRange([emp],r.from,r.to).margeGes||0;}),mx=Math.max.apply(null,vs.concat([1]));
+    mg+='<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;min-width:0">'
+      +'<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)"><span>'+P[per].label+'</span><span style="letter-spacing:0;text-transform:none;font-weight:600;color:var(--text3)">'+opt+' Opt.</span></div>'
+      +'<div style="border-bottom:1px solid #E4E0D6;margin:6px 0 10px;padding-bottom:10px"><div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;align-items:end;height:36px">'
+      +vs.map(function(v,i){return '<i title="'+rs[i].label+': '+_ppFmt(v,'eur')+'" style="display:block;border-radius:3px 3px 0 0;height:'+Math.max(3,v/mx*36)+'px;background:'+(i===7?'#F08566':'#CFC8BA')+'"></i>';}).join('')+'</div>'
+      +'<div style="display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px;margin-top:3px">'+rs.map(function(r,i){return '<span style="font-size:9.5px;text-align:center;white-space:nowrap;overflow:hidden;color:'+(i===7?'var(--text)':'var(--text3)')+';font-weight:'+(i===7?700:500)+'">'+r.label+'</span>';}).join('')+'</div></div>'
+      +'<div style="font-size:28px;font-weight:300;line-height:1.15;white-space:nowrap">'+_ppFmt(val,'eur')+'</div>'
+      +'<div style="display:flex;align-items:center;gap:8px;margin-top:6px;font-size:12px;color:var(--text3);white-space:nowrap">'
+      +(pc!=null?'<span style="font-size:13px;font-weight:700;color:'+(ok?'#2f6b52':'#B5513A')+'">'+pc+' %</span><span>von '+_ppFmt(ziel,'eur')+'</span>':'<span>kein Ziel hinterlegt</span>')
+      +'<span style="margin-left:auto" title="Margenerhöhung pro Auftrag">'+(avg!=null?'Ø '+Math.round(avg).toLocaleString('de-DE')+' €':'')+'</span></div>'
+      +'<div style="height:4px;border-radius:2px;background:#E4E0D6;margin-top:10px;overflow:hidden"><i style="display:block;height:100%;width:'+(pc!=null?Math.min(100,pc):0)+'%;background:'+(ok?'#3a3833':'#F08566')+'"></i></div></div>';
+  });
+  mg+='</div></div>';
+  // 4) KPI-Tabelle
+  var KR=[['Opt./Std.','optH','dec','optPerH'],['CR OEM','crOEM','pct','crOEM'],['CR TW','crTeilweise','pct','crTeilweise'],['CR Yes','crYes','pct','crYes'],['CR SY/MY','crSyMy','pct','crSyMy'],['Mega Yes (CR MY)','crMegaYes','pct','crMegaYes'],['CR SY','crSuperYes','pct','crSuperYes']];
+  var TH='font-size:10.5px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text2);padding:7px 8px;text-align:right;border-bottom:1px solid #E4E0D6;background:#EFECE5';
+  var tb='<div id="ppSecK" style="'+CARD+';margin-bottom:4px"><div style="display:flex;align-items:center;font-weight:700;font-size:14px;margin-bottom:10px">KPIs<span style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)">Heute · Woche · Monat · Ziel</span></div><table style="width:100%;border-collapse:collapse"><tr><th style="'+TH+';text-align:left">Kennzahl</th><th style="'+TH+'">Heute</th><th style="'+TH+'">Woche</th><th style="'+TH+'">Monat</th><th style="'+TH+'">Ziel</th></tr>';
+  KR.forEach(function(k){
+    var hl=k[1]==='crMegaYes',t=_ppTarget(emp,k[3]);
+    var vd=_ppVal(emp,k[1],P.day.from,P.day.to),vw=_ppVal(emp,k[1],P.week.from,P.week.to),vm=_ppVal(emp,k[1],P.month.from,P.month.to);
+    var TD='padding:0 8px;height:38px;border-bottom:1px solid #eae7e0;font-size:13.5px;text-align:right;'+(hl?'background:#FDF0EB;':'');
+    tb+='<tr><td style="'+TD+'text-align:left;'+(hl?'font-weight:700':'')+'">'+k[0]+'</td><td style="'+TD+'">'+_ppFmt(vd,k[2])+'</td><td style="'+TD+'">'+_ppFmt(vw,k[2])+'</td><td style="'+TD+'font-weight:600;'+(_ppMiss(vm,t)?'color:#B5513A':'')+'">'+_ppFmt(vm,k[2])+'</td><td style="'+TD+'font-size:12px;color:var(--text3)">'+(t?(t.dir==='lte'?'≤ ':'≥ ')+_ppFmt(t.val,k[2]):'—')+'</td></tr>';
+  });
+  tb+='</table></div>';
+  var body=document.getElementById('ppBody');
+  body.innerHTML=ban+verl+mg+tb;
+  ppRenderChart();
+  body.scrollTop=0;
+  openModal('perfPopModal');
+}
+function taskDbUpdate(id,fields){
+  // completed_at gibt es erst nach 06_aufgaben_erledigt_am.sql – fehlt die Spalte, wird ohne sie gespeichert
+  return sb.from('tasks').update(fields).eq('id',id).then(function(res){
+    if(res.error&&fields.hasOwnProperty('completed_at')&&/completed_at/i.test(res.error.message||'')){
+      var f2=Object.assign({},fields);delete f2.completed_at;
+      return sb.from('tasks').update(f2).eq('id',id);
+    }
+    return res;
+  });
+}
+function atRender(){
+  var list=(tasks[selectedEmp]||[]);
+  var t0=today();
+  function dd(ds){return Math.round((new Date(t0+'T00:00:00')-new Date(ds+'T00:00:00'))/86400000);}
+  function dmy(ds){return ds?ds.slice(8,10)+'.'+ds.slice(5,7)+'.':'';}
+  var CH='font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;white-space:nowrap;';
+  function row(t,done){
+    var right='';
+    if(done){var ca=t.completedAt?String(t.completedAt).slice(0,10):'';right=ca?'<span style="'+CH+'background:#fff;border:1px solid #E4E0D6;color:var(--text2)">erledigt '+dmy(ca)+'</span>':'';}
+    else{
+      if(t.dueDate){var o=dd(t.dueDate);
+        right+=o>0?'<span style="'+CH+'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A">seit '+o+' '+(o===1?'Tag':'Tagen')+' fällig</span>'
+          :'<span style="'+CH+'background:#fff;border:1px solid #E4E0D6;color:var(--text2)">'+(o===0?'heute fällig':'fällig '+dmy(t.dueDate))+'</span>';}
+      if(t.priority==='high')right+='<span style="'+CH+'background:#3a3833;border:1px solid #3a3833;color:#fff">Hoch</span>';
+    }
+    var subTxt=[t.description,t.source?'Quelle: '+t.source:''].filter(Boolean).join(' · ');
+    return '<div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 12px;border:1px solid #E4E0D6;border-radius:10px;background:'+(done?'#F7F5F0':'#EFECE5')+';margin-bottom:6px">'
+      +'<span role="checkbox" aria-checked="'+(done?'true':'false')+'" title="'+(done?'Wieder öffnen':'Als erledigt markieren')+'" onclick="atToggle(\''+t.id+'\')" style="width:22px;height:22px;border-radius:7px;border:1.5px solid '+(done?'#3a3833':'#B4AC9C')+';background:'+(done?'#3a3833':'#fff')+';flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff">'+(done?'<i class="ti ti-check" style="font-size:14px"></i>':'')+'</span>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:'+(done?500:600)+';white-space:nowrap;overflow:hidden;text-overflow:ellipsis;'+(done?'text-decoration:line-through;color:var(--text3)':'')+'">'+esc(t.text||'')+'</div>'
+      +(subTxt?'<div style="font-size:12px;color:var(--text3);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(subTxt)+'</div>':'')+'</div>'
+      +'<span style="display:flex;gap:6px;flex-shrink:0">'+right+'</span></div>';
+  }
+  var open=list.filter(function(t){return t.status!=='done'&&!t.done;}).sort(function(a,b){return (a.dueDate||'9999').localeCompare(b.dueDate||'9999');});
+  var done=list.filter(function(t){return t.status==='done'||t.done;}).sort(function(a,b){return String(b.completedAt||b.createdAt||'').localeCompare(String(a.completedAt||a.createdAt||''));}).slice(0,3);
+  var oEl=document.getElementById('atOpen'),dEl=document.getElementById('atDone'),nEl=document.getElementById('atOpenN');
+  if(nEl)nEl.textContent='('+open.length+')';
+  if(oEl)oEl.innerHTML=open.length?open.map(function(t){return row(t,false);}).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Keine offenen Aufgaben.</div>';
+  if(dEl)dEl.innerHTML=done.length?done.map(function(t){return row(t,true);}).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch nichts erledigt.</div>';
+}
+var _atLast=null;
+function atToast(msg,undo){
+  var t=document.getElementById('atToast');if(!t)return;
+  document.getElementById('atToastMsg').textContent=msg;
+  t.lastElementChild.style.display=undo?'':'none';
+  _atLast=undo;t.style.display='flex';
+  clearTimeout(window._atTT);window._atTT=setTimeout(function(){t.style.display='none';},4000);
+}
+function atUndo(){if(!_atLast)return;var id=_atLast;_atLast=null;document.getElementById('atToast').style.display='none';atToggle(id,true);}
+function atToggle(id,isUndo){
+  var t=(tasks[selectedEmp]||[]).find(function(x){return String(x.id)===String(id);});if(!t)return;
+  var old={status:t.status,done:t.done,completedAt:t.completedAt};
+  var nowDone=!(t.status==='done'||t.done);
+  t.status=nowDone?'done':'open';t.done=nowDone;t.completedAt=nowDone?new Date().toISOString():null;
+  atRender();
+  if(view==='emp')renderEmpDetail();
+  if(!isUndo)atToast((nowDone?'Erledigt: ':'Wieder geöffnet: ')+t.text,t.id);
+  taskDbUpdate(t.id,{status:t.status,done:t.done,completed_at:t.completedAt}).then(function(res){
+    if(res&&res.error){alert('Fehler beim Speichern: '+res.error.message);t.status=old.status;t.done=old.done;t.completedAt=old.completedAt;atRender();if(view==='emp')renderEmpDetail();return;}
+    var e0=employees.find(function(x){return x.id===selectedEmp;});
+    logActivity('task','status_changed','Aufgabe '+(nowDone?'erledigt':'wieder geöffnet')+': "'+t.text+'"',selectedEmp,e0?e0.name:'');
+  });
+}
+// ── Bereich „Einstellungen“ im gemeinsamen Popup: Stammdaten & Provisionsvereinbarung wie im Reiter, als Flächen ──
+var _esEmp=null,_esHidMain=false;
+function openEmpSetModal(empId){
+  var emp=employees.find(function(e){return String(e.id)===String(empId||selectedEmp);});if(!emp)return;
+  _esEmp=emp.id;selectedEmp=emp.id;
+  var body=document.getElementById('espBody');
+  // Felder-IDs eindeutig halten: offene Stammdaten im Hauptbereich vorübergehend ausblenden
+  var ex=document.getElementById('es-name');
+  if(ex&&!body.contains(ex)){var ma=document.getElementById('mainArea');if(ma){ma.innerHTML='';_esHidMain=true;}}
+  body.innerHTML=esBuildHtml(emp,'panels','');
+  var sub=document.getElementById('esHdSub');if(sub)sub.textContent=emp.name+(emp.role?' · '+emp.role:'');
+  espRenderHist();
+  openModal('empSetModal');
+  var sc=document.getElementById('espScroll');if(sc)sc.scrollTop=0;
+}
+function closeEmpSetModal(){
+  closeModal('empSetModal');
+  var b=document.getElementById('espBody');if(b)b.innerHTML='';
+  if(_esHidMain){_esHidMain=false;renderMain();}
+}
+function espRenderHist(){
+  var el=document.getElementById('espHist');if(!el)return;
+  var evs=(typeof histEvents==='function')?histEvents(_esEmp):[];
+  var n=document.getElementById('espHistN');if(n)n.textContent='('+evs.length+')';
+  var last=document.getElementById('espLast');
+  if(last){if(evs.length){var d0=new Date(evs[0].t);last.textContent='zuletzt geändert '+('0'+d0.getDate()).slice(-2)+'.'+('0'+(d0.getMonth()+1)).slice(-2)+'.'+d0.getFullYear()+' von '+evs[0].who;}else last.textContent='';}
+  el.innerHTML=evs.length?evs.slice(0,5).map(function(ev){
+    var d=new Date(ev.t);var ds=('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.';
+    var it=ev.items[0]||{label:'Änderung'};
+    var title=it.label+(ev.items.length>1?' +'+(ev.items.length-1):'');
+    var txt=ev.items.map(function(x){return x.legacy?x.label+' geändert':(ev.items.length>1?x.label+': ':'')+x.ov+' → '+x.nv;}).join(' · ');
+    return '<div title="'+esc(txt)+'" style="display:flex;align-items:flex-start;gap:12px;height:66px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
+      +'<div style="width:150px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+ds+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(title)+'</span></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px">'+esc(ev.who)+'</div>'
+      +'<div style="font-size:13.5px;line-height:19px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--text)">'+esc(txt)+'</div></div></div>';
+  }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch keine Änderungen.</div>';
+}
+function saveEmpSetModal(){
+  var emp=employees.find(function(e){return String(e.id)===String(_esEmp);});if(!emp)return;
+  selectedEmp=emp.id;
+  var _b=document.getElementById('espBody'),_x=document.getElementById('es-name');
+  if(_x&&_b&&!_b.contains(_x)){var _ma=document.getElementById('mainArea');if(_ma){_ma.innerHTML='';_esHidMain=true;}}
+  // Beide Speicherfunktionen lesen die Felder aus dem Popup; der Hauptbereich wird währenddessen nicht neu gezeichnet
+  var _red=window.renderEmpDetail;window.renderEmpDetail=function(){};
+  try{saveProvisionSettings(emp.id);saveEmpEinstellungen();}finally{window.renderEmpDetail=_red;}
+  var t=document.getElementById('espToast');if(t){t.textContent='Änderungen gespeichert';t.style.display='block';clearTimeout(window._espTT);window._espTT=setTimeout(function(){t.style.display='none';},3000);}
+  var sub=document.getElementById('esHdSub');if(sub)sub.textContent=emp.name+(emp.role?' · '+emp.role:'');
+  if(!_esHidMain&&view==='emp')renderEmpDetail();
+  setTimeout(function(){if(typeof loadEmployeeHistoryFromSupabase==='function')loadEmployeeHistoryFromSupabase().then(function(){espRenderHist();});},1200);
+}
+function openAddTaskModal(empId){
+  if(empId)selectedEmp=empId;
+  var e=employees.find(function(x){return String(x.id)===String(selectedEmp);});
+  var sub=document.getElementById('atHdSub');if(sub)sub.textContent=e?(e.name+(e.role?' · '+e.role:'')):'—';
+  atRender();
+  var tt=document.getElementById('atToast');if(tt)tt.style.display='none';
+  openModal('addTaskModal');
+  var sc=document.getElementById('atSec1');if(sc&&sc.parentElement)sc.parentElement.scrollTop=0;
+}
+function puInit(){
+  Object.keys(PU_OPEN).forEach(function(id){
+    var name=PU_OPEN[id],orig=window[name];
+    if(typeof orig!=='function'||orig._pu)return;
+    var w=function(){
+      var emp=arguments[0]!==undefined&&arguments[0]!==null?arguments[0]:selectedEmp;
+      if(!_puSwitching)puResetAll();
+      _puEmp=emp;
+      var r=orig.apply(this,arguments);
+      _puState[id]=String(emp);
+      if(id==='neuesCoachingModal'||id==='sessionPlanenModal')_puSeVariant=id;
+      try{puDecorate(id);}catch(err){console.warn('Popup-Leiste:',err);}
+      return r;
+    };
+    w._pu=true;window[name]=w;
   });
 }
 function saveNewEmp(){
@@ -10551,7 +11015,8 @@ function loadTasksFromSupabase(){
       byEmp[r.employee_id].push({
         id:r.id,text:r.text,description:r.description||'',done:r.done,
         status:r.status||(r.done?'done':'open'),
-        priority:r.priority,dueDate:r.due_date,source:r.source||''
+        priority:r.priority,dueDate:r.due_date,source:r.source||'',
+        completedAt:r.completed_at||null,createdAt:r.created_at||null
       });
     });
     Object.keys(byEmp).forEach(function(k){byEmp[k].sort(function(a,b){return (b.dueDate||'').localeCompare(a.dueDate||'');});});
@@ -10936,9 +11401,10 @@ function sessionSpeichernNeu(){
     document.getElementById('sessionUhrzeit').value='09:00';
     document.getElementById('sessionEndUhrzeit').value='';
     sessionSelectedEmpIds=[];
-    closeModal('sessionPlanenModal');
+    var _spOpen=!document.getElementById('sessionPlanenModal').classList.contains('hidden');
     renderSidebar();
     renderMain();
+    if(_spOpen)spAfterSave();
   }).catch(function(err){
     _savingSessionPlanen=false;
     alert('Unerwarteter Fehler: '+err.message);
@@ -11485,30 +11951,65 @@ var _cbScores={};
 
 
 
+var _qaBase=null;
 function setCbScore(key,val){
   _cbScores[key]=val;
-  var disp=document.getElementById('cbv_'+key);
-  if(disp){disp.style.color='var(--text)';disp.textContent=val;}
-  [1,2,3,4].forEach(function(v){
-    var btn=document.getElementById('cbf_'+key+'_'+v);
-    if(!btn)return;
-    if(v===val&&v===1){btn.style.background='#FDF0EB';btn.style.borderColor='rgba(240,133,102,0.6)';btn.style.color='#B5513A';}
-    else if(v===val){btn.style.background='#3a3833';btn.style.borderColor='#3a3833';btn.style.color='#fff';}
-    else{btn.style.background='#F7F5F0';btn.style.borderColor='#E4E0D6';btn.style.color='var(--text2)';}
-  });
+  var sl=document.getElementById('qas_'+key);if(sl&&+sl.value!==val)sl.value=val;
+  var disp=document.getElementById('cbv_'+key);if(disp)disp.textContent=val;
+  var lv=_qaBase&&_qaBase.scores?_qaBase.scores[key]:null;
+  var l=document.getElementById('qal_'+key);if(l)l.textContent=lv?'zuletzt '+lv:'';
+  var d=document.getElementById('qad_'+key);
+  if(d){if(!lv)d.textContent='';else{var dd=val-lv;d.textContent=dd>0?'+'+dd:dd<0?String(dd):'±0';d.style.color=dd>0?'#2f6b52':dd<0?'#B5513A':'var(--text3)';}}
   updateQaChips();
 }
 function updateQaChips(){
-  var all=[];CALL_CATS.forEach(function(c){all=all.concat(c.items);});
-  var done=all.filter(function(k){return _cbScores&&_cbScores[k];}).length;
-  var c=document.getElementById('qaCountChip');if(c)c.textContent=done+' von '+all.length+' bewertet';
-  var t=document.getElementById('qaTotalChip');if(t)t.textContent=done?('Gesamt '+Math.round(totalScore({scores:_cbScores}))+' %'):'Gesamt –';
+  CALL_CATS.forEach(function(cat){
+    var vs=cat.items.map(function(k){return _cbScores[k]||0;}).filter(function(x){return x>0;});
+    var e=document.getElementById('qacg_'+cat.key);if(e)e.textContent=vs.length?'Ø '+(vs.reduce(function(a,b){return a+b;},0)/vs.length).toFixed(1).replace('.',','):'';
+  });
+  var t=document.getElementById('qaTotalTxt');
+  if(t){var cur=Math.round(totalScore({scores:_cbScores}));var base=_qaBase?Math.round(totalScore(_qaBase)):null;
+    t.innerHTML='Gesamt <b style="color:var(--text);font-size:13.5px;font-weight:600">'+cur+' %</b>'+(base!=null?' ('+base+' %)':'');}
+}
+function qaToast(m){var t=document.getElementById('qaToast');if(!t)return;t.textContent=m;t.style.display='block';clearTimeout(window._qaTT);window._qaTT=setTimeout(function(){t.style.display='none';},3000);}
+function qaRealId(rid){var r=(callRatings[selectedEmp]||[]).find(function(x){return String(x.id)===String(rid);});return r?r.id:rid;}
+function qaReopen(rid){if(rid)rid=qaRealId(rid);_puSwitching=true;try{openQaBewertungModal(selectedEmp,rid||undefined);}finally{_puSwitching=false;}var sc=document.getElementById('qaSecBew');if(sc)sc.scrollIntoView({behavior:'smooth',block:'start'});}
+function qaRenderList(){
+  var el=document.getElementById('qaList');if(!el)return;
+  var list=(callRatings[selectedEmp]||[]).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  var n=document.getElementById('qaListN');if(n)n.textContent='('+list.length+')';
+  var ed=canEditHistorie();
+  el.innerHTML=list.length?list.slice(0,5).map(function(r,i){
+    var has=r.scores&&Object.keys(r.scores).some(function(k){return r.scores[k]>0;});
+    var ts=has?Math.round(totalScore(r)):null;
+    var prev=list.slice(i+1).find(function(x){return x.scores&&Object.keys(x.scores).some(function(k){return x.scores[k]>0;});});
+    var dl=(ts!=null&&prev)?ts-Math.round(totalScore(prev)):0;
+    var d=r.date?r.date.slice(8,10)+'.'+r.date.slice(5,7)+'.':'';
+    var meta=[r.auftragsnr?'Auftrag '+r.auftragsnr:'',r.b2b||'',r.status==='ja'?'Abschluss'+(r.abschlussArt?' · Opt.: '+r.abschlussArt:''):'kein Abschluss'].filter(Boolean).join(' · ');
+    var txt=[r.einwand?'Einwand: '+r.einwand:'',r.hinweis||''].filter(Boolean).join(' · ');
+    return '<div title="'+esc(txt)+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
+      +'<div style="width:96px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+d+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text)">'+(ts!=null?ts+' %':'–')+(dl?' <span style="font-size:11.5px;font-weight:700;color:'+(dl>0?'#2f6b52':'#B5513A')+'">'+(dl>0?'▲':'▼')+'</span>':'')+'</span></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(meta)+'</div>'
+      +'<div style="font-size:13.5px;line-height:19px;height:38px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:'+(txt?'var(--text)':'var(--text3)')+'">'+(txt?esc(txt):(has?'Keine Notiz':'Keine Einzelpunkte gespeichert'))+'</div></div>'
+      +(ed?'<span style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start">'
+        +'<button class="btn" type="button" title="Bearbeiten" onclick="qaReopen(\''+r.id+'\')" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-pencil"></i></button>'
+        +'<button class="btn" type="button" title="Löschen" onclick="qaDelete(\''+r.id+'\')" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-trash"></i></button></span>':'')
+      +'</div>';
+  }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch keine Calls bewertet.</div>';
+}
+function qaDelete(rid){
+  var n0=(callRatings[selectedEmp]||[]).length;
+  deleteHistorieCallRating(selectedEmp,qaRealId(rid));
+  if((callRatings[selectedEmp]||[]).length<n0){
+    if(String(_editingCallRatingId)===String(rid))qaReopen(null);else qaRenderList();
+    qaToast('Bewertung gelöscht');
+  }
 }
 
 var _savingCallBewertung=false;
 function saveInlineCallBewertung(empId){
   if(_savingCallBewertung)return;
-  if(empId)selectedEmp=empId;
+  if(empId){var _se=employees.find(function(e){return String(e.id)===String(empId);});selectedEmp=_se?_se.id:empId;}
   var datum=document.getElementById('cb-date');
   var auftrag=document.getElementById('cb-auftrag');
   var bewerter=document.getElementById('cb-bewerter');
@@ -11556,8 +12057,9 @@ function saveInlineCallBewertung(empId){
       var avgScore=Object.keys(scores).length?(Object.values(scores).reduce(function(a,b){return a+b;},0)/Object.keys(scores).length).toFixed(1):null;
       logActivity('qa',isEditing?'updated':'created',(isEditing?'Call-Bewertung bearbeitet':'Neuen Call bewertet')+(avgScore?' (Ø '+avgScore+'/4)':''),selectedEmp,e0?e0.name+' · '+fd(r.date):'');
       _cbScores={};_editingCallRatingId=null;
-      closeModal('qaBewertungModal');
-      renderTab();
+      var _qm=document.getElementById('qaBewertungModal');
+      if(_qm&&!_qm.classList.contains('hidden')){qaReopen(null);qaToast(isEditing?'Änderung gespeichert':'Bewertung gespeichert');}
+      if(view==='emp')renderTab();
     };
     if(isEditing){
       sb.from('call_rating_scores').delete().eq('call_rating_id',r.id).then(function(){
@@ -11742,13 +12244,12 @@ function openCoachingInfoModal(empId){
   var sc=function(id){return "var el=document.getElementById('"+id+"');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})";};
   h+='<div style="display:flex;min-height:0;flex:1">'
     +'<div style="width:56px;flex-shrink:0;align-self:stretch;margin:14px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3">'
-    +railBtn('ti-layout-grid','Übersicht',sc('ciSecTop'),true)+railBtn('ti-message-circle','Verlauf',sc('ciSecVerlauf'))+railBtn('ti-notes','Notiz',sc('ciSecNotiz'))
-    +railBtn('ti-star','QA-Bewertungen',"closeModal('coachingInfoModal');selectedEmp='"+empId+"';view='emp';activeTab='call-performance';renderSidebar();renderMain();")
+    +railBtn('ti-chart-bar','Coaching im Überblick',sc('ciSecTop'),true)+railBtn('ti-notes','Notiz zum Mitarbeiter',sc('ciSecNotiz'))+railBtn('ti-list','Verlauf',sc('ciSecVerlauf'))
     +'<span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0"></span>'
     +railBtn('ti-calendar-plus','Session planen',"closeModal('coachingInfoModal');openSessionModal('"+empId+"')")
     +'</div>'
     +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">'
-    +'<div id="ciScroll" style="flex:1;overflow-y:auto;padding:14px 18px 12px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 14px,#000 calc(100% - 20px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 14px,#000 calc(100% - 20px),transparent 100%)">'
+    +'<div id="ciScroll" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">'
     +'<div id="ciSecTop"></div>'
     +box+noteBox;
   // ── Verlauf: eine Box, alle Eintraege untereinander, gleich hohe Zeilen ──
@@ -11838,6 +12339,31 @@ function updateSessionHdSub(){
   var e=employees.find(function(x){return x.id===ids[0];});
   el.textContent=e?(e.name+(e.role?' · '+e.role:'')):'1 Mitarbeiter';
 }
+// ── Session planen im gemeinsamen Popup: geplante Sessions, nach dem Planen offen bleiben ──
+function spRenderList(){
+  var el=document.getElementById('spList');if(!el)return;
+  var t0=today();
+  var list=(protocols[selectedEmp]||[]).filter(function(x){return x.status==='geplant'&&x.date>=t0;}).slice().sort(function(a,b){return String(a.date+(a.uhrzeit||'')).localeCompare(String(b.date+(b.uhrzeit||'')));});
+  var n=document.getElementById('spListN');if(n)n.textContent='('+list.length+')';
+  el.innerHTML=list.length?list.slice(0,5).map(function(x){
+    var coach=x.coachId?employees.find(function(e){return String(e.id)===String(x.coachId);}):null;
+    var meta=[x.uhrzeit?x.uhrzeit+(x.endUhrzeit?'–'+x.endUhrzeit:'')+' Uhr':'',coach?'Coach '+coach.name.split(' ')[0]:'',x.topics&&x.topics.length?x.topics.join(', '):''].filter(Boolean).join(' · ');
+    var txt=x.note||x.notes||'';
+    return '<div title="'+esc(txt)+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid rgba(240,133,102,0.45);border-radius:10px;background:#FDF0EB;margin-bottom:6px;overflow:hidden">'
+      +'<div style="width:150px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+fd(x.date)+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(x.type||'Session')+'</span></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(meta)+'</div>'
+      +'<div style="font-size:13.5px;line-height:19px;height:38px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:'+(txt?'var(--text)':'var(--text3)')+'">'+(txt?esc(txt):'Kein Anlass notiert')+'</div></div>'
+      +'<span style="display:flex;gap:6px;flex-shrink:0;align-self:flex-start"><button class="btn" type="button" title="Jetzt erfassen" onclick="openPlannedSession(selectedEmp,\''+x.id+'\',\''+esc(x.type||'').replace(/'/g,'')+'\',\''+esc((x.topics&&x.topics[0])||'').replace(/'/g,'')+'\',\''+x.date+'\',\''+(x.uhrzeit||'')+'\')" style="width:34px;height:34px;padding:0;justify-content:center"><i class="ti ti-check"></i></button></span>'
+      +'</div>';
+  }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Keine Sessions geplant.</div>';
+}
+function spAfterSave(){
+  var m=document.getElementById('sessionPlanenModal');
+  if(!m)return;
+  _puSwitching=true;try{openSessionModal(selectedEmp);}finally{_puSwitching=false;}
+  var c=document.getElementById('spSecNew');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});
+  var t=document.getElementById('spToast');if(t){t.textContent='Session geplant';t.style.display='block';clearTimeout(window._spTT);window._spTT=setTimeout(function(){t.style.display='none';},3000);}
+}
 function openSessionModal(empId){
   if(empId)selectedEmp=empId;
   sessionSelectedEmpIds=empId?[empId]:[];
@@ -11864,6 +12390,7 @@ function openSessionModal(empId){
   if(datumEl&&!datumEl.value)datumEl.value=today();
   renderLastContinueBox(selectedEmp);
   updateSessionHdSub();
+  spRenderList();
   openModal('sessionPlanenModal');
 }
 function updateNcHdSub(){
@@ -12051,35 +12578,69 @@ function openQaBewertungModal(empId,editRatingId){
   var statusEl=document.getElementById('cb-status');if(statusEl)statusEl.value=editingRating?editingRating.status:'nein';
   var b2bEl=document.getElementById('cb-b2b');if(b2bEl)b2bEl.value=editingRating?editingRating.b2b:'B2C';
   var artEl=document.getElementById('cb-abschlussart');if(artEl)artEl.value=editingRating?(editingRating.abschlussArt||''):'';
+  // Vergleichsbasis: der letzte Call vor diesem (beim Bearbeiten der davor)
+  var _qaList=(callRatings[selectedEmp]||[]).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  var _qaHas=function(r){return r&&r.scores&&Object.keys(r.scores).some(function(k){return r.scores[k]>0;});};
+  if(editingRating){var _ix=_qaList.indexOf(editingRating);_qaBase=_qaList.slice(_ix+1).find(_qaHas)||null;}
+  else _qaBase=_qaList.find(_qaHas)||null;
   var box=document.getElementById('qaScoringSection');
   if(box){
+    var BAND='font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between';
     var h='';
     CALL_CATS.forEach(function(cat,ci){
-      h+='<div style="display:flex;justify-content:space-between;font-size:11px;font-weight:700;color:var(--text3);letter-spacing:.06em;text-transform:uppercase;margin:'+(ci?12:0)+'px 0 6px">'+esc(cat.label)+'<span>'+Math.round(cat.weight*100)+' %</span></div>';
+      h+='<div style="'+BAND+';margin:'+(ci?12:0)+'px 0 4px"><span>'+esc(cat.label)+' · '+Math.round(cat.weight*100)+' %</span><span id="qacg_'+cat.key+'" style="letter-spacing:0;text-transform:none;color:var(--text3)"></span></div>';
       cat.items.forEach(function(k){
-        h+='<div style="display:flex;align-items:center;gap:10px;height:42px;padding:0 10px;border-radius:10px;border:1px solid #E4E0D6;background:#EFECE5;margin-bottom:6px">';
-        h+='<div style="flex:1;font-size:13.5px;color:var(--text)">'+ITEM_LABELS[k]+'</div>';
-        h+='<div style="display:flex;gap:4px">';
-        [1,2,3,4].forEach(function(v){
-          h+='<button type="button" id="cbf_'+k+'_'+v+'" onclick="setCbScore(\''+k+'\','+v+')" style="width:30px;height:28px;border:1px solid #E4E0D6;border-radius:8px;background:#F7F5F0;cursor:pointer;font-size:12.5px;font-weight:600;color:var(--text2);font-family:inherit;padding:0">'+v+'</button>';
-        });
-        h+='</div></div>';
+        h+='<div style="display:flex;align-items:center;gap:12px;height:36px;padding:0 10px;border-bottom:1px solid #eae7e0">'
+          +'<span style="flex:1;min-width:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ITEM_LABELS[k]+'</span>'
+          +'<span id="qal_'+k+'" style="width:62px;flex-shrink:0;font-size:12px;color:var(--text3)"></span>'
+          +'<input type="range" min="1" max="4" step="1" id="qas_'+k+'" oninput="setCbScore(\''+k+'\',+this.value)" style="width:150px;flex-shrink:0;accent-color:#3a3833;margin:0;padding:0;height:20px;border:none;background:transparent">'
+          +'<b id="cbv_'+k+'" style="width:18px;text-align:right;font-size:13.5px"></b>'
+          +'<span id="qad_'+k+'" style="width:30px;text-align:right;font-size:12px;font-weight:700"></span></div>';
       });
     });
     box.innerHTML=h;
-    if(editingRating&&editingRating.scores){
-      Object.keys(editingRating.scores).forEach(function(k){setCbScore(k,editingRating.scores[k]);});
-    }
+    CALL_CATS.forEach(function(cat){cat.items.forEach(function(k){
+      var v=editingRating&&editingRating.scores&&editingRating.scores[k]?editingRating.scores[k]:(_qaBase&&_qaBase.scores[k]?_qaBase.scores[k]:2);
+      setCbScore(k,v);
+    });});
   }
-  var kEl=document.getElementById('qaHdKick');if(kEl)kEl.textContent=editingRating?'Call-Bewertung bearbeiten':'Neuen Call bewerten';
-  var sEl=document.getElementById('qaHdSub');var qe=employees.find(function(e){return e.id===selectedEmp;});if(sEl)sEl.textContent=qe?(qe.name+(qe.role?' · '+qe.role:'')):'—';
+  var kEl=document.getElementById('qaHdKick');if(kEl)kEl.textContent=editingRating?'Call-Bewertung bearbeiten':'Call bewerten';
+  var sEl=document.getElementById('qaHdSub');var qe=employees.find(function(e){return String(e.id)===String(selectedEmp);});if(sEl)sEl.textContent=qe?(qe.name+(qe.role?' · '+qe.role:'')):'—';
   updateQaChips();
   var saveBtn=document.getElementById('qaSaveBtn');
   if(saveBtn){
     saveBtn.dataset.eid=selectedEmp;
-    saveBtn.innerHTML=editingRating?'<i class="ti ti-device-floppy"></i> Änderungen speichern':'<i class="ti ti-device-floppy"></i> Bewertung speichern';
+    saveBtn.innerHTML=editingRating?'<i class="ti ti-check"></i> Änderung speichern':'<i class="ti ti-check"></i> Bewertung speichern';
   }
+  var ce=document.getElementById('qaCancelEdit');if(ce)ce.style.display=editingRating?'':'none';
+  var ct=document.getElementById('qaCardTitle');if(ct)ct.textContent=editingRating?'Bewertung bearbeiten':'Neue Bewertung';
+  qaRenderList();
   openModal('qaBewertungModal');
+}
+// ── Session im gemeinsamen Popup: letzte Sessions, nach dem Speichern offen bleiben ──
+function ncToast(m){var t=document.getElementById('ncToast');if(!t)return;t.textContent=m;t.style.display='block';clearTimeout(window._ncTT);window._ncTT=setTimeout(function(){t.style.display='none';},3000);}
+function ncRenderList(){
+  var el=document.getElementById('ncList');if(!el)return;
+  var t0=today();
+  var list=(protocols[selectedEmp]||[]).filter(function(x){return x.status!=='geplant'||x.date<=t0;}).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});
+  var n=document.getElementById('ncListN');if(n)n.textContent='('+list.length+')';
+  el.innerHTML=list.length?list.slice(0,5).map(function(x){
+    var coach=x.coachId?employees.find(function(e){return String(e.id)===String(x.coachId);}):null;
+    var dur=(typeof sessionDuration==='function')?sessionDuration(x.uhrzeit,x.endUhrzeit):0;
+    var meta=[coach?'Coach '+coach.name.split(' ')[0]:'',dur&&typeof formatDuration==='function'?formatDuration(dur):'',x.topics&&x.topics.length?x.topics.join(', '):''].filter(Boolean).join(' · ');
+    var txt=[x.start?'Start: '+x.start:'',x.stop?'Stop: '+x.stop:'',x.cont?'Continue: '+x.cont:'',x.notes||''].filter(Boolean).join(' · ');
+    return '<div title="'+esc(txt)+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
+      +'<div style="width:150px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+fd(x.date)+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(x.type||'Session')+'</span></div>'
+      +'<div style="flex:1;min-width:0"><div style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3);margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(meta)+'</div>'
+      +'<div style="font-size:13.5px;line-height:19px;height:38px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:'+(txt?'var(--text)':'var(--text3)')+'">'+(txt?esc(txt):'Kein Rückblick erfasst')+'</div></div></div>';
+  }).join(''):'<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch keine Sessions.</div>';
+}
+function ncAfterSave(wasEdit){
+  var m=document.getElementById('neuesCoachingModal');
+  if(!m||m.classList.contains('hidden'))return;
+  _puSwitching=true;try{openNeuesCoachingModal(selectedEmp);}finally{_puSwitching=false;}
+  var c=document.getElementById('ncSecNew');if(c)c.scrollIntoView({behavior:'smooth',block:'start'});
+  ncToast(wasEdit?'Session aktualisiert':'Session gespeichert');
 }
 function openNeuesCoachingModal(empId){
   if(empId)selectedEmp=empId;
@@ -12108,6 +12669,8 @@ function openNeuesCoachingModal(empId){
   if(saveBtn)saveBtn.dataset.eid=selectedEmp;
   renderLastContinueBox(selectedEmp,'ncLastContinueBox');
   updateNcHdSub();
+  ncRenderList();
+  var nf=document.getElementById('ncFrom');if(nf){var cn=(typeof currentCoach!=='undefined'&&currentCoach)?currentCoach.name:((typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'');nf.textContent=cn?'von '+cn:'';}
   openModal('neuesCoachingModal');
 }
 
@@ -12303,6 +12866,8 @@ function zieleSpeichern(){
   }).observe(document.documentElement,{childList:true,subtree:true});
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',scan);else scan();
 })();
+// Ein Popup für alles: Öffnungsfunktionen verbinden
+try{puInit();}catch(e){console.warn('puInit',e);}
 </script>
 </body>
 </html>

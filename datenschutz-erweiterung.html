@@ -5,47 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Datenschutzhinweise – Sales OS Chrome-Erweiterung</title>
 <style>
-  body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #142a2e; background: #f7faf9; line-height: 1.6; }
-  header { background: linear-gradient(135deg, #113c41, #1f6a72); color: #f4f7f6; padding: 40px 24px; }
-  header p { margin: 0; color: #7ed2db; font-weight: 700; letter-spacing: 2px; font-size: 13px; }
-  header h1 { margin: 8px 0 0; font-size: 28px; }
+  body { margin: 0; font-family: "Segoe UI", Roboto, Arial, sans-serif; color: #1a1a18; background: #EEEDE9; line-height: 1.6; }
+  header { background: linear-gradient(135deg, #E9773F 0%, #DE5A5E 50%, #C23B66 100%); color: #fff; padding: 40px 24px; }
+  header .in { max-width: 760px; margin: 0 auto; }
+  header p { margin: 0; font-weight: 600; letter-spacing: .09em; font-size: 13px; }
+  header h1 { margin: 8px 0 0; font-size: 28px; font-weight: 400; line-height: 1.25; }
   main { max-width: 760px; margin: 0 auto; padding: 32px 24px 64px; }
-  h2 { font-size: 19px; margin: 32px 0 8px; color: #113c41; }
-  ul { padding-left: 20px; }
-  .small { color: #56676a; font-size: 14px; }
+  section { background: #F7F5F0; border: 1px solid #E4E0D6; border-radius: 14px; padding: 4px 24px 18px; margin-bottom: 16px; }
+  h2 { font-size: 18px; margin: 18px 0 6px; }
+  ul { padding-left: 20px; margin: 6px 0; }
+  li { margin: 4px 0; }
+  a { color: #B5513A; }
+  .small { color: #6b6b67; font-size: 14px; }
 </style>
 </head>
 <body>
-<header>
+<header><div class="in">
   <p>SALES OS</p>
   <h1>Datenschutzhinweise zur Chrome-Erweiterung „Sales OS – Deine Kennzahlen“</h1>
-</header>
+</div></header>
 <main>
+  <section>
   <h2>Zweck der Erweiterung</h2>
-  <p>Die Erweiterung ist ein internes Werkzeug der Wiegand GmbH für ihre Mitarbeiterinnen und Mitarbeiter im Vertrieb. Sie zeigt angemeldeten Nutzern ausschließlich ihre <b>eigenen</b> Kennzahlen (z. B. Optimierungen, Marge, Conversion-Raten) und ihre vorläufige Provision aus dem internen System Sales OS an.</p>
+  <p>Die Erweiterung ist ein internes Werkzeug der Wiegand GmbH für ihre Mitarbeiterinnen und Mitarbeiter im Vertrieb. Sie zeigt angemeldeten Nutzern ihre <b>eigenen</b> Kennzahlen (z. B. Optimierungen, Marge, Conversion-Raten), ihre Ziele und ihre vorläufige Provision aus dem internen System Sales OS. Außerdem zeigt sie die eigenen geplanten Termine (z. B. Weekly, Coaching, Performance-Gespräch) und das eigene Urlaubskonto. Über die Erweiterung kann Urlaub beantragt werden.</p>
+  </section>
 
+  <section>
   <h2>Welche Daten verarbeitet werden</h2>
   <ul>
-    <li><b>Anmeldedaten:</b> die dienstliche E-Mail-Adresse und das Passwort werden zur Anmeldung an Sales OS übermittelt. Das Passwort wird nicht in der Erweiterung gespeichert.</li>
-    <li><b>Sitzungsdaten:</b> nach der Anmeldung wird ein Sitzungsschlüssel lokal im Browser gespeichert, damit man nicht bei jedem Öffnen neu angemeldet werden muss.</li>
-    <li><b>Eigene Leistungsdaten:</b> die Erweiterung ruft die Kennzahlen, Ziele und Provisionsgrundlagen des angemeldeten Mitarbeiters aus Sales OS ab und zeigt sie an. Daten anderer Mitarbeiter sind für den Nutzer technisch nicht abrufbar.</li>
-    <li><b>Lokaler Zwischenspeicher:</b> der zuletzt geladene Stand, der zuletzt gewählte Bereich sowie für den laufenden Tag stündliche Zwischenstände der eigenen Optimierungen und Marge (für die Anzeige „Verlauf“) werden lokal im Browser gespeichert.</li>
+    <li><b>Anmeldedaten:</b> Die dienstliche E-Mail-Adresse und das Passwort werden zur Anmeldung an Sales OS übermittelt. Das Passwort wird nicht in der Erweiterung gespeichert.</li>
+    <li><b>Sitzungsdaten:</b> Nach der Anmeldung wird ein Sitzungsschlüssel lokal im Browser gespeichert, damit man nicht bei jedem Öffnen neu angemeldet werden muss.</li>
+    <li><b>Eigene Leistungsdaten und Ziele:</b> Die Erweiterung ruft Kennzahlen, Ziele und Provisionsgrundlagen des angemeldeten Mitarbeiters aus Sales OS ab. Leistungs- und Provisionsdaten anderer Mitarbeiter sind für den Nutzer technisch nicht abrufbar.</li>
+    <li><b>Eigene Termine:</b> Datum, Uhrzeit, Art und Thema der eigenen Coaching-Sessions sowie die mit dem Mitarbeiter vereinbarten Punkte (Start, Stop, Continue) und der Name des Coaches. Interne Notizen und Bewertungen der Coaches sind nicht sichtbar.</li>
+    <li><b>Eigener Urlaub:</b> Urlaubskonto, eigene Abwesenheiten und Anträge. Ein Antrag (Zeitraum, halber Tag, optionale Notiz) wird in Sales OS gespeichert und dort von Admins oder Coaches genehmigt oder abgelehnt. Offene Anträge kann der Mitarbeiter selbst zurückziehen.</li>
+    <li><b>Teamansicht beim Urlaubsantrag:</b> Damit Urlaub im Team abgestimmt werden kann, sieht der Nutzer für den gewählten Zeitraum (höchstens sechs Wochen je Abruf), welche Kolleginnen und Kollegen <b>am eigenen Standort</b> beantragten oder genehmigten Urlaub haben oder abwesend sind. Angezeigt werden nur Vorname und der erste Buchstabe des Nachnamens. Krankheit, Ausgleichstage und Freistellungen erscheinen nur als „abwesend“, ohne Grund und ohne Notizen. Diese Einschränkung setzt die Datenbank selbst durch, nicht nur die Erweiterung.</li>
+    <li><b>Lokaler Zwischenspeicher:</b> Der zuletzt geladene Stand, der zuletzt gewählte Bereich, die Einstellungen für Benachrichtigungen, die Hinweise des laufenden Tages sowie stündliche Zwischenstände der eigenen Optimierungen und Marge (für die Anzeige „Verlauf“) werden lokal im Browser gespeichert.</li>
+    <li><b>Benachrichtigungen:</b> Die Erweiterung kann Hinweise über die Chrome-Benachrichtigungen anzeigen (z. B. Prognose unter Tagesziel, Urlaubsantrag entschieden, Termin am nächsten Tag). Jede Art lässt sich in der Erweiterung einzeln abschalten. Die Hinweise entstehen lokal im Browser und werden nicht übertragen.</li>
   </ul>
+  </section>
 
+  <section>
   <h2>Was nicht passiert</h2>
   <ul>
     <li>Kein Tracking, keine Analyse des Surfverhaltens, keine Werbung.</li>
     <li>Die Erweiterung liest keine Inhalte der besuchten Webseiten.</li>
+    <li>Keine Ranglisten und keine Vergleiche der eigenen Leistung mit anderen Mitarbeitern.</li>
     <li>Keine Weitergabe oder kein Verkauf von Daten an Dritte. Die Daten werden ausschließlich zwischen Browser und der Sales-OS-Datenbank übertragen, die bei unserem Hosting-Dienstleister (Supabase) betrieben wird.</li>
   </ul>
+  </section>
 
+  <section>
   <h2>Speicherdauer und Löschung</h2>
-  <p>Beim <b>Abmelden</b> in der Erweiterung werden Sitzung, zwischengespeicherte Kennzahlen und Tagesverlauf aus dem Browser gelöscht. Beim Entfernen der Erweiterung löscht Chrome alle ihre lokalen Daten. Die stündlichen Zwischenstände werden jeweils am nächsten Tag überschrieben.</p>
+  <p>Beim <b>Abmelden</b> in der Erweiterung werden Sitzung, zwischengespeicherte Kennzahlen und Tagesverlauf aus dem Browser gelöscht. Beim Entfernen der Erweiterung löscht Chrome alle ihre lokalen Daten. Die stündlichen Zwischenstände und die Hinweise werden jeweils am nächsten Tag überschrieben. Urlaubsanträge werden in Sales OS wie alle Abwesenheiten in der Urlaubsplanung aufbewahrt.</p>
+  </section>
 
+  <section>
   <h2>Verantwortlicher und Kontakt</h2>
   <p>Verantwortlich ist die Wiegand GmbH. Fragen zur Erweiterung und zum Datenschutz richten Sie bitte an die Sales-OS-Administration: <a href="mailto:p.rode@wiegand-gmbh.de">p.rode@wiegand-gmbh.de</a>. Ergänzend gelten die allgemeinen Datenschutzhinweise der Wiegand GmbH für Beschäftigte.</p>
-
-  <p class="small">Stand: Oktober 2026</p>
+  <p class="small">Stand: November 2026 · gilt ab Version 1.2.0</p>
+  </section>
 </main>
 </body>
 </html>

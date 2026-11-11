@@ -14,7 +14,7 @@
 <!-- feste Versionen mit Pruefsumme: veraenderte Dateien vom CDN werden vom Browser abgelehnt -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.118.0/dist/umd/supabase.js" integrity="sha384-TcHRA3zBbn+Lexh5n+Oil4guNPOS3rjNDpGRAN46u/s/mB2IZ50ceC6TYDU2yvgK" crossorigin="anonymous"></script>
 <style>
-:root{
+:root{--ban-h:282px;
   /* Feste Flaechen-Palette (Ebenen 3-6): nur diese hellen Toene innerhalb von Boxen verwenden */
   --page:#EEEDE9;--s-sub:#EFECE5;--s-white:#F7F5F0;--s-tint:rgba(29,28,26,0.035);--s-tint-strong:rgba(29,28,26,0.07);
   --bg:var(--s-white);--bg-solid:var(--s-white);--bg2:var(--s-sub);--bg3:var(--s-sub);
@@ -29,6 +29,7 @@
   --r-sm:6px;--r-md:8px;--r-lg:14px;
   --sidebar:250px;
 }
+@media(max-width:1649px){:root{--ban-h:332px}} /* schmalere Bildschirme: Kacheln brechen um, alle Banner gleich hoch */
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;overflow:hidden;}
 button,input,select,textarea,optgroup{font-family:inherit;}
@@ -623,6 +624,8 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 .kal-tgl b{margin-left:4px}.kal-tgl.on{background:#1d1c1a!important;color:#fff!important;border-color:#1d1c1a!important}
 .kal-cw{display:grid;grid-template-columns:minmax(0,1fr) 330px;gap:16px;align-items:start}
 .kal-cw.nopane{grid-template-columns:minmax(0,1fr)}.kal-cw.nopane .kal-pane{display:none}
+.kal-cw.co{align-items:stretch}.kal-cw.co .kal-pane{position:relative;top:0;padding:0;max-height:none;overflow:hidden;contain:size;align-self:stretch}.kal-cw.co .kal-pin{position:absolute;inset:0;overflow:auto;padding:14px}
+@media(max-width:1250px){.kal-cw.co .kal-pane{contain:none}.kal-cw.co .kal-pin{position:static;max-height:420px}}
 @media(max-width:1250px){.kal-cw{grid-template-columns:1fr}}
 .kal-pane{background:#EFECE5;border:1px solid #E4E0D6;border-radius:14px;padding:14px;position:sticky;top:8px;max-height:calc(100vh - 40px);overflow:auto}
 .kal-pane .ph{display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin:2px 2px 6px}.kal-pane .ph span{margin-left:auto;color:var(--text3);font-weight:500}
@@ -683,6 +686,8 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 .kal-tl .blk{position:absolute;left:0;right:0;top:7px;bottom:7px;font-size:10.5px;display:flex;align-items:center;justify-content:center;font-weight:700;cursor:pointer}
 .kal-tl .blk[draggable=true]{cursor:grab}.kal-tl .blk.h{top:20px}.kal-tl .blk.s{left:3px;border-top-left-radius:7px;border-bottom-left-radius:7px}.kal-tl .blk.e{right:3px;border-top-right-radius:7px;border-bottom-right-radius:7px}
 .kal-tl .dot{position:absolute;bottom:3px;width:7px;height:7px;border-radius:2px}
+.kal-cw.co .kal-tlw{overflow:auto}.kal-cw.co .kal-tl .hd{position:sticky;top:0;z-index:3}.kal-cw.co .kal-tl .hd.nm{z-index:4}.kal-cw.co .kal-tl .ft{position:sticky;bottom:0;z-index:3}.kal-cw.co .kal-tl .ft.nm{z-index:4}
+.kal-tl .sb{position:absolute;left:4px;right:4px;top:9px;bottom:9px;border-radius:6px;font-size:10.5px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer}.kal-tl .sb[draggable=true]{cursor:grab}
 .kal-tl .ft{font-size:12px;font-weight:700;color:var(--text2);background:#EFECE5;border-bottom:0}.kal-tl .ft.nm{background:#EFECE5;padding-left:12px}.kal-tl .ft.w3{background:#FBE3DA;color:#9A3F22}
 .kal-tl .cell{cursor:pointer}.kal-tl .cell:hover{background:rgba(240,133,102,.08)}
 /* Urlaubskonto */
@@ -811,7 +816,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 .au-now{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:700;color:#9A3F22}.au-now:after{content:"";flex:1;height:2px;background:#F08566}
 .au-dot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;background:#CDBB9E}.au-dot.od{background:#F08566}
 .au-cell{display:inline-flex;min-width:54px;justify-content:center;padding:3px 6px;border-radius:7px;font-size:12px;font-weight:700}.au-cell.c3{background:#E5EDE6;color:#2F6B4F}.au-cell.c2{background:#F1E9D9;color:#6E5A3A}.au-cell.c1{background:#FBE3DA;color:#9A3F22}.au-cell.c0{background:#EFECE5;color:#7A7268}
-.rl-btn.au-badge{position:relative}.rl-btn.au-badge::after{content:attr(data-n);position:absolute;top:3px;right:3px;min-width:15px;height:15px;padding:0 3px;border-radius:5px;background:#F08566;color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;box-sizing:border-box}
+.rl-btn.au-badge{position:relative}.rl-btn.au-badge::after{content:attr(data-n);position:absolute;top:2px;right:0;min-width:17px;height:17px;padding:0 4px;border-radius:9px;background:#F08566;color:#fff;font-size:10.5px;font-weight:700;line-height:1;display:flex;align-items:center;justify-content:center;box-sizing:border-box;box-shadow:0 0 0 2px #F7F5F0;pointer-events:none}
 /* Formular */
 #kalFormModal .kal-fs{background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)}
 .kal-fs{background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px}
@@ -1431,14 +1436,14 @@ function loadEmployeesFromSupabase(){
     if(res.error){ console.warn('employees load failed:', res.error); return false; }
     employees = res.data.map(function(e){
       return {
-        id: e.id, name: e.name, role: e.role, phase: e.phase,
+        id: e.id, name: e.name, role: e.role==='SC'?'SDC':e.role, phase: e.phase, sdlTeam: Array.isArray(e.sdl_team)?e.sdl_team.map(String):[],
         color: e.color_index, startDate: e.start_date, endDate: e.end_date || null,
         team: e.team, contract: e.contract, hours: e.hours, active: e.active,
         auth_user_id: e.auth_user_id || null, notes: e.notes || '',
         isPureCoach: e.is_pure_coach===true, boardRole: e.board_role||null, provisionSettings: e.provision_settings || {}, email: e.email || '', workHours: e.work_hours || null, urlaub: e.urlaub || {}
       };
     });
-    return true;
+    return loadSalariesFromSupabase();
   });
 }
 
@@ -1452,7 +1457,7 @@ var provisionTeamDropdownOpen=false;
 var provisionTeamSearchQuery='';
 function toggleProvisionTeamDropdown(){provisionTeamDropdownOpen=!provisionTeamDropdownOpen;if(!provisionTeamDropdownOpen)provisionTeamSearchQuery='';renderProvisionTeam();}
 function toggleProvisionTeamEmpId(id){
-  var visIds=employees.filter(function(e){return !e.isPureCoach&&e.active!==false;}).map(function(e){return e.id;});
+  var visIds=employees.filter(function(e){return !e.isPureCoach&&e.active!==false&&canSeeSalary(e);}).map(function(e){return e.id;});
   if(!provisionTeamSelectedIds)provisionTeamSelectedIds=visIds.slice();
   var idx=provisionTeamSelectedIds.indexOf(id);
   if(idx>=0)provisionTeamSelectedIds.splice(idx,1);else provisionTeamSelectedIds.push(id);
@@ -1562,7 +1567,20 @@ var settingsNavOpen=true;
 // ── Benutzer & Rechte: eine gemeinsame Liste fuer alle Personen ──
 var userFilter='all', userSearch='', userShowAllAgents=false, loginInfo=null, loginInfoLoading=false, userMsg='';
 var BOARD_ROLE_LABEL={admin:'Admin',coach:'Coach',viewer:'Betrachter',agent:'Sales Agent'};
-function positionRole(p){ return (p.isPureCoach||p.role==='SC'||p.role==='SDM')?'Coach':'Sales Agent'; }
+// Coach im Board: gesetzte Board-Rolle geht vor (Coach = ja, Betrachter/Agent = nein), sonst wie bisher nach Position
+function isCoachEmp(e){ if(!e)return false; if(e.boardRole==='coach')return true; if(e.boardRole==='viewer'||e.boardRole==='agent')return false; return !!(e.isPureCoach||e.role==='SDC'||e.role==='SDM'||e.role==='SDL'); }
+// SDL (Sales Department Lead): sieht Provision und Gehalt nur von sich und seinem Team (Stammdaten › Team)
+function isSdlUser(){return currentUserRole==='coach'&&!!currentCoach&&currentCoach.role==='SDL';}
+function canSeeSalary(emp){if(!emp||!isSdlUser())return true;var id=String(emp.id);return id===String(currentCoach.id)||(currentCoach.sdlTeam||[]).indexOf(id)>=0;}
+var SALARY_TABLE=false; // true, sobald die Tabelle employee_salary existiert (SQL 29)
+function loadSalariesFromSupabase(){return sb.from('employee_salary').select('*').then(function(res){
+  if(res.error){SALARY_TABLE=false;console.warn('employee_salary (SQL 29 ausgeführt?)',res.error);return true;}
+  SALARY_TABLE=true;var by={};(res.data||[]).forEach(function(r){by[String(r.employee_id)]=r;});
+  employees.forEach(function(e){var r=by[String(e.id)];var pv=e.provisionSettings||(e.provisionSettings={});delete pv.grundgehalt;delete pv.agSozialabgaben;
+    if(r){if(r.grundgehalt!=null)pv.grundgehalt=+r.grundgehalt;if(r.ag_sozialabgaben!=null)pv.agSozialabgaben=+r.ag_sozialabgaben;}});
+  return true;}).catch(function(e){SALARY_TABLE=false;console.warn('employee_salary',e);return true;});}
+function esSdlToggle(v){var b=document.getElementById('es-sdl-team');if(b)b.style.display=v==='SDL'?'':'none';}
+function positionRole(p){ return (p.isPureCoach||p.role==='SDC'||p.role==='SDM'||p.role==='SDL')?'Coach':'Sales Agent'; }
 function personRole(p){ if(p.kind==='app') return p.role==='admin'?'Admin':'Betrachter'; if(p.boardRole&&BOARD_ROLE_LABEL[p.boardRole]) return BOARD_ROLE_LABEL[p.boardRole]; return positionRole(p); }
 function updateEmpBoardRole(sel){
   var emp=employees.find(function(e){return String(e.id)===String(sel.dataset.eid);});if(!emp)return;
@@ -1775,17 +1793,24 @@ document.addEventListener('click',function(){document.querySelectorAll('.dd-pane
 
 function setOverviewChartMetric(m){overviewChartMetric=m;renderTeam();}
 function setOverviewChartEmp(v){overviewChartEmpId=v||null;renderTeam();}
-var _bannerRotationOrder=['performance','overview','ziel','coaching','activity'];
+var _bannerRotationOrder=['performance','overview','ziel','coaching','activity','kalender','aufgaben'];
+var BANNER_TITLES={performance:'Performance',overview:'Overview',ziel:'Zielvereinbarung',coaching:'Coaching',activity:'Aktivitäten',kalender:'Kalender',aufgaben:'Aufgaben'};
+// Punkte des Banner-Karussells (für alle Folien gleich, aktive Folie als breiter Strich)
+function bannerDots(active){return _bannerRotationOrder.map(function(m){var on=m===active;return '<div onclick="setBannerViewMode(\''+m+'\')" style="'+(on?'width:20px;height:7px;border-radius:4px;background:#F7B39A':'width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25)')+';cursor:pointer" title="'+BANNER_TITLES[m]+'"></div>';}).join('');}
+function bannerDotsBar(active){return '<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'+bannerDots(active)+'</div>';}
+function gbVisible(){return employees.filter(function(e){return !e.isPureCoach;});}
+// In Kalender und Aufgaben nur den Banner austauschen (die Seite selbst bleibt unberührt: Scroll, Ziehen, offene Leisten)
+function bannerSwapInPlace(){if(view!=='kalender'&&view!=='aufgaben')return false;var el=document.getElementById('gBan');if(!el)return false;el.outerHTML=buildGlobalBannerHtml(gbVisible());return true;}
 var _bannerRotationTimer=null;
 function _bannerRotateNext(){
   // Auf der Mitarbeiter-Detailseite wird ein eigenstaendiger Banner gezeigt (nicht der globale) -
   // ein Re-Render hier wuerde nur unnoetig die Seite zuruecksetzen (u.a. Scroll-Position), ohne
   // dass sich optisch etwas Sichtbares aendert. Rotation daher auf diesen Seiten pausieren.
-  if(view!=='team'&&view!=='coaching'&&view!=='activity')return;
+  if(view!=='team'&&view!=='coaching'&&view!=='activity'&&view!=='kalender'&&view!=='aufgaben')return;
   var cur=bannerViewMode||'overview';
   var idx=_bannerRotationOrder.indexOf(cur);
   bannerViewMode=_bannerRotationOrder[(idx+1)%_bannerRotationOrder.length];
-  renderMain();
+  if(!bannerSwapInPlace())renderMain();
 }
 // Idempotent: laeuft die Rotation schon, wird nichts veraendert (sonst wuerde jeder normale
 // Re-Render z.B. bei Dateneingaben den 60s-Timer immer wieder zuruecksetzen und er wuerde nie feuern)
@@ -1802,7 +1827,7 @@ function resetBannerRotation(){
 function setBannerViewMode(m){
   bannerViewMode=m;
   resetBannerRotation();
-  renderMain();
+  if(!bannerSwapInPlace())renderMain();
 }
 var overviewToDate=null;   // Bis-Datum (Overview Performance-Tabelle), null = Standard (Monatsende/heute)
 function setOverviewDateRange(from,to){overviewFromDate=from||null;overviewToDate=to||null;rerenderOverviewContext();}
@@ -2008,7 +2033,7 @@ function resolveCurrentCoach(){
     if(currentCoach && currentCoach.boardRole && BOARD_ROLE_LABEL[currentCoach.boardRole]){
       // bewusst gesetzte Board-Rolle geht vor der Position
       currentUserRole=currentCoach.boardRole;
-    } else if(currentCoach && !(currentCoach.isPureCoach || currentCoach.role==='SC' || currentCoach.role==='SDM')){
+    } else if(currentCoach && !(currentCoach.isPureCoach || currentCoach.role==='SDC' || currentCoach.role==='SDM' || currentCoach.role==='SDL')){
       // Mitarbeiter mit Login, aber kein Coach: Agent (nutzt nur die Chrome-Erweiterung, kein Board-Zugang)
       currentUserRole='agent';
     } else if(currentCoach){
@@ -2398,7 +2423,7 @@ function buildDailyWizardCr(){
 // Schwaechste 3: nur Verkaeufer (keine Coaches SC/SDM, keine inaktiven) mit mehr als minOpt Optimierungen heute
 function dwWorstCandidates(minOpt){
   var lim=(minOpt!=null)?+minOpt:5;
-  return employees.filter(function(e){return !e.isPureCoach&&e.active!==false&&e.role!=='SC'&&e.role!=='SDM';})
+  return employees.filter(function(e){return !e.isPureCoach&&e.active!==false&&e.role!=='SDC'&&e.role!=='SDM';})
     .map(function(e){return {e:e,s:dwSums(dwRowsToday(e.id))};})
     .filter(function(x){return x.s.opt>lim;});
 }
@@ -2469,7 +2494,7 @@ var WIZ_SLIDES={
     return [{type:'stagerow',title:'Worst 3 Mitarbeiter',sub:(c.kpi==='marge'||c.kpi==='opt'?'Summe ':'Ø ')+wizKpiLabel(c.kpi)+' der letzten 30 Tage'+(c.minOpt>0?' · ab '+c.minOpt+' Opt.':'')+'.',
       boxes:r.length?r.map(function(x){return{n:wizKpiFmt(x.v,c.kpi),l:wizFirst(x.e)};}):[{n:'—',l:'Keine Daten'}]}];}},
   dist:{label:'Verteilung über Coaches',desc:'Abgeschlossene Coachings je Coach, gesamt',def:{},build:function(){
-    var coachEmps=employees.filter(function(e){return(e.role==='SDM'||e.role==='SC')&&e.active!==false;}),cnt={};
+    var coachEmps=employees.filter(function(e){return(e.role==='SDM'||e.role==='SDC')&&e.active!==false;}),cnt={};
     employeeActiveList().forEach(function(e){(protocols[e.id]||[]).forEach(function(p){if(p.status!=='geplant'&&p.coachId)cnt[p.coachId]=(cnt[p.coachId]||0)+1;});});
     var d=coachEmps.map(function(c){return{n:String(cnt[c.id]||0),l:wizFirst(c)};}).sort(function(a,b){return(+b.n)-(+a.n);});
     return [{type:'stagerow',title:'Verteilung über Coaches',sub:'Alle abgeschlossenen Coachings, gesamt.',boxes:d.length?d:[{n:'0',l:'—'}]}];}},
@@ -2611,7 +2636,7 @@ function dailyWizardNext(){wizardNext();}
 function buildCoachingAbdeckungTab(liste,hD,heute){
   var HIDDEN=[];
   var visible=liste.filter(function(e){return HIDDEN.indexOf(e.role)<0&&!e.isPureCoach;});
-  var coachEmps=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var coachEmps=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;});
 
   // ── Kennzahlen oben ──
   var ueberfaellig=visible.filter(function(e){var t=tageSeitLetzterSession(e.id);return t===null||t>30;}).sort(function(a,b){
@@ -2644,7 +2669,7 @@ function buildCoachingAbdeckungTab(liste,hD,heute){
     +covTile('MITARBEITER',visible.length,'#F08566','aktiv, ohne Coaches')
     +covTile('ÜBERFÄLLIG',ueberfaellig.length,ueberfaellig.length?'var(--red)':'var(--teal-dark)','>30 Tage kein Coaching')
     +covTile('Ø TAGE SEIT LETZTEM',(avgTage!==null?avgTage+'d':'—'),'#F08566','Team-Durchschnitt')
-    +covTile('QA FÄLLIG',qaDueListe.length,qaDueListe.length?'var(--amber-dark)':'var(--teal-dark)','unter 5 Calls / 60 Tage')
+    +covTile('QA FÄLLIG',qaDueListe.length,qaDueListe.length?'var(--amber-dark)':'var(--teal-dark)','unter 4 Calls / Woche')
     +covTile('QA-BEDARF',bedarfListe.length,bedarfListe.length?'var(--red)':'var(--teal-dark)','konstant schwache Kategorie')
     +'</div>';
 
@@ -2759,7 +2784,7 @@ function buildCoachingAbdeckungTab(liste,hD,heute){
 
   // ── QA-Bewertungen fällig: volle Liste ──
   h+='<div class="card">';
-  h+='<div class="card-title"><i class="ti ti-phone-check"></i> QA-Bewertungen fällig <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+qaDueListe.length+') · Ziel: 5 Calls / 60 Tage</span></div>';
+  h+='<div class="card-title"><i class="ti ti-phone-check"></i> QA-Bewertungen fällig <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+qaDueListe.length+') · Ziel: 4 Calls / Woche</span></div>';
   if(!qaDueListe.length){
     h+='<div style="text-align:center;color:var(--teal-dark);padding:20px"><i class="ti ti-check" style="font-size:24px;display:block;margin-bottom:6px"></i>Alle im Ziel</div>';
   } else {
@@ -2798,7 +2823,7 @@ function renderCoachingAnsicht(){
     });
   });
   all.sort(function(a,b){return b.d.localeCompare(a.d);});
-  var coachList=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var coachList=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;});
   if(coachFilterView!=='overview'){
     all=all.filter(function(x){return x.coachId===coachFilterView;});
   }
@@ -2872,7 +2897,7 @@ function renderCoachingAnsicht(){
   var COACH_PETROL_PALETTE=['#1d1c1a','#F08566','#F08566','#F08566','#F59A5B','#F7A777'];
   function coachPetrolColor(coachId){
     if(!coachId)return COACH_PETROL_PALETTE[1];
-    var coachList=employees.filter(function(e){return e.role==='SDM'||e.role==='SC';}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var coachList=employees.filter(function(e){return isCoachEmp(e)||e.role==='SDM'||e.role==='SDC';}).sort(function(a,b){return a.name.localeCompare(b.name);});
     var idx=coachList.findIndex(function(c){return c.id===coachId;});
     return COACH_PETROL_PALETTE[idx>=0?idx%COACH_PETROL_PALETTE.length:1];
   }
@@ -3103,28 +3128,7 @@ function renderCoachingAnsicht(){
   // ══ Performance-Tabelle (dieselbe Tabelle wie im Performance-Reiter, ohne Banner und ohne Diagramm) ══
   h+=buildOverviewTab(liste,'performance',true,true);
 
-  // ══ Geplante Sessions (volle Breite, weiße Box) ══
-  var gep10=gep.slice(0,10);
-  h+='<div class="card" style="margin-bottom:22px">';
-  h+='<div class="card-title"><i class="ti ti-calendar-event"></i> Geplante Sessions'+(gep.length?' <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">('+gep10.length+(gep.length>10?' von '+gep.length:'')+')</span>':'')+'</div>';
-  if(!gep.length){
-    h+='<div style="text-align:center;color:var(--text3);padding:28px"><i class="ti ti-calendar-off" style="font-size:28px;display:block;margin-bottom:8px"></i>Keine Sessions geplant<div style="margin-top:10px"><button class="btn btn-sm btn-primary" onclick="openSessionModal(0)"><i class="ti ti-plus"></i> Jetzt planen</button></div></div>';
-  } else {
-    h+='<div style="display:flex;flex-direction:column;gap:8px">';
-    gep10.forEach(function(x){
-      var c=ec(x.eid),dt2=new Date(x.d+'T00:00:00'),df=Math.round((dt2-hD)/86400000);
-      var pTyp=(x.t||'').replace(/[<>"']/g,'');
-      var pFok=(x.f||'').replace(/[<>"']/g,'');
-      var pUhr=(x.uhrzeit||'').replace(/[<>"']/g,'');
-      h+='<div style="background:var(--s-sub);border:1px solid var(--border2);border-radius:var(--r-lg);padding:11px 14px;display:flex;align-items:center;gap:12px;cursor:pointer" onclick="openPlannedSession(\''+x.eid+'\',\''+x.sid+'\',\''+pTyp+'\',\''+pFok+'\',\''+x.d+'\',\''+pUhr+'\')">';
-      h+='<div style="min-width:46px;text-align:center;background:var(--purple-bg);border-radius:var(--r-md);padding:6px 8px;flex-shrink:0"><div style="font-size:10px;font-weight:600;color:var(--purple)">'+wday(x.d)+'</div><div style="font-size:21px;font-weight:700;color:var(--purple);line-height:1.1">'+dt2.getDate()+'</div></div>';
-      h+='<div style="flex:1;min-width:0"><div style="display:flex;align-items:center;gap:8px;margin-bottom:3px"><div class="av" style="width:26px;height:26px;font-size:10px;background:'+c.bg+';color:'+c.text+';flex-shrink:0">'+ini(x.en)+'</div><span style="font-weight:600;font-size:13px;white-space:nowrap">'+x.en+'</span>'+(pUhr?'<span style="font-size:10px;color:var(--text2)"><i class="ti ti-clock" style="font-size:10px"></i> '+pUhr+'</span>':'')+' <span style="font-size:10px;padding:1px 6px;border-radius:20px;background:'+(df<=1?'var(--amber-bg)':'var(--bg2)')+';color:'+(df<=1?'var(--amber-dark)':'var(--text2)')+'">'+tdiff(x.d)+'</span></div><div style="font-size:12px;color:var(--text2);overflow:hidden;text-overflow:ellipsis;white-space:nowrap">'+(pTyp||'Coaching')+(pFok?' · '+pFok:'')+'</div></div>';
-      h+='<button class="btn btn-sm" data-id="'+x.eid+'" data-d="'+x.d+'" data-f="'+pFok+'" onclick="event.stopPropagation();emailSession(this.dataset.id,this.dataset.d,this.dataset.f)" title="Termin-E-Mail" style="padding:6px 9px;flex-shrink:0"><i class="ti ti-mail"></i></button>';
-      h+='</div>';
-    });
-    h+='</div>';
-  }
-  h+='</div>';
+  // Geplante Sessions: jetzt im Coaching-Kalender über den Knopf „Geplant“ (Seitenleiste)
 
   // ══ Letzte Sessions (volle Breite, weiße Box, gleiches Tabellenformat wie Coaching-Historie) ══
   var let7=abg.slice(0,10);
@@ -3504,6 +3508,7 @@ function openPlannedSessionFromChip(el){
   var proto=proto0;
   openNeuesCoachingModal(empId);
   _editingSessionId=sessionId||null;
+  if(_editingSessionId&&typeof puColSet==='function')puColSet('ncSecNew',true); // Bereich „Neue Session“ direkt aufgeklappt, damit die geplante Session erfasst werden kann
   var dateEl=document.getElementById('sess-date');
   var timeEl=document.getElementById('sess-time');
   var endTimeEl=document.getElementById('sess-end-time');
@@ -4274,7 +4279,7 @@ function zielvereinbarungHtml(){
   var weekDetailHtml=(function(){
     if(!zielMonth)return '';
     var monthLabel=MONTH_NAMES_ZIEL[+zielMonth.slice(5,7)-1]+' '+zielMonth.slice(0,4);
-    var ZIEL_ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+    var ZIEL_ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
     var visibleEmps=employees.filter(function(e){return empActiveInZielMonth(e,zielMonth)&&!e.isPureCoach;}).sort(function(a,b){
       var ra=ZIEL_ROLE_ORDER[a.role]!=null?ZIEL_ROLE_ORDER[a.role]:99,rb=ZIEL_ROLE_ORDER[b.role]!=null?ZIEL_ROLE_ORDER[b.role]:99;
       if(ra!==rb)return ra-rb;
@@ -4834,8 +4839,8 @@ function renderSidebar(){
   var coachSubEl=document.getElementById('coachingCoachSubItems');
   if(coachSubEl){
     coachSubEl.innerHTML='';
-    var coachOrder=['Kathrin','Dogoro','Joey'];
-    var coachListSb=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;}).sort(function(a,b){
+    var coachOrder=['Kathrin','Dogoro','Amir'];
+    var coachListSb=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;}).sort(function(a,b){
       var ia=coachOrder.indexOf(a.name.split(' ')[0]),ib=coachOrder.indexOf(b.name.split(' ')[0]);
       if(ia===-1&&ib===-1)return a.name.localeCompare(b.name,'de');
       if(ia===-1)return 1;
@@ -4857,7 +4862,7 @@ function renderSidebar(){
   var onboardingEmps=visible.filter(function(e){return e.phase==='Onboarding'&&e.role!=='VLC';});
   var aktivEmps=visible.filter(function(e){return e.phase!=='Onboarding'||e.role==='VLC';});
   // Gruppen dynamisch nach Position (role), feste Reihenfolge
-  var order=['SE','SR','VLC','SDM','SC'];
+  var order=['SE','SR','SDL','VLC','SDM','SDC'];
   var positions=[];
   aktivEmps.forEach(function(e){
     var r=e.role||'Sonstige';
@@ -4966,7 +4971,7 @@ var coachingNavOpen=false;
 // ── Team-Ziele: Durchschnitt der aktuell gueltigen Einzelziele (Stammdaten & Provisionsvereinbarung) ──
 // Ersetzt die frueheren „Allgemeinen KPIs“. Mitarbeiter ohne eigenes Ziel (leeres Feld) zaehlen nicht mit.
 var TEAM_TARGET_KEYS=['crOEM','crTeilweise','crSuperYes','crMegaYes','optPerH','crSyMy','crYes','anteilOEM'];
-function teamTargetList(){return employees.filter(function(e){return e.active!==false&&!e.isPureCoach&&e.role!=='SC'&&e.role!=='SDM';});}
+function teamTargetList(){return employees.filter(function(e){return e.active!==false&&!e.isPureCoach&&e.role!=='SDC'&&e.role!=='SDM';});}
 function teamTargetFor(list,key){
   var vals=[],dirs={};
   (list||[]).forEach(function(e){if(!e||!e.startDate)return;var t=empTargets(e)[key];if(t&&t.val!=null&&t.val!==''&&!isNaN(+t.val)){vals.push(+t.val);dirs[t.dir||'gte']=1;}});
@@ -5393,7 +5398,7 @@ function buildBannerSlide1Html(visible,dotsHtml,marginTop){
   }
   var optOemZiel=avgOptTagZielvereinbarungLocal();
 
-  h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:'+marginTop+'px;min-height:278px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+  h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:'+marginTop+'px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
   h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);min-height:118px;align-items:center">';
   h+='<div style="grid-column:span 1;padding-left:14px">'
     +'<div style="font-size:10.5px;font-weight:600;color:#FFE1D6;letter-spacing:.04em;margin-bottom:4px">OPT. GESAMT</div>'
@@ -5498,8 +5503,12 @@ function buildBannerSlide1Html(visible,dotsHtml,marginTop){
   h+='</div>'; // Ende Hero-Panel
   return h;
 }
-function buildGlobalBannerHtml(visible){
+function buildGlobalBannerHtml(visible){return '<div id="gBan">'+buildGlobalBannerInner(visible)+'</div>';}
+function buildGlobalBannerInner(visible){
   ensureBannerRotation();
+  var _bm=bannerViewMode||'overview';
+  if(_bm==='kalender'){if(!KAL.cur)KAL.cur=kalRef();_kalOnIdx=null;return kalBanner();}
+  if(_bm==='aufgaben')return aufgBannerHtml(aufgAll());
   function avgOptTagZielvereinbarungLocal(){
     var zmk=today().slice(0,7);
     var zRec=zielStore[zmk]||{};
@@ -5575,7 +5584,7 @@ function buildGlobalBannerHtml(visible){
       });
     });
     var margeMonatZiel=teamMonthZiel(visible,ovMkZiel,true);
-    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:278px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
     h+='<div style="display:flex;height:'+CH2+'px">';
     h+='<div style="width:16.6667%;flex-shrink:0;display:flex;flex-direction:column">';
     h+='<div style="min-height:118px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center">'
@@ -5608,11 +5617,7 @@ function buildGlobalBannerHtml(visible){
     h+='</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
-      +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
-      +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
-      +'<div onclick="setBannerViewMode(\'ziel\')" style="width:20px;height:7px;border-radius:4px;background:#F7B39A;cursor:pointer" title="Zielvereinbarung"></div>'
-      +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
-      +'<div onclick="setBannerViewMode(\'activity\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Aktivitäten"></div>'
+    +bannerDots('ziel')
       +'</div>';
     h+='</div>';
     return h;
@@ -5662,7 +5667,7 @@ function buildGlobalBannerHtml(visible){
     var _sessPct=_sessionsZiel>0?Math.min(100,Math.round(_sessionsMonat/_sessionsZiel*100)):0;
     var _sessDiff=_sessionsMonat-_sessionsZiel;
     var _sessBarCol='#fff';
-    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:278px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
     h+='<div style="display:flex;height:195px">';
     h+='<div style="width:16.6667%;flex-shrink:0;display:flex;flex-direction:column">';
     h+='<div style="min-height:118px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center">'
@@ -5716,11 +5721,7 @@ function buildGlobalBannerHtml(visible){
     })();
     h+='</div>';
     h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
-      +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
-      +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
-      +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
-      +'<div onclick="setBannerViewMode(\'coaching\')" style="width:20px;height:7px;border-radius:4px;background:#F7B39A;cursor:pointer" title="Coaching"></div>'
-      +'<div onclick="setBannerViewMode(\'activity\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Aktivitäten"></div>'
+    +bannerDots('coaching')
       +'</div>';
     h+='</div>';
     return h;
@@ -5747,7 +5748,7 @@ function buildGlobalBannerHtml(visible){
     var _actTrendArrow=_actTrendPct===null?'':(_actTrendPct>0?' ↑':_actTrendPct<0?' ↓':'');
     var _actTrendCol='#fff';
     var _actAvgPerDay=(_act30Sum/30).toFixed(1);
-    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:278px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+    h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px 10px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
     h+='<div style="display:flex;height:195px">';
     h+='<div style="width:16.6667%;flex-shrink:0;display:flex;flex-direction:column">';
     h+='<div style="min-height:118px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);display:flex;align-items:center">'
@@ -5774,22 +5775,14 @@ function buildGlobalBannerHtml(visible){
     h+='</div>';
     h+='</div>';
     h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
-      +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
-      +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
-      +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
-      +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
-      +'<div onclick="setBannerViewMode(\'activity\')" style="width:20px;height:7px;border-radius:4px;background:#F7B39A;cursor:pointer" title="Aktivitäten"></div>'
+    +bannerDots('activity')
       +'</div>';
     h+='</div>';
     return h;
   }
   if(_bvMode==='performance'){
   h+=buildBannerSlide1Html(visible,
-    '<div onclick="setBannerViewMode(\'performance\')" style="width:20px;height:7px;border-radius:4px;background:#F7B39A;cursor:pointer" title="Performance"></div>'
-    +'<div onclick="setBannerViewMode(\'overview\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Overview"></div>'
-    +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
-    +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
-    +'<div onclick="setBannerViewMode(\'activity\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Aktivitäten"></div>'
+    bannerDots('performance')
   );
   } else {
   // ── NEUE, eigenstaendige Overview-Hero-Panel-Version (gleiche Optik wie Performance, andere Kennzahlen) ──
@@ -5834,7 +5827,7 @@ function buildGlobalBannerHtml(visible){
     });
     return count;
   }
-  h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:278px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+  h+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
   h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);min-height:118px;align-items:center">';
   h+='<div style="grid-column:span 1;padding-left:14px">'+renderOemTileHtml(visible)+'</div>'
     +'<div style="grid-column:span 1;display:flex;align-items:center;height:100%;padding:4px 14px">'+barsHighlightLast(ovLast14WD.map(function(d){return ovCountsForDate(d,'oem');}),'#F7B39A',300,34,ovLast14WD,function(v){return Math.round(v).toLocaleString('de-DE')+' Stk.';})+'</div>';
@@ -5911,11 +5904,7 @@ function buildGlobalBannerHtml(visible){
   h+=ovRingTile('Margenerhöhung (Monat)',ovMargeGesamtNeu,ovMargeZielMonatNeu,moSollFrac,'€');
   h+='</div>'; // Ende KPI-Zeile
   h+='<div style="display:flex;justify-content:center;gap:8px;position:absolute;bottom:16px;left:0;right:0">'
-    +'<div onclick="setBannerViewMode(\'performance\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Performance"></div>'
-    +'<div onclick="setBannerViewMode(\'overview\')" style="width:20px;height:7px;border-radius:4px;background:#F7B39A;cursor:pointer" title="Overview"></div>'
-    +'<div onclick="setBannerViewMode(\'ziel\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Zielvereinbarung"></div>'
-    +'<div onclick="setBannerViewMode(\'coaching\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Coaching"></div>'
-    +'<div onclick="setBannerViewMode(\'activity\')" style="width:7px;height:7px;border-radius:50%;background:rgba(255,255,255,0.25);cursor:pointer" title="Aktivitäten"></div>'
+    +bannerDots('overview')
     +'</div>';
   h+='</div>'; // Ende Hero-Panel
   } // Ende else (Overview)
@@ -6229,7 +6218,7 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
       +'<input id="overviewEmpSearchInput" placeholder="Mitarbeiter suchen…" value="'+esc(overviewEmpSearchQuery)+'" oninput="overviewEmpSearchQuery=this.value;filterOverviewEmpList(this.value)" style="border:none;background:none;outline:none;font-size:12.5px;width:100%;color:var(--text)">'
       +'</div></div>';
     h+='<div id="overviewEmpScrollList" style="max-height:160px;overflow-y:auto;padding-top:4px">';
-    var ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+    var ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
     var sortedVisible=visible.slice().sort(function(a,b){
       var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
       return ra-rb||a.name.localeCompare(b.name);
@@ -6677,7 +6666,7 @@ function renderTeam(){
       else{noCoachCount++;}
     });
   });
-  var coachEmps=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC');});
+  var coachEmps=employees.filter(function(e){return (e.role==='SDM'||e.role==='SDC');});
   var coachDistRows=coachEmps.map(function(c){return {name:c.name,n:coachCounts[c.id]||0};});
   if(noCoachCount>0)coachDistRows.push({name:'Ohne Zuordnung (Altdaten)',n:noCoachCount});
   var maxCoachN=Math.max.apply(null,coachDistRows.map(function(x){return x.n;}).concat([1]));
@@ -6762,7 +6751,7 @@ function renderTeam(){
     var cnt=(callRatings[e.id]||[]).filter(function(r){return r.date>=qaCutoff60;}).length;
     return {e:e,cnt:cnt};
   }).filter(function(x){return x.cnt<5;}).sort(function(a,b){return a.cnt-b.cnt;});
-  coverageHtml+='<div><div class="sec-title" style="margin-bottom:8px">QA-Bewertungen fällig <span style="font-weight:400;text-transform:none;letter-spacing:0">(Ziel: 5 / 60 Tage)</span></div>';
+  coverageHtml+='<div><div class="sec-title" style="margin-bottom:8px">QA-Bewertungen fällig <span style="font-weight:400;text-transform:none;letter-spacing:0">(Ziel: 4 / Woche)</span></div>';
   if(!qaDueListe.length){
     coverageHtml+='<div style="font-size:12px;color:var(--teal-dark);display:flex;align-items:center;gap:6px"><i class="ti ti-check"></i> Alle im Ziel</div>';
   } else {
@@ -7233,10 +7222,12 @@ function qaWeakSpots(empId,n){
 // QA-Kategorie: Ø der letzten n Calls vs. Ø der n Calls davor (analog "dieser Monat vs Vormonat")
 // QA-Kategorie: Ø über aktive Kollegen der gleichen Rolle (jeweils letzte n Calls)
 // QA-Kategorie: letzte 7 Bewertungen chronologisch (für Sparkline)
-// QA-Bewertungspflicht: Ziel 5 Calls / 60 Tage. Gibt {due, cnt, target} zurück.
+// QA-Bewertungspflicht: Ziel 4 Calls pro Woche (ab Montag der laufenden Woche). Gibt {due, cnt, target} zurück.
+var QA_WEEK_TARGET=4;
 function qaCallsDue(empId){
-  var target=5;
-  var cutoff=addDaysUTC(today(),-60);
+  var target=QA_WEEK_TARGET;
+  var t=today(),d=new Date(+t.slice(0,4),+t.slice(5,7)-1,+t.slice(8,10));d.setDate(d.getDate()-((d.getDay()+6)%7));
+  var cutoff=d.getFullYear()+'-'+('0'+(d.getMonth()+1)).slice(-2)+'-'+('0'+d.getDate()).slice(-2);
   var cnt=(callRatings[empId]||[]).filter(function(r){return r.date>=cutoff;}).length;
   return {due:Math.max(0,target-cnt),cnt:cnt,target:target};
 }
@@ -8159,7 +8150,7 @@ function renderTab(){
         +'<div class="task-row" style="cursor:default">'
         +'<div class="task-check" style="background:'+ps.bg+';border-color:'+ps.color+';cursor:default"><i class="ti ti-phone-plus" style="font-size:11px;color:'+ps.color+'"></i></div>'
         +'<div style="flex:1;min-width:0"><div class="task-title">QA-Bewertungen: noch '+qaDue.due+' Call'+(qaDue.due!==1?'s':'')+' bewerten</div>'
-        +'<div class="task-meta"><span>Automatisch &middot; Ziel 5 Calls / 60 Tage</span><span style="color:'+ps.color+'">'+qaDue.cnt+'/'+qaDue.target+' bewertet</span></div></div>'
+        +'<div class="task-meta"><span>Automatisch &middot; Ziel 4 Calls / Woche</span><span style="color:'+ps.color+'">'+qaDue.cnt+'/'+qaDue.target+' bewertet</span></div></div>'
         +'<span class="task-prio" style="background:'+ps.bg+';color:'+ps.color+'">'+(qaHigh?'high':'medium')+'</span>'
         +'<button class="btn btn-sm btn-primary" data-eid="'+emp.id+'" onclick="event.stopPropagation();openQaBewertungModal(this.dataset.eid)"><i class="ti ti-phone-plus"></i> Bewerten</button>'
         +'</div></div>';
@@ -8288,7 +8279,7 @@ function renderTab(){
     html=esBuildHtml(emp,false,html);
     if(true){
       // ── Zugang zur Sales-OS-Erweiterung (nur Admins, nur fuer Agents) ──
-      if(currentUserRole==='admin' && !(emp.isPureCoach||emp.role==='SC'||emp.role==='SDM')){
+      if(currentUserRole==='admin' && !(emp.isPureCoach||emp.role==='SDC'||emp.role==='SDM')){
         var hasLogin=!!emp.auth_user_id;
         html+='<div class="card" id="agentLoginCard"><div class="card-title"><i class="ti ti-puzzle"></i> Zugang zur Sales-OS-Erweiterung</div>';
         html+='<p style="font-size:12px;color:var(--text2);margin:0 0 12px;line-height:1.5">'+(hasLogin
@@ -8637,8 +8628,8 @@ function dshRangeKey(p){return p==='days'?'day':p==='weeks'?'week':p==='months'?
 var DSH_TEAMS=['SE','SR','OB','VLC'],DSH_AREAS=['OEM','UPS','WKA'],DSH_AC=['#5C564F','#A89C8E','#D3C8B6'];
 function dshSetPeriod(p){dshPeriod=p;renderDashboard();}
 function dshSetEmpTeam(t){dshEmpTeam=t;renderDashboard();}
-function dshActive(){return employees.filter(function(e){return e.active!==false&&!e.isPureCoach&&e.role!=='SC'&&e.role!=='SDM';});}
-function dshTeamOf(e){if(e.role==='VLC')return 'VLC';if(e.phase==='Onboarding')return 'OB';if(e.role==='SE')return 'SE';if(e.role==='SR')return 'SR';return null;}
+function dshActive(){return employees.filter(function(e){return e.active!==false&&!e.isPureCoach&&e.role!=='SDC'&&e.role!=='SDM';});}
+function dshTeamOf(e){if(e.role==='VLC')return 'VLC';if(e.phase==='Onboarding')return 'OB';if(e.role==='SE'||e.role==='SDL')return 'SE';if(e.role==='SR')return 'SR';return null;}
 function dshAll(){return dshActive().filter(function(e){return !!dshTeamOf(e);});}
 function dshTeam(t){return dshAll().filter(function(e){return dshTeamOf(e)===t;});}
 function dshYmd(d){return d.toISOString().slice(0,10);}
@@ -9103,7 +9094,7 @@ function dshEmpSection(R,all,S,Z,REF,under){
 
 function renderActivity(){
   var ma=document.getElementById('mainArea');if(!ma)return;
-  var coachList=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;});
+  var coachList=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;});
   var auditActionLabels={kpi_target_global:'Globale KPI-Ziele geändert',kpi_target_employee:'Individuelle KPI-Ziele geändert',employee_deactivated:'Mitarbeiter deaktiviert'};
   var auditActionCategory={kpi_target_global:'kpi_target',kpi_target_employee:'kpi_target',employee_deactivated:'employee'};
   var auditAsActivity=(adminAuditLog||[]).map(function(a){
@@ -9554,7 +9545,7 @@ function buildIntegrationsHtml(){
   var tok=sCard('ti-key','Zugangsschlüssel','Ablaufende Schlüssel rechtzeitig erneuern, sonst stoppt der Sync',tokSt,
     '<div style="display:flex;gap:10px;align-items:flex-end;flex-wrap:wrap"><div style="flex:1;min-width:200px"><label for="tokExp">GitHub-Token für cron-job.org läuft ab am</label><input id="tokExp" type="date" value="'+esc(settings.tokenExpiry||'')+'" onchange="settings.tokenExpiry=this.value;sb.from(\'settings\').upsert({key:\'tokenExpiry\',value:this.value},{onConflict:\'key\'}).then(function(){renderMain();})"></div></div>'
     +sKvTable(sKv('SFTP-Passwort','in GitHub gespeichert')+sKv('Supabase Service-Schlüssel','nur auf dem Server')));
-  var agentsAll=employees.filter(function(e){return e.active!==false&&!(e.isPureCoach||e.role==='SC'||e.role==='SDM');});
+  var agentsAll=employees.filter(function(e){return e.active!==false&&!(e.isPureCoach||e.role==='SDC'||e.role==='SDM');});
   var withLogin=agentsAll.filter(function(e){return !!e.auth_user_id;}).length;
   var ext=sCard('ti-puzzle','Chrome-Erweiterung','„Sales OS – Deine Kennzahlen“ für die Sales Agents',settings.extensionUrl?sStatus('Im Web Store','ok'):sStatus('Link fehlt','off'),
     sKvTable(sKv('Agents mit Zugang',withLogin+' von '+agentsAll.length))
@@ -10012,7 +10003,7 @@ function buildProvisionTeamTable(){
     }
     return {urlaub:urlaub,krank:krank};
   }
-  var visible=employees.filter(function(e){return !e.isPureCoach&&e.active!==false;});
+  var visible=employees.filter(function(e){return !e.isPureCoach&&e.active!==false&&canSeeSalary(e);});
   var selectedEmps=provisionTeamSelectedIds?visible.filter(function(e){return provisionTeamSelectedIds.indexOf(e.id)>=0;}):visible;
   var isAll=!provisionTeamSelectedIds||provisionTeamSelectedIds.length===visible.length;
   var selLabel=isAll?'Alle Mitarbeiter':(selectedEmps.length===1?selectedEmps[0].name:selectedEmps.length+' Mitarbeiter ausgewählt');
@@ -10031,7 +10022,7 @@ function buildProvisionTeamTable(){
       +'<input placeholder="Mitarbeiter suchen…" value="'+esc(provisionTeamSearchQuery)+'" oninput="provisionTeamSearchQuery=this.value;filterProvisionTeamEmpList(this.value)" style="border:none;background:none;outline:none;font-size:12.5px;width:100%;color:var(--text)">'
       +'</div></div>';
     h+='<div id="provisionTeamEmpScrollList" style="max-height:160px;overflow-y:auto;padding-top:4px">';
-    var ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+    var ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
     var sortedVisible=visible.slice().sort(function(a,b){
       var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
       return ra-rb||a.name.localeCompare(b.name);
@@ -10209,6 +10200,7 @@ function buildProvisionTeamTable(){
   return h;
 }
 function buildProvisionTable(empId){
+  if(!canSeeSalary(employees.find(function(e){return String(e.id)===String(empId);})))return '<div class="card"><div class="kal-note">Provision ist für dich nur bei deinem Team sichtbar.</div></div>';
   var emp=employees.find(function(e){return e.id===empId;});
   if(!emp)return '<div class="card">Mitarbeiter nicht gefunden</div>';
   function stackCell(main,sub){
@@ -10928,12 +10920,13 @@ function esBuildHtml(emp,asPopup,html){
         html+='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">';
         html+='<div><label>Vollständiger Name</label><input type="text" id="es-name" value="'+esc(emp.name)+'"></div>';
         html+='<div><label>Position</label>'
-          +'<select id="es-role" onchange="var cv=this.value;if(cv===\'__new__\'){var nv=prompt(\'Neue Position eingeben:\');if(nv&&nv.trim()){var opt=document.createElement(\'option\');opt.value=nv.trim();opt.text=nv.trim();this.add(opt);this.value=nv.trim();}}toggleProvisionModel(this.value);">'
+          +'<select id="es-role"'+(currentUserRole!=='admin'&&(!asPopup||asPopup==='panels')?' disabled title="Position ändern nur Admins"':'')+' onchange="esSdlToggle(this.value);var cv=this.value;if(cv===\'__new__\'){var nv=prompt(\'Neue Position eingeben:\');if(nv&&nv.trim()){var opt=document.createElement(\'option\');opt.value=nv.trim();opt.text=nv.trim();this.add(opt);this.value=nv.trim();}}toggleProvisionModel(this.value);">'
           +'<option'+(emp.role==='SR'?' selected':'')+'>SR</option>'
           +'<option'+(emp.role==='SE'?' selected':'')+'>SE</option>'
           +'<option'+(emp.role==='VLC'?' selected':'')+'>VLC</option>'
           +'<option'+(emp.role==='SDM'?' selected':'')+'>SDM</option>'
-          +'<option'+(emp.role==='SC'?' selected':'')+'>SC</option>'
+          +'<option'+(emp.role==='SDC'?' selected':'')+'>SDC</option>'
+          +'<option'+(emp.role==='SDL'?' selected':'')+(currentUserRole!=='admin'&&emp.role!=='SDL'?' disabled':'')+'>SDL</option>'
           +'<option value="__new__">+ Neue Position hinzufügen</option>'
           +'</select></div>';
         html+='<div><label>Phase</label><select id="es-phase">'
@@ -10951,6 +10944,9 @@ function esBuildHtml(emp,asPopup,html){
         html+='<div><label>Avatar-Farbe</label><div style="margin-top:6px">'+swatches+'</div></div>';
         html+='</div>';
 
+        (function(){var cands=teamTargetList().filter(function(x){return String(x.id)!==String(emp.id)&&x.role!=='SDL';}).sort(function(a,b){return a.name.localeCompare(b.name);});var mine=(emp.sdlTeam||[]),ro=currentUserRole!=='admin';
+          html+='<div id="es-sdl-team" style="'+(emp.role==='SDL'?'':'display:none;')+'margin:6px 0 12px"><label>Team (Position SDL)</label><div class="kal-note" style="margin-bottom:8px">Diese Mitarbeiter sieht der SDL in der Provisionsübersicht, dazu sich selbst. Ihre Weeklys und QA-Bewertungen gehen an ihn.'+(ro?' Ändern nur Admins.':'')+'</div>'
+            +'<div style="display:flex;flex-wrap:wrap;gap:6px 14px">'+cands.map(function(x){var on=mine.indexOf(String(x.id))>=0;return '<label style="display:inline-flex;align-items:center;gap:6px;margin:0;font-weight:400;cursor:pointer;font-size:13px"><input type="checkbox" class="es-sdl-cb" value="'+esc(String(x.id))+'" style="width:auto;margin:0" '+(on?'checked':'')+(ro?' disabled':'')+'>'+esc(x.name)+'</label>';}).join('')+'</div></div>';})();
         cut('person');
         html+='<p style="font-size:11.5px;color:var(--text3);margin-bottom:10px;line-height:1.5">Arbeitszeiten je Wochentag – ermöglicht präzise Teilzeit-Steuerung und eine korrekte Optimierungen/Std.-Berechnung (z.B. kürzerer Freitag, längerer Montag).</p>';
         (function(){
@@ -11014,8 +11010,13 @@ function esBuildHtml(emp,asPopup,html){
         }
         html+='<div class="pv-de-block" style="'+(isVlcModel?'display:none':'')+'">';
         html+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:16px">';
+        if(canSeeSalary(emp)){
         html+=stripField('Grundgehalt/Mon.','pv-grundgehalt',2800,'€',10);
         html+=stripField('AG-Sozialabgaben','pv-agSozialabgaben',21,'%',1);
+        } else {
+          html+=stripField('Grundgehalt/Mon.','pv-grundgehalt-x','','€',10).replace('type="number"','type="text" disabled').replace('value=""','value="–"');
+          html+=stripField('AG-Sozialabgaben','pv-agSozialabgaben-x','','%',1).replace('type="number"','type="text" disabled').replace('value=""','value="–"');
+        }
         html+=stripField('Basisprov./Opt.','pv-basisProOpt',1.00,'€',0.10);
         html+=stripField('Mindestprov.','pv-mindestprovision',20,'%',5).replace('border-right:1px solid rgba(255,255,255,0.14)','');
         html+='</div>';
@@ -11178,7 +11179,7 @@ function esBuildHtml(emp,asPopup,html){
           {n:1,t:'Person',sum:esc(emp.role||'–')+' · '+esc(emp.phase||'–')+' · '+esc(emp.contract==='part'?'Teilzeit':emp.contract==='full'?'Vollzeit':(emp.contract||'–'))+' · '+(emp.email?esc(emp.email):'<span style="color:var(--red)">keine E-Mail</span>'),body:SEG.person},
           {n:2,t:'Vertrag',sum:'Beginn '+esD(emp.startDate)+' · Gültig ab '+esD(pv.gueltigAb)+' · '+(emp.endDate?'Ende '+esD(emp.endDate):'unbefristet')+(esBm?' · Beschäftigungsmonat '+esBm:''),body:SEG.vertrag},
           {n:3,t:'Arbeitszeit',sum:(esWorkDaysTxt?esWorkDaysTxt+' · ':'')+esN(esWeekTotal,1)+' Std. pro Woche',body:SEG.zeit},
-          {n:4,t:deOnly('Provision')+vlcOnly('Bonus'),sum:deOnly(esN(pvNum('grundgehalt',2800))+' € Grundgehalt · '+esN(pvNum('basisProOpt',1),2)+' €/Opt. · −'+esN(pvNum('reduktionProKpi',20))+' % je KPI · Mindestprov. '+esN(pvNum('mindestprovision',20))+' %')+vlcOnly(esN(vpv.serviceRate)+' € Service Rate · '+esN(vpv.bonusProOpt,2)+' €/Opt. · Stufen '+stufenUniq.join('/')+' % · Extra Pay folgt'),body:SEG.prov},
+          {n:4,t:deOnly('Provision')+vlcOnly('Bonus'),sum:deOnly((canSeeSalary(emp)?esN(pvNum('grundgehalt',2800))+' € Grundgehalt':'Gehalt nicht sichtbar')+' · '+esN(pvNum('basisProOpt',1),2)+' €/Opt. · −'+esN(pvNum('reduktionProKpi',20))+' % je KPI · Mindestprov. '+esN(pvNum('mindestprovision',20))+' %')+vlcOnly(esN(vpv.serviceRate)+' € Service Rate · '+esN(vpv.bonusProOpt,2)+' €/Opt. · Stufen '+stufenUniq.join('/')+' % · Extra Pay folgt'),body:SEG.prov},
           {n:5,t:'Provisionsrelevante KPIs',sum:deOnly('6 Kennzahlen')+vlcOnly('3 Kennzahlen')+(mLabel?' · aktuell „'+mLabel+'“':''),body:SEG.kpi},
           {n:6,t:'Ergänzende KPI-Ziele',sum:deOnly('9 Kennzahlen')+vlcOnly('12 Kennzahlen')+' · nicht provisionsrelevant',body:SEG.erg}
         ];
@@ -12262,6 +12263,7 @@ function openPlannedSession(empId, sessionId, typ, fokus, datum, uhrzeit){
   setTimeout(function(){
     openNeuesCoachingModal(empId);
     _editingSessionId=sessionId||null;
+    if(_editingSessionId&&typeof puColSet==='function')puColSet('ncSecNew',true);
     var dateEl=document.getElementById('sess-date');
     var timeEl=document.getElementById('sess-time');
     var endTimeEl=document.getElementById('sess-end-time');
@@ -12321,11 +12323,11 @@ function saveGroupSession(){
   var rating=ratingEl&&ratingEl.value?parseInt(ratingEl.value):null;
   var note=document.getElementById('groupSessNote').value.trim();
   _savingGroupSession=true;
-  sb.from('protocols').update({status:'durchgeführt',rating:rating,note:note}).eq('group_id',groupId).then(function(res){
+  sb.from('protocols').update({status:'abgeschlossen',rating:rating,note:note}).eq('group_id',groupId).then(function(res){
     _savingGroupSession=false;
     if(res.error){alert('Fehler beim Speichern: '+res.error.message);return;}
     members.forEach(function(m){
-      m.proto.status='durchgeführt';m.proto.rating=rating;m.proto.note=note;m.proto.notes=note;
+      m.proto.status='abgeschlossen';m.proto.rating=rating;m.proto.note=note;m.proto.notes=note;
     });
     var namesTxt=members.map(function(m){return m.emp.name;}).join(', ');
     logActivity('session','updated','Gruppensession durchgeführt ('+members.length+' Mitarbeiter)',null,namesTxt);
@@ -12599,6 +12601,10 @@ function saveEmpEinstellungen(){
   var oldSnapshot={name:emp.name,role:emp.role,phase:emp.phase,contract:emp.contract,hours:emp.hours,startDate:emp.startDate,endDate:emp.endDate,email:emp.email};
   emp.name=document.getElementById('es-name').value.trim()||emp.name;
   emp.role=document.getElementById('es-role').value;
+  var oldSdlTeam=JSON.stringify(emp.sdlTeam||[]);
+  if(emp.role==='SDL'){var cbs=document.querySelectorAll('#es-sdl-team .es-sdl-cb');if(cbs.length||document.getElementById('es-sdl-team'))emp.sdlTeam=Array.prototype.filter.call(cbs,function(c){return c.checked;}).map(function(c){return String(c.value);});}
+  else emp.sdlTeam=[];
+  var sdlTeamChanged=JSON.stringify(emp.sdlTeam||[])!==oldSdlTeam;
   emp.phase=document.getElementById('es-phase').value;
   var wasActive=oldSnapshot.phase!=='Inaktiv';
   var nowActive=emp.phase!=='Inaktiv';
@@ -12632,16 +12638,19 @@ function saveEmpEinstellungen(){
   if(notesEl)emp.notes=notesEl.value;
   renderSidebar();renderEmpDetail();  lsSave();
   _savingEmpEinstellungen=true;
-  sb.from('employees').update({
+  var empUpd={
     name:emp.name,role:emp.role,phase:emp.phase,team:emp.team,active:emp.active,
     start_date:emp.startDate||null,end_date:emp.endDate||null,
     contract:emp.contract,hours:emp.hours,notes:emp.notes||null,color_index:emp.color,email:emp.email||null,work_hours:emp.workHours||null
-  }).eq('id',emp.id).then(function(res){
+  };
+  if(sdlTeamChanged)empUpd.sdl_team=emp.sdlTeam||[];
+  sb.from('employees').update(empUpd).eq('id',emp.id).then(function(res){
     _savingEmpEinstellungen=false;
     if(res.error){alert('Fehler beim Speichern in Supabase: '+res.error.message+'\n\nDie Änderung ist lokal sichtbar, aber NICHT gespeichert -- bitte nochmal versuchen.');return;}
     var stammChanges=[];
     if(oldSnapshot.name!==emp.name)stammChanges.push('Name: '+oldSnapshot.name+' → '+emp.name);
     if(oldSnapshot.role!==emp.role)stammChanges.push('Rolle: '+oldSnapshot.role+' → '+emp.role);
+    if(sdlTeamChanged)stammChanges.push('Team: '+((emp.sdlTeam||[]).map(function(i){var x=kalEmp(i);return x?x.name:i;}).join(', ')||'keins'));
     if(oldSnapshot.phase!==emp.phase)stammChanges.push('Phase: '+oldSnapshot.phase+' → '+emp.phase);
     if(oldSnapshot.contract!==emp.contract)stammChanges.push('Anstellung: '+oldSnapshot.contract+' → '+emp.contract);
     if(oldSnapshot.hours!==emp.hours)stammChanges.push('Stunden: '+oldSnapshot.hours+' → '+emp.hours);
@@ -12845,6 +12854,8 @@ function saveProvisionSettings(empId){
     ['optH','syMy','crOem'].forEach(function(k){vlcS.stufen[k]={aus1:nval('pv-vlc-st-'+k+'-aus1'),grenze:nval('pv-vlc-st-'+k+'-grenze'),aus2:nval('pv-vlc-st-'+k+'-aus2')};});
     settings.vlc=vlcS;
   } else if(oldSettings.vlc){settings.vlc=oldSettings.vlc;}
+  var salaryVisible=canSeeSalary(emp);
+  if(!salaryVisible){settings.grundgehalt=oldSettings.grundgehalt;settings.agSozialabgaben=oldSettings.agSozialabgaben;if(settings.grundgehalt==null)delete settings.grundgehalt;if(settings.agSozialabgaben==null)delete settings.agSozialabgaben;}
   emp.provisionSettings=settings;
   // Aenderungshistorie fuer Provisionseinstellungen
   var actorNamePv=null;
@@ -12858,6 +12869,7 @@ function saveProvisionSettings(empId){
   Object.keys(TOPFIELD_LABELS).forEach(function(k){
     var ov=oldSettings[k], nv=settings[k];
     var ovNorm=(ov==null||ov==='')?null:ov, nvNorm=(nv==null||nv==='')?null:nv;
+    if(!salaryVisible&&(k==='grundgehalt'||k==='agSozialabgaben'))return;
     if(String(ovNorm)!==String(nvNorm))pvHistRows.push({employee_id:empId,field:'provision_'+k,old_value:ovNorm!=null?String(ovNorm):null,new_value:nvNorm!=null?String(nvNorm):null,changed_by:currentCoach?currentCoach.id:null,changed_by_name:actorNamePv});
   });
   var MONAT_SUBFIELD_LABELS={optH:'Opt. Gesamt / Std.',crOem:'CR OEM',tw:'CR TW',sy:'CR SY',my:'CR MY',syMy:'CR SY/MY',oemAnteil:'Anteil OEM',crYes:'CR YES',notReached:'NE - Nicht Erreicht',notPossible:'NM - Nicht Möglich',notSuccessful:'NEF - Nicht Erfolgreich',aktivitaeten:'Aktivitäten / Std.',convOEM:'Conv. OEM / Tag',optGesamt:'Opt. Gesamt / Tag',margeZiel:'Marge Ziel'};
@@ -12890,7 +12902,12 @@ function saveProvisionSettings(empId){
   _savingProvisionSettings=true;
   var statusEl=document.getElementById('pv-save-status');
   if(statusEl)statusEl.textContent='Speichere...';
-  sb.from('employees').update({provision_settings:settings}).eq('id',empId).then(function(res){
+  var dbSettings=settings;
+  if(SALARY_TABLE){
+    dbSettings=JSON.parse(JSON.stringify(settings));delete dbSettings.grundgehalt;delete dbSettings.agSozialabgaben;
+    if(salaryVisible)sb.from('employee_salary').upsert({employee_id:empId,grundgehalt:settings.grundgehalt!=null?settings.grundgehalt:null,ag_sozialabgaben:settings.agSozialabgaben!=null?settings.agSozialabgaben:null,updated_at:new Date().toISOString()},{onConflict:'employee_id'}).then(function(r){if(r.error){console.error('employee_salary',r.error);alert('Gehalt konnte nicht gespeichert werden: '+r.error.message);}});
+  }
+  sb.from('employees').update({provision_settings:dbSettings}).eq('id',empId).then(function(res){
     _savingProvisionSettings=false;
     if(res.error){
       if(statusEl)statusEl.textContent='Fehler: Spalte "provision_settings" fehlt evtl. in der employees-Tabelle (siehe Konsole)';
@@ -13333,7 +13350,7 @@ function openSessionModal(empId){
   var coachSel=document.getElementById('sessionCoach');
   if(coachSel){
     coachSel.innerHTML='';
-    var coachList=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;}).sort(function(a,b){return a.name.localeCompare(b.name);});
+    var coachList=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;}).sort(function(a,b){return a.name.localeCompare(b.name);});
     coachList.forEach(function(c){
       var o=document.createElement('option');o.value=c.id;o.textContent=c.name;coachSel.appendChild(o);
     });
@@ -13366,7 +13383,7 @@ function renderNcEmpDropdown(){
       ncSelectedEmpIds.length+' Mitarbeiter ausgewählt (Gruppencoaching)';
   }
   if(!ncEmpDropdownOpen){wrap.innerHTML='';return;}
-  var ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+  var ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
   var sorted=visible.slice().sort(function(a,b){
     var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
     return ra-rb||a.name.localeCompare(b.name);
@@ -13437,7 +13454,7 @@ function renderSessionEmpDropdown(){
       sessionSelectedEmpIds.length+' Mitarbeiter ausgewählt (Gruppencoaching)';
   }
   if(!sessionEmpDropdownOpen){wrap.innerHTML='';return;}
-  var ROLE_ORDER={SDM:0,SC:1,SE:2,SR:3,VLC:4};
+  var ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
   var sorted=visible.slice().sort(function(a,b){
     var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
     return ra-rb||a.name.localeCompare(b.name);
@@ -13855,6 +13872,8 @@ function kalActor(){return currentCoach?currentCoach.name:(currentAuthUser?resol
 // ── Regeln (Einstellungen › Kalender) ──
 function kalRules(){var r=settings.kalenderRules||{};return {freiGrenze:r.freiGrenze!=null?+r.freiGrenze:3,freiBezug:r.freiBezug||'standort',verschieben:r.verschieben||'direkt',fehltAn:r.fehltAn!==false,fehltZeit:/^\d{2}:\d{2}$/.test(r.fehltZeit||'')?r.fehltZeit:'09:30',
   weekly:Object.assign({auto:true,minKpis:2,marge:true,zeitraum:'monat'},r.weekly||{}),routinen:r.routinen||[]};}
+// Teamleiter (Position SDL) eines Agents laut Stammdaten des SDL → Aufgaben-Schlüssel 'emp:<id>'
+function aufgTeamLead(e){if(!e)return null;var id=String(e.id);var l=employees.find(function(x){return x.role==='SDL'&&x.active!==false&&String(x.id)!==id&&(x.sdlTeam||[]).indexOf(id)>=0;});return l?'emp:'+l.id:null;}
 function kalSaveRules(r,log){settings.kalenderRules=r;saveSettingJson('kalenderRules',r,log||'Kalender-Regeln geändert');renderMain();}
 function kalRuleSet(path,val){var r=kalRules();if(path.indexOf('weekly.')===0)r.weekly[path.slice(7)]=val;else r[path]=val;kalSaveRules(r);}
 function kalTeamOf(e){return e.team||e.role||'';}
@@ -13978,12 +13997,15 @@ function kalCtx(){return view==='coaching'?'coach':'kal';}
 function kalSesCat(p){var t=p.type||p.typ||'';if(/^weekly$/i.test(t))return 'Weekly';return typeof findCoachingCategoryForType==='function'?findCoachingCategoryForType(t):'Coaching';}
 function kalFilterCats(){var a=kalIsViewer()?[['urlaub','Urlaub'],['flex','Flex Day'],['abwesend','Abwesend']]:[['urlaub','Urlaub'],['flex','Flex Day'],['ausgleich','Ausgleichstag'],['freistellung','Freistellung'],['krank','Krank']];
   var c=[['Weekly','Weekly']].concat(Object.keys(COACHING_CATEGORIES).map(function(x){return [x,x];}));return {abs:a,ses:c};}
-function kalShowAbs(x){return !KAL.hide[kalShowArt(x)];}
+// Filter getrennt je Kalender: im Coaching-Kalender sind Abwesenheiten standardmäßig ausgeblendet
+function kalHid(){if(kalCtx()!=='coach')return KAL.hide;if(!KAL.chide){KAL.chide={};kalFilterCats().abs.forEach(function(o){KAL.chide[o[0]]=1;});}return KAL.chide;}
+function kalSetHide(h){if(kalCtx()==='coach')KAL.chide=h;else KAL.hide=h;}
+function kalShowAbs(x){return !kalHid()[kalShowArt(x)];}
 function kalOnV(eid,d){var x=kalOn(eid,d);return x&&kalShowAbs(x)?x:null;}
-function kalFilt(key){if(key==='*')KAL.hide={};else if(KAL.hide[key])delete KAL.hide[key];else KAL.hide[key]=1;kalRerender();}
-function kalFiltOnly(grp){var f=kalFilterCats();KAL.hide={};(grp==='abs'?f.ses:f.abs).forEach(function(o){KAL.hide[o[0]]=1;});kalRerender();}
-function kalFilterBtn(){var f=kalFilterCats(),n=Object.keys(KAL.hide).length;
-  function box(o){var on=!KAL.hide[o[0]];return '<label style="display:flex;align-items:center;gap:8px;margin:0;padding:5px 6px;border-radius:7px;cursor:pointer;font-weight:400;font-size:13px"><input type="checkbox" style="width:auto;margin:0" '+(on?'checked':'')+' onchange="kalFilt(\''+o[0]+'\')">'+esc(o[1])+'</label>';}
+function kalFilt(key){if(key==='*')kalSetHide({});else if(kalHid()[key])delete kalHid()[key];else kalHid()[key]=1;kalRerender();}
+function kalFiltOnly(grp){var f=kalFilterCats();kalSetHide({});(grp==='abs'?f.ses:f.abs).forEach(function(o){kalHid()[o[0]]=1;});kalRerender();}
+function kalFilterBtn(){var f=kalFilterCats(),n=Object.keys(kalHid()).length;
+  function box(o){var on=!kalHid()[o[0]];return '<label style="display:flex;align-items:center;gap:8px;margin:0;padding:5px 6px;border-radius:7px;cursor:pointer;font-weight:400;font-size:13px"><input type="checkbox" style="width:auto;margin:0" '+(on?'checked':'')+' onchange="kalFilt(\''+o[0]+'\')">'+esc(o[1])+'</label>';}
   return '<div style="position:relative" id="kalFiltWrap"><button class="btn'+(n?' kal-tgl on':'')+'" onclick="KAL.fOpen=!KAL.fOpen;kalRerender()"><i class="ti ti-filter"></i> Filter'+(n?'<b>'+n+' aus</b>':'')+'</button>'
     +(KAL.fOpen?'<div style="position:absolute;top:40px;right:0;z-index:50;background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px;width:250px;box-shadow:0 8px 24px rgba(0,0,0,.12)">'
       +'<div style="display:flex;align-items:center;margin:0 6px 4px"><b style="font-size:11px;letter-spacing:.06em;color:var(--text2)">ABWESENHEITEN</b><a style="margin-left:auto;font-size:11.5px;cursor:pointer;color:var(--text2)" onclick="kalFiltOnly(\'abs\')">nur diese</a></div>'+f.abs.map(box).join('')
@@ -13994,7 +14016,7 @@ document.addEventListener('mousedown',function(ev){if(!KAL.fOpen)return;var w=do
 // ── Sessions aus protocols ──
 function kalSessEmps(){return kalCtx()==='coach'?employees.filter(function(e){return e.active!==false;}):kalEmps();}
 function kalSess(d,eid,raw){var out=[],grp={},cf=kalCtx()==='coach'&&typeof coachFilterView!=='undefined'&&coachFilterView&&coachFilterView!=='overview'?coachFilterView:null;
-  kalSessEmps().forEach(function(e){if(eid&&e.id!==eid)return;(protocols[e.id]||[]).forEach(function(p){if(p.date!==d||kalOn(e.id,d))return;if(cf&&p.coachId!==cf)return;if(!raw&&KAL.hide[kalSesCat(p)])return;
+  kalSessEmps().forEach(function(e){if(eid&&e.id!==eid)return;(protocols[e.id]||[]).forEach(function(p){if(p.date!==d||kalOn(e.id,d))return;if(cf&&p.coachId!==cf)return;if(!raw&&kalHid()[kalSesCat(p)])return;
     if(p.groupId&&!eid){if(grp[p.groupId]){grp[p.groupId].n++;return;}var o={e:e,p:p,n:1};grp[p.groupId]=o;out.push(o);return;}out.push({e:e,p:p,n:1});});});
   return out.sort(function(a,b){return (a.p.uhrzeit||'').localeCompare(b.p.uhrzeit||'');});}
 function kalSesPast(p){return p.status!=='geplant'||p.date<today();}
@@ -14049,7 +14071,7 @@ function kalBanner(){var t=today(),L=kalEmps(),wds=[],d=t;while(wds.length<10){i
   function big(l,v,s){return '<div style="grid-column:span 1;padding-left:14px"><div style="font-size:10.5px;font-weight:600;color:#FFE1D6;letter-spacing:.04em;margin-bottom:4px">'+l+'</div><div style="font-size:30px;font-weight:700;line-height:1">'+v+'</div><div style="font-size:11px;color:#E9B2A6;margin-top:4px">'+s+'</div></div>';}
   function chart(vals,lab,fmt){return '<div style="grid-column:span 1;display:flex;align-items:center;height:100%;padding:4px 14px">'+barsHighlightLast(vals,'#F7B39A',300,34,lab,fmt)+'</div>';}
   function small(l,v,s){return '<div style="padding:4px 14px"><div style="font-size:9.5px;font-weight:600;color:#FFE1D6;letter-spacing:.04em">'+l+'</div><div style="font-size:18px;font-weight:700;margin-top:4px">'+v+'</div><div style="font-size:9.5px;color:#E9B2A6;margin-top:3px">'+s+'</div></div>';}
-  var h='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:220px;width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
+  var h='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin-bottom:22px;margin-top:16px;min-height:var(--ban-h);width:100%;box-sizing:border-box;position:relative;overflow:hidden">';
   h+='<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;padding-bottom:18px;margin-bottom:18px;border-bottom:1px solid rgba(255,255,255,0.14);min-height:110px;align-items:center">';
   h+=big('ABWESEND HEUTE',L.filter(function(e){return kalOn(e.id,t);}).length,'von '+L.length+' · '+KAL.loc)+chart(abw,wds.map(kalF),function(v){return v+' abwesend';});
   h+=big('SESSIONS KW '+kalKw(mo),sesN,'geplant und durchgeführt')+chart(sesW,wk.map(kalF),function(v){return v+' Sessions';});
@@ -14057,7 +14079,7 @@ function kalBanner(){var t=today(),L=kalEmps(),wds=[],d=t;while(wds.length<10){i
   h+='</div><div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px;min-height:56px;align-items:center">';
   h+=small('ABWESEND KW '+kalKw(nmo),abwN.size,'Mitarbeiter')+small('RESTURLAUB TEAM',kalNf(sum('frei')),'Tage frei')+small('FLEX DAYS ÜBRIG',kalNf(sum('flex')),'im Team');
   h+=small('KRANKHEITSTAGE',kalNf(kr),KAL_MON[+mk.slice(5)-1])+small('AUSGLEICHSTAGE',ag,KAL_MON[+mk.slice(5)-1])+small('ZU PLANEN',kalTasks().length,'Sessions');
-  return h+'</div></div>';}
+  return h+'</div>'+bannerDotsBar('kalender')+'</div>';}
 
 // ── Ansichten ──
 function kalAbsRz(x,d){if(!(kalCanEdit()&&!x.fixed&&!x.masked))return '';var ds=kalDays(x);return (ds[0]===d?'<span class="kal-rz l" data-krz="von"></span>':'')+(ds[ds.length-1]===d?'<span class="kal-rz r" data-krz="bis"></span>':'');}
@@ -14085,7 +14107,7 @@ function kalVMonth(){var d0=kalP(KAL.cur),y=d0.getFullYear(),mo=d0.getMonth(),fi
     var fix=kalFixDay(d)?'<div class="kal-ch '+(d.slice(-2)==='24'?'kal-u':'kal-a')+'">alle · '+(d.slice(-2)==='24'?'Urlaubstag':'Ausgleichstag')+'</div>':'';
     h+='<div class="c'+(hn?' hl':'')+(out?' out':'')+'" data-kday="'+d+'" data-kopen="'+d+'"><div class="dn">'+(d===t?'<span class="tday">'+kalP(d).getDate()+'</span>':kalP(d).getDate())+kalFreeTag(d)+'</div>'+(hn?'<div class="hn">'+esc(hn)+'</div>':'')+fix+ch.slice(0,5).join('')+(ch.length>5?'<div class="kal-more">+'+(ch.length-5)+' weitere</div>':'')+'</div>';d=kalAdd(d,1);}
   return h+'</div>';}
-function kalVYear(){var y=+KAL.cur.slice(0,4),t=today(),h='<div class="kal-yv">',L=kalEmps();
+function kalVYear(){if(kalCtx()==='coach')return kalVYearCoach();var y=+KAL.cur.slice(0,4),t=today(),h='<div class="kal-yv">',L=kalEmps();
   for(var m=0;m<12;m++){var f=new Date(y,m,1),n=new Date(y,m+1,0).getDate(),g=['M','D','M','D','F','S','S'].map(function(w){return '<i>'+w+'</i>';}).join(''),tot=0;
     for(var k=0;k<(f.getDay()+6)%7;k++)g+='<b class="e"></b>';
     for(var dd=1;dd<=n;dd++){var d=kalI(new Date(y,m,dd));if(kalWknd(d)){g+='<b class="we">'+dd+'</b>';continue;}var hn=kalHol(d,KAL.loc);if(hn){g+='<b class="hd" data-ktip="'+esc(hn)+'">'+dd+'</b>';continue;}
@@ -14093,14 +14115,27 @@ function kalVYear(){var y=+KAL.cur.slice(0,4),t=today(),h='<div class="kal-yv">'
       g+='<b class="'+(lv?'l'+lv:'')+(d===t?' td':'')+'"'+(ab.length?' data-ktip="'+esc(kalF(d)+' · '+ab.map(function(o){return kalFirst(o.e.name)+' ('+KAL_ART[kalShowArt(o.x)]+')';}).join(', '))+'"':'')+'>'+dd+'</b>';}
     h+='<div class="kal-ym'+(m===+t.slice(5,7)-1&&String(y)===t.slice(0,4)?' cur':'')+'" data-kmonth="'+kalI(f)+'"><h4>'+KAL_MON[m]+'<span>'+tot+' Abw.-Tage</span></h4><div class="g">'+g+'</div></div>';}
   return h+'</div>';}
+// Jahr im Coaching: je dunkler, desto mehr Sessions an dem Tag (1–2 / 3–4 / ab 5)
+function kalVYearCoach(){var y=+KAL.cur.slice(0,4),t=today(),h='<div class="kal-yv">';
+  for(var m=0;m<12;m++){var f=new Date(y,m,1),n=new Date(y,m+1,0).getDate(),g=['M','D','M','D','F','S','S'].map(function(w){return '<i>'+w+'</i>';}).join(''),tot=0;
+    for(var k=0;k<(f.getDay()+6)%7;k++)g+='<b class="e"></b>';
+    for(var dd=1;dd<=n;dd++){var d=kalI(new Date(y,m,dd)),ss=kalSess(d);tot+=ss.length;
+      if(kalWknd(d)&&!ss.length){g+='<b class="we">'+dd+'</b>';continue;}var hn=kalHol(d,KAL.loc);if(hn&&!ss.length){g+='<b class="hd" data-ktip="'+esc(hn)+'">'+dd+'</b>';continue;}
+      var c=ss.length,lv=c>=5?3:c>=3?2:c?1:0,tip=ss.slice(0,8).map(function(o){return (o.p.uhrzeit?o.p.uhrzeit+' ':'')+(o.p.groupId?'Gruppencoaching ('+o.n+')':kalFirst(o.e.name))+' · '+(o.p.type||'Session');}).join(', ')+(c>8?' …':'');
+      g+='<b class="'+(lv?'l'+lv:'')+(d===t?' td':'')+'"'+(c?' data-ktip="'+esc(kalF(d)+' · '+c+' Session'+(c>1?'s':'')+': '+tip)+'"':'')+'>'+dd+'</b>';}
+    h+='<div class="kal-ym'+(m===+t.slice(5,7)-1&&String(y)===t.slice(0,4)?' cur':'')+'" data-kmonth="'+kalI(f)+'"><h4>'+KAL_MON[m]+'<span>'+tot+' Session'+(tot===1?'':'s')+'</span></h4><div class="g">'+g+'</div></div>';}
+  return h+'</div>';}
 function kalVTeam(){var d0=kalP(KAL.cur),y=d0.getFullYear(),mo=d0.getMonth(),n=new Date(y,mo+1,0).getDate(),D=[],t=today();for(var i=1;i<=n;i++)D.push(kalI(new Date(y,mo,i)));
-  var h='<div class="kal-tlw"><div class="kal-tl" style="grid-template-columns:210px repeat('+n+',minmax(28px,1fr))"><div class="hd nm">Mitarbeiter</div>'+D.map(function(d){var hn=kalHol(d,KAL.loc);return '<div class="hd'+(kalWknd(d)||hn?' we':'')+(d===t?' td':'')+'"'+(hn?' data-ktip="'+esc(hn)+'"':'')+'><b>'+kalP(d).getDate()+'</b>'+KAL_WD[kalP(d).getDay()]+'</div>';}).join('');
-  kalEmps().forEach(function(e){h+='<div class="nm"><span class="kal-av">'+kalIni(e.name)+'</span>'+esc(e.name)+'<small>'+esc(e.role||'')+'</small></div>';
+  var h='<div class="kal-tlw"'+(kalCtx()==='coach'?' style="max-height:'+(kalEmps(KAL.loc).length*42+94)+'px"':'')+'><div class="kal-tl" style="grid-template-columns:210px repeat('+n+',minmax(28px,1fr))"><div class="hd nm">Mitarbeiter</div>'+D.map(function(d){var hn=kalHol(d,KAL.loc);return '<div class="hd'+(kalWknd(d)||hn?' we':'')+(d===t?' td':'')+'"'+(hn?' data-ktip="'+esc(hn)+'"':'')+'><b>'+kalP(d).getDate()+'</b>'+KAL_WD[kalP(d).getDay()]+'</div>';}).join('');
+  var co=kalCtx()==='coach',TE=co?kalEmps('MUC').concat(kalEmps('VLC')):kalEmps();
+  TE.forEach(function(e){h+='<div class="nm"><span class="kal-av">'+kalIni(e.name)+'</span>'+esc(e.name)+'<small>'+esc(e.role||'')+'</small></div>';
     D.forEach(function(d,ix){var hn=kalHol(d,KAL.loc),x=kalOnV(e.id,d),inner='';
       if(x){var a=kalShowArt(x),pv=ix>0&&kalOnV(e.id,D[ix-1])===x,nx=ix<n-1&&kalOnV(e.id,D[ix+1])===x,dr=kalCanEdit()&&!x.fixed&&!x.masked;
         inner='<span class="blk '+KAL_CLS[a]+(x.status==='offen'?' kal-op':'')+(x.halb?' h':'')+(!pv?' s':'')+(!nx?' e':'')+'" '+(dr?'draggable="true" data-kabs="'+x.id+'" data-kfrom="'+d+'"':'')+(x.fixed||x.masked?'':' data-kedit="'+x.id+'"')+' data-ktip="'+esc(kalTip(x))+'">'+(dr&&!pv?'<span class="kal-rz l" data-krz="von"></span>':'')+(dr&&!nx?'<span class="kal-rz r" data-krz="bis"></span>':'')+(!pv?(x.halb?'½':KAL_ART[a].slice(0,1)):'')+'</span>';}
-      var ss=kalSess(d,e.id);if(ss.length)inner+='<span class="dot kal-ses'+(ss.every(function(o){return kalSesPast(o.p);})?' past':'')+'" data-ktip="'+esc(ss.map(function(o){return (o.p.uhrzeit||'')+' '+(o.p.type||'Session');}).join(' · '))+'"></span>';
+      var ss=kalSess(d,e.id);if(ss.length&&co){var o0=ss[0];inner+='<span class="sb kal-ses kal-sopen'+(ss.every(function(o){return kalSesPast(o.p);})?' past':'')+'" '+(kalCanEdit()?'draggable="true" data-kses="'+o0.p.id+'" data-kemp="'+o0.e.id+'"':'')+kalSesAttrs(o0)+' data-ktip="'+esc(ss.map(function(o){return kalSesTip(o);}).join(' · '))+'">'+(ss.length>1?ss.length:'')+'</span>';}
+      else if(ss.length)inner+='<span class="dot kal-ses'+(ss.every(function(o){return kalSesPast(o.p);})?' past':'')+'" data-ktip="'+esc(ss.map(function(o){return (o.p.uhrzeit||'')+' '+(o.p.type||'Session');}).join(' · '))+'"></span>';
       h+='<div class="cell'+(kalWknd(d)||hn?' we':'')+(d===t?' td':'')+'" data-kday="'+d+'" data-kemp="'+e.id+'"'+(!kalWknd(d)?' data-kopen="'+d+'"':'')+'>'+inner+'</div>';});});
+  if(co){h+='<div class="ft nm">Sessions</div>'+D.map(function(d){var c=0;TE.forEach(function(e){c+=kalSess(d,e.id).length;});return '<div class="ft'+(kalWknd(d)||kalHol(d,KAL.loc)?' we':'')+'">'+(c||'')+'</div>';}).join('');return h+'</div></div>';}
   h+='<div class="ft nm">Frei (ohne Krank)</div>'+D.map(function(d){if(kalWknd(d)||kalHol(d,KAL.loc)||kalFixDay(d))return '<div class="ft we">·</div>';var o=kalFree(d,KAL.loc,null);return '<div class="ft'+(kalFreeOver(d,o)?' w3':'')+'"'+(o.length?' data-ktip="'+esc(o.map(function(z){return z.e.name+(z.x.status==='offen'?' (beantragt)':'');}).join(' · '))+'"':'')+'>'+(o.length||'')+'</div>';}).join('');
   return h+'</div></div>';}
 function kalPane(){if(!KAL.pane)return '';var R=kalOpenReqs(),T=kalTasks(),t=today();
@@ -14117,15 +14152,33 @@ function kalBar(){var v=[['woche','Woche'],['monat','Monat'],['jahr','Jahr'],['t
     +'<div class="r"><button class="btn kal-tgl'+(KAL.pane==='gen'?' on':'')+'" onclick="kalSetPane(\'gen\')"><i class="ti ti-checklist"></i> Genehmigen<b>'+R+'</b></button><button class="btn kal-tgl'+(KAL.pane==='plan'?' on':'')+'" onclick="kalSetPane(\'plan\')"><i class="ti ti-list-check"></i> Planen<b>'+T+'</b></button>'
     +'<div class="dsh-seg" role="group" aria-label="Standort">'+['MUC','VLC'].map(function(l){return '<button type="button" class="'+(KAL.loc===l?'on':'')+'" onclick="kalSetLoc(\''+l+'\')">'+(l==='MUC'?'Olching (MUC)':'Valencia (VLC)')+'</button>';}).join('')+'</div>'
     +kalFilterBtn()+(kalCanEdit()?'<button class="btn btn-primary" onclick="kalOpenForm()"><i class="ti ti-plus"></i> Abwesenheit eintragen</button>':'')+'</div>';}
-function kalCoachBar(){var v=[['woche','Woche'],['monat','Monat']];
+function kalCoachBar(){var v=[['woche','Woche'],['monat','Monat'],['jahr','Jahr'],['team','Team']];
   return '<div class="dsh-seg" role="group" aria-label="Ansicht">'+v.map(function(o){return '<button type="button" class="'+(KAL.view===o[0]?'on':'')+'" onclick="kalSetView(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>'
     +'<button class="btn" onclick="kalToday()"><i class="ti ti-calendar"></i> Heute</button><button class="kal-nav" aria-label="Zurück" onclick="kalStep(-1)">‹</button><button class="kal-nav" aria-label="Weiter" onclick="kalStep(1)">›</button><span class="rng">'+kalRangeLabel()+'</span>'
-    +'<div class="r">'+kalFilterBtn()+(kalCanEdit()?'<button class="btn btn-primary" onclick="openSessionModal(0)"><i class="ti ti-plus"></i> Session planen</button>':'')+'</div>';}
-// Kalender im Menü Coaching: gleiche Ansicht wie im Menü Kalender, nur Woche/Monat, alle Standorte, Coach-Filter der Seite
-function kalCoachCard(){if(!KAL.cur)KAL.cur=kalRef();_kalOnIdx=null;var sv=KAL.view;KAL.view=KAL.cview==='monat'?'monat':'woche';
-  var h='<div class="card" style="margin-bottom:22px"><div class="kal-bar">'+kalCoachBar()+'</div>'+(KAL.view==='woche'?kalVWeek():kalVMonth())+kalLegend()+'</div>';KAL.view=sv;return h;}
+    +'<div class="r"><button class="btn kal-tgl'+(KAL.cpane==='gep'?' on':'')+'" onclick="kalCoachSetPane(\'gep\')"><i class="ti ti-calendar-event"></i> Geplant<b>'+kalCoachPlanned().length+'</b></button><button class="btn kal-tgl'+(KAL.cpane==='ueb'?' on':'')+'" onclick="kalCoachSetPane(\'ueb\')"><i class="ti ti-alert-circle"></i> Überfällig<b>'+kalCoachPlanned(true).length+'</b></button>'+kalFilterBtn()+(kalCanEdit()?'<button class="btn btn-primary" onclick="openSessionModal(0)"><i class="ti ti-plus"></i> Session planen</button>':'')+'</div>';}
+// Kalender im Menü Coaching: gleiche Ansichten wie im Menü Kalender (Woche/Monat/Jahr/Team), alle Standorte, Coach-Filter der Seite
+function kalCoachView(){return ['monat','jahr','team'].indexOf(KAL.cview)>=0?KAL.cview:'woche';}
+function kalCoachCard(){if(!KAL.cur)KAL.cur=kalRef();_kalOnIdx=null;var sv=KAL.view;KAL.view=kalCoachView();
+  var vw=KAL.view==='woche'?kalVWeek():KAL.view==='jahr'?kalVYear():KAL.view==='team'?kalVTeam():kalVMonth();
+  var h='<div class="card" style="margin-bottom:22px"><div class="kal-bar">'+kalCoachBar()+'</div><div class="kal-cw co'+(KAL.cpane?'':' nopane')+'"><div style="min-width:0">'+vw+'</div><aside class="kal-pane"><div class="kal-pin">'+(KAL.cpane?kalCoachPane():'')+'</div></aside></div>'+kalLegend()+'</div>';KAL.view=sv;return h;}
+function kalCoachSetPane(p){KAL.cpane=KAL.cpane===p?null:p;kalRerender();}
+// Alle geplanten Sessions ab heute (Coach-Filter der Seite gilt), Gruppencoaching als ein Eintrag
+function kalCoachPlanned(over){var t=today(),out=[],grp={},cf=typeof coachFilterView!=='undefined'&&coachFilterView&&coachFilterView!=='overview'?coachFilterView:null;
+  kalSessEmps().forEach(function(e){(protocols[e.id]||[]).forEach(function(p){if(p.status!=='geplant'||!p.date||(over?p.date>=t:p.date<t))return;if(cf&&p.coachId!==cf)return;
+    if(p.groupId){if(grp[p.groupId]){grp[p.groupId].n++;return;}var o={e:e,p:p,n:1};grp[p.groupId]=o;out.push(o);return;}out.push({e:e,p:p,n:1});});});
+  out.sort(function(a,b){return (a.p.date+(a.p.uhrzeit||'99')).localeCompare(b.p.date+(b.p.uhrzeit||'99'));});return over?out.reverse():out;}
+function kalCoachPane(){var ov=KAL.cpane==='ueb',L=kalCoachPlanned(ov),t=today(),so=kalAdd(kalMon(t),6),mo=kalAdd(t,1);
+  function card(o){var d=o.p.date,wd=KAL_WD[kalP(d).getDay()],ago=Math.round((kalP(t)-kalP(d))/86400000),rel=ov?(ago===1?'seit gestern':'seit '+ago+' Tagen'):d===t?'Heute':d===mo?'Morgen':'',f=String(o.p.focus||'').replace(/[<>"']/g,'');
+    return '<div class="kal-card kal-sopen'+(rel?' due':'')+'" style="cursor:pointer;display:flex;gap:10px;align-items:flex-start"'+kalSesAttrs(o)+'><div style="flex:1;min-width:0"><div class="t">'+esc(o.p.groupId?'Gruppencoaching ('+o.n+')':o.e.name)+(rel?' <span class="kal-tag warn" style="margin-left:4px">'+rel+'</span>':'')+'</div><div class="s">'+wd+' '+kalF(d)+(o.p.uhrzeit?' · '+esc(o.p.uhrzeit):'')+' · '+esc(o.p.type||'Session')+'</div></div>'
+      +(o.p.groupId?'':'<button class="btn btn-sm" title="Termin-E-Mail" style="padding:5px 8px;flex-shrink:0" data-id="'+esc(o.e.id)+'" data-d="'+esc(d)+'" data-f="'+esc(f)+'" onclick="event.stopPropagation();emailSession(this.dataset.id,this.dataset.d,this.dataset.f)"><i class="ti ti-mail"></i></button>')+'</div>';}
+  if(ov)return '<div class="ph"><i class="ti ti-alert-circle"></i> Überfällig<span>'+L.length+'</span></div><div class="kal-note">Geplant, aber noch nicht erfasst. Klick öffnet die Session.</div>'
+    +(L.length?'<div class="gp">Neueste zuerst<span></span></div>'+L.map(card).join(''):'<div class="kal-note" style="margin-top:10px">Nichts überfällig.</div>');
+  var wk=L.filter(function(o){return o.p.date<=so;}),la=L.filter(function(o){return o.p.date>so;});
+  return '<div class="ph"><i class="ti ti-calendar-event"></i> Geplante Sessions<span>'+L.length+'</span></div><div class="kal-note">Klick öffnet die Session.</div>'
+    +(wk.length?'<div class="gp">Diese Woche<span>'+wk.length+'</span></div>'+wk.map(card).join(''):'')+(la.length?'<div class="gp">Später<span>'+la.length+'</span></div>'+la.map(card).join(''):'')
+    +(L.length?'':'<div class="kal-note" style="margin-top:10px">Keine Sessions geplant.</div>');}
 function kalLegend(){return '<div class="kal-legend"><span><i class="kal-sw kal-u"></i>Urlaub</span><span><i class="kal-sw kal-f"></i>Flex Day</span>'+(kalIsViewer()?'<span><i class="kal-sw kal-x"></i>Abwesend</span>':'<span><i class="kal-sw kal-a"></i>Ausgleichstag</span><span><i class="kal-sw kal-fs2"></i>Freistellung</span><span><i class="kal-sw kal-k"></i>Krank</span>')+'<span><i class="kal-sw kal-u kal-op"></i>beantragt</span><span><i class="kal-sw kal-hol"></i>Feiertag / Wochenende</span><span><i class="kal-sw kal-ses"></i>Session geplant</span><span><i class="kal-sw kal-ses past"></i>Session vergangen</span>'
-  +(kalCtx()==='coach'?'<span class="kal-note">Klick auf eine Session öffnet sie, Klick auf eine freie Zeit plant eine neue.</span>':KAL.view==='jahr'?'<span class="kal-note">Je dunkler, desto mehr fehlen. Koralle-Rand ab 3. Klick öffnet den Monat.</span>':kalCanEdit()?'<span class="kal-note">Einträge und Sessions lassen sich ziehen, Klick auf einen Eintrag bearbeitet ihn.</span>':'')+'</div>';}
+  +(kalCtx()==='coach'?'<span class="kal-note">'+(KAL.view==='jahr'?'Je dunkler, desto mehr Sessions. Klick öffnet den Monat.':KAL.view==='team'?'Klick auf eine Session öffnet sie, Klick auf einen freien Tag plant eine neue für den Mitarbeiter.':'Klick auf eine Session öffnet sie, Klick auf eine freie Zeit plant eine neue.')+'</span>':KAL.view==='jahr'?'<span class="kal-note">Je dunkler, desto mehr fehlen. Koralle-Rand ab 3. Klick öffnet den Monat.</span>':kalCanEdit()?'<span class="kal-note">Einträge und Sessions lassen sich ziehen, Klick auf einen Eintrag bearbeitet ihn.</span>':'')+'</div>';}
 function kalReqTable(){var L=kalOpenReqs();if(!L.length)return '<div class="kal-note" style="padding:10px 2px">Keine offenen Anträge.</div>';
   return '<div class="std-wrap"><table class="std-table"><thead><tr><th style="width:22%">Mitarbeiter</th><th style="width:14%">Zeitraum</th><th style="width:11%">Art</th><th class="r" style="width:6%">Tage</th><th>Hinweise</th><th style="width:200px"></th></tr></thead><tbody>'+L.map(function(x){var e=kalEmp(x.employeeId),a=kalShowArt(x);
     return '<tr><td><div style="display:flex;align-items:center;gap:10px"><span class="kal-av">'+kalIni(e.name)+'</span><div>'+esc(e.name)+'<div class="kal-note">eingereicht '+kalF(x.eingereichtAm)+(x.eingereichtVon?' · '+esc(x.eingereichtVon):'')+'</div></div></div></td><td>'+kalRange(x)+'</td><td><span class="kal-tag"><i class="kal-sw '+KAL_CLS[a]+' kal-op"></i>'+KAL_ART[a]+'</span></td><td class="r">'+kalNf(kalAmt(x))+'</td><td><div class="kal-tags" style="margin:0">'+kalHintTags(x)+'</div></td><td class="r">'+(kalCanEdit()?'<div class="kal-acts" style="justify-content:flex-end"><button class="btn btn-sm" onclick="kalDecide(\''+x.id+'\',false)">Ablehnen</button><button class="btn btn-sm btn-primary" onclick="kalDecide(\''+x.id+'\',true)">Genehmigen</button></div>':'')+'</td></tr>';}).join('')+'</tbody></table></div>';}
@@ -14173,7 +14226,7 @@ function kalRtSet(id,key,val){var r=kalRules(),rt=r.routinen.find(function(x){re
 function kalRtEmp(id,eid,on){var r=kalRules(),rt=r.routinen.find(function(x){return x.id===id;});if(!rt)return;rt.empIds=(rt.empIds||[]).filter(function(x){return x!==eid;});if(on)rt.empIds.push(eid);kalSaveRules(r,'Routine geändert');}
 function kalRtAdd(){var r=kalRules();r.routinen.push({id:'r'+Date.now(),art:'Weekly',rhythmus:'woche',coachId:currentCoach?currentCoach.id:null,empIds:[]});kalSaveRules(r,'Routine angelegt');}
 function kalRtDel(id){if(!confirm('Diese Routine löschen?'))return;var r=kalRules();r.routinen=r.routinen.filter(function(x){return x.id!==id;});kalSaveRules(r,'Routine gelöscht');}
-function buildKalRulesHtml(){var R=kalRules(),W=R.weekly,coaches=employees.filter(function(e){return (e.role==='SDM'||e.role==='SC')&&e.active!==false;}),agents=teamTargetList().filter(function(e){return !kalIsVlc(e);}).sort(function(a,b){return a.name.localeCompare(b.name);});
+function buildKalRulesHtml(){var R=kalRules(),W=R.weekly,coaches=employees.filter(function(e){return isCoachEmp(e)&&e.active!==false;}),agents=teamTargetList().filter(function(e){return !kalIsVlc(e);}).sort(function(a,b){return a.name.localeCompare(b.name);});
   function seg(path,cur,opts){return '<div class="dsh-seg sm">'+opts.map(function(o){return '<button type="button" class="'+(cur===o[0]?'on':'')+'" onclick="kalRuleSet(\''+path+'\',\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</div>';}
   function row(lbl,sub,ctl){return '<div style="display:grid;grid-template-columns:minmax(0,1fr) auto;gap:16px;align-items:center;padding:12px 0;border-bottom:1px solid #E4E0D6"><div><div style="font-weight:600">'+lbl+'</div>'+(sub?'<div class="kal-note">'+sub+'</div>':'')+'</div><div>'+ctl+'</div></div>';}
   var aff=agents.map(function(e){return {e:e,why:kalWeeklyReason(e)};}).filter(function(o){return o.why.length;});
@@ -14204,19 +14257,19 @@ function buildKalRulesHtml(){var R=kalRules(),W=R.weekly,coaches=employees.filte
 function kalRerender(){_kalTC.v=null;if(view==='coaching')renderCoachingAnsicht();else if(view==='kalender')renderKalender();}
 function renderKalender(){var ma=document.getElementById('mainArea');if(!ma)return;if(!KAL.cur)KAL.cur=kalRef();_kalOnIdx=null;
   var vw=KAL.view==='woche'?kalVWeek():KAL.view==='jahr'?kalVYear():KAL.view==='team'?kalVTeam():kalVMonth();
-  var h='<div class="content">'+kalBanner();
+  var h='<div class="content">'+buildGlobalBannerHtml(gbVisible());
   h+='<div class="card"><div class="kal-bar">'+kalBar()+'</div><div class="kal-cw'+(KAL.pane?'':' nopane')+'"><div style="min-width:0">'+vw+'</div><aside class="kal-pane">'+kalPane()+'</aside></div>'+kalLegend()+'</div>';
   h+='<div class="card"><div class="card-title">'+(KAL.low==='req'?'Offene Anträge':'Zu planen')+'<span class="kal-note" style="font-weight:400;margin-left:6px">'+(KAL.low==='req'?'alle Hinweise auf einen Blick':'Zeile in den Kalender ziehen oder „Einplanen“')+'</span><span class="dsh-tr"><span class="dsh-seg"><button type="button" class="'+(KAL.low==='req'?'on':'')+'" onclick="KAL.low=\'req\';kalRerender()">Anträge · '+kalOpenReqs().length+'</button><button type="button" class="'+(KAL.low==='plan'?'on':'')+'" onclick="KAL.low=\'plan\';kalRerender()">Planen · '+kalTasks().length+'</button></span></span></div>'+(KAL.low==='req'?kalReqTable():kalTaskTable())+'</div>';
   h+='<div class="card"><div class="card-title">Urlaubskonto '+today().slice(0,4)+'<span class="kal-note" style="font-weight:400;margin-left:6px">Klick auf einen Mitarbeiter öffnet die Details</span><span class="dsh-tr"><span class="dsh-seg"><button type="button" class="'+(KAL.sort==='rest'?'on':'')+'" onclick="KAL.sort=\'rest\';kalRerender()">Resturlaub</button><button type="button" class="'+(KAL.sort==='name'?'on':'')+'" onclick="KAL.sort=\'name\';kalRerender()">Name</button></span></span></div>'+kalKontoList()+'</div>';
   h+='</div>';
   var oc=ma.querySelector('.content'),st=oc?oc.scrollTop:0;ma.innerHTML=h;var nc=ma.querySelector('.content');if(nc&&st)nc.scrollTop=st;
   if(document.getElementById('kalFormModal')&&!document.getElementById('kalFormModal').classList.contains('hidden'))kalDrawForm();}
-function selectKalender(){view='kalender';renderSidebar();renderMain();}
+function selectKalender(){view='kalender';bannerViewMode='kalender';resetBannerRotation();renderSidebar();renderMain();}
 function kalSetView(v){if(kalCtx()==='coach')KAL.cview=v;else KAL.view=v;kalRerender();}
 function kalSetPane(p){KAL.pane=KAL.pane===p?null:p;kalRerender();}
 function kalSetLoc(l){KAL.loc=l;KAL.open=null;kalRerender();}
 function kalToday(){KAL.cur=kalRef();kalRerender();}
-function kalStep(n){var d=kalP(KAL.cur),vw=kalCtx()==='coach'?(KAL.cview==='monat'?'monat':'woche'):KAL.view;if(vw==='woche')KAL.cur=kalAdd(KAL.cur,7*n);else if(vw==='jahr')KAL.cur=kalI(new Date(d.getFullYear()+n,0,1));else KAL.cur=kalI(new Date(d.getFullYear(),d.getMonth()+n,1));kalRerender();}
+function kalStep(n){var d=kalP(KAL.cur),vw=kalCtx()==='coach'?kalCoachView():KAL.view;if(vw==='woche')KAL.cur=kalAdd(KAL.cur,7*n);else if(vw==='jahr')KAL.cur=kalI(new Date(d.getFullYear()+n,0,1));else KAL.cur=kalI(new Date(d.getFullYear(),d.getMonth()+n,1));kalRerender();}
 function kalGoto(d){KAL.cur=d;KAL.view='monat';kalRerender();}
 function kalToggleAcc(id){KAL.open=KAL.open===id?null:id;kalRerender();}
 
@@ -14317,13 +14370,13 @@ document.addEventListener('dragover',function(ev){if(!KAL.drag||(view!=='kalende
 document.addEventListener('dragend',function(){KAL.drag=null;document.querySelectorAll('.kal-over').forEach(function(x){x.classList.remove('kal-over');});var g=document.querySelector('.kal-ghost');if(g)g.remove();});
 document.addEventListener('drop',function(ev){if(!KAL.drag||(view!=='kalender'&&view!=='coaching'))return;var z=ev.target.closest('[data-kslot],[data-kday]');if(!z)return;ev.preventDefault();var day=z.dataset.kslot||z.dataset.kday,tm=z.dataset.kslot?kalSlotTime(z,ev):null,d=KAL.drag;KAL.drag=null;
   if(d.k==='abs')kalMoveAbs(d.id,d.from,day);else if(d.k==='ses')kalMoveSes(d.emp,d.id,day,tm);else{var t=kalTasks().find(function(x){return x.id===d.id;});if(t)kalPlanSession(t,day,tm);}});
-document.addEventListener('click',function(ev){if(KAL.rzDone){KAL.rzDone=false;ev.stopPropagation();return;}if((view!=='kalender'&&view!=='coaching')||!ev.target.closest)return;if(!ev.target.closest('#mainArea'))return;if(view==='coaching'&&!ev.target.closest('.kal-bar,.kal-wv,.kal-mg'))return;
+document.addEventListener('click',function(ev){if(KAL.rzDone){KAL.rzDone=false;ev.stopPropagation();return;}if((view!=='kalender'&&view!=='coaching')||!ev.target.closest)return;if(!ev.target.closest('#mainArea'))return;if(view==='coaching'&&!ev.target.closest('.kal-bar,.kal-wv,.kal-mg,.kal-yv,.kal-tlw,.kal-pane'))return;
   var so=ev.target.closest('.kal-sopen');if(so){if(typeof openPlannedSessionFromChip==='function')openPlannedSessionFromChip(so);return;}
-  var mo=ev.target.closest('[data-kmonth]');if(mo){KAL.cur=mo.dataset.kmonth;KAL.view='monat';kalRerender();return;}
+  var mo=ev.target.closest('[data-kmonth]');if(mo){KAL.cur=mo.dataset.kmonth;if(kalCtx()==='coach')KAL.cview='monat';else KAL.view='monat';kalRerender();return;}
   var ed=ev.target.closest('[data-kedit]');if(ed){if(kalCanEdit())kalOpenForm(null,null,ed.dataset.kedit);return;}
   if(ev.target.closest('[draggable=true],.kal-tag,button,input,select,a'))return;
   var o=ev.target.closest('[data-kopen]');if(!o||!kalCanEdit())return;
-  if(kalCtx()==='coach'){if(o.dataset.kslot){var tm=kalSlotTime(o,ev);kalKlickMitZeit(o.dataset.kopen,+tm.slice(0,2));}else kalKlick(o.dataset.kopen);return;}
+  if(kalCtx()==='coach'){if(o.dataset.kemp&&!o.dataset.kslot){var de=o.dataset.kopen;openSessionModal(o.dataset.kemp);setTimeout(function(){var el=document.getElementById('sessionDatum');if(el)el.value=de;},50);return;}if(o.dataset.kslot){var tm=kalSlotTime(o,ev);kalKlickMitZeit(o.dataset.kopen,+tm.slice(0,2));}else kalKlick(o.dataset.kopen);return;}
   kalOpenForm(o.dataset.kemp||null,o.dataset.kopen);});
 // ── Länge ändern wie in Outlook: Session oben/unten (Uhrzeit), Abwesenheit links/rechts (Datum) ──
 function kalMinStr(m){return ('0'+Math.floor(m/60)).slice(-2)+':'+('0'+m%60).slice(-2);}
@@ -14370,7 +14423,7 @@ function loadZielLocksFromSupabase(){
 function ztKeep(mk){if(!ZT.saved[mk])ZT.saved[mk]=JSON.parse(JSON.stringify(zielStore[mk]||{}));}
 function ztIsAdmin(){return currentUserRole==='admin';}
 function ztCalMonth(mk){return mk>=ZT_KAL_START;}
-function ztEmps(mk){var R={SDM:0,SC:1,SE:2,SR:3,VLC:4};return employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;}).sort(function(a,b){var ra=R[a.role]!=null?R[a.role]:99,rb=R[b.role]!=null?R[b.role]:99;return ra!==rb?ra-rb:a.name.localeCompare(b.name);});}
+function ztEmps(mk){var R={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};return employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;}).sort(function(a,b){var ra=R[a.role]!=null?R[a.role]:99,rb=R[b.role]!=null?R[b.role]:99;return ra!==rb?ra-rb:a.name.localeCompare(b.name);});}
 function ztDaysOfMonth(mk){var r=[],d=mk+'-01';while(d.slice(0,7)===mk){r.push(d);d=kalAdd(d,1);}return r;}
 function ztWeeks(mk){return getMonthWeeksZiel(mk);}
 // geplante Tage eines Mitarbeiters in einer KW (nur Tage im Monat)
@@ -14670,16 +14723,28 @@ function loadAufgabenFromSupabase(){return Promise.all([sb.from('aufgaben_meta')
   if(r[0]&&!r[0].error)(r[0].data||[]).forEach(function(x){aufgMeta[x.key]=x;});else console.warn('aufgaben_meta (Tabelle angelegt?)',r[0]&&r[0].error);
   if(r[1]&&!r[1].error)aufgKomm=(r[1].data||[]).sort(function(a,b){return (b.am||'').localeCompare(a.am||'');});return true;}).catch(function(e){console.warn('aufgaben',e);return false;});}
 // Personen (Spalten): Admin-Spalte + Coaches/Admins aus den Mitarbeitern
-function aufgStaff(){var L=[];employees.filter(function(e){return e.active!==false&&e.boardRole!=='admin'&&!/^niklas/i.test(e.name||'')&&(e.boardRole==='coach'||e.isPureCoach||e.role==='SC'||e.role==='SDM');}).sort(function(a,b){return a.name.localeCompare(b.name);})
-  .forEach(function(e){L.push({key:'emp:'+e.id,name:e.name,sub:e.boardRole==='admin'?'Admin':(e.role==='SDM'?'Sales Development':'Coach')});});if(!L.length)L.push({key:'admin',name:'Nicht zugeordnet',sub:'kein Coach angelegt'});return L;}
-function aufgMeKeys(){var k=[];if(currentCoach)k.push('emp:'+currentCoach.id);if(currentUserRole==='admin')k.push('admin');return k;}
+// Feste Reihenfolge der Spalten: Dogoro, Kathrin, Amir, Niklas; weitere Coaches danach alphabetisch
+var AUFG_ORDER=['dogoro','kathrin','amir','niklas'];
+function aufgNiklasEmp(){return employees.find(function(x){return x.active!==false&&/^niklas/i.test(x.name||'');})||null;}
+function aufgNiklasKey(){var e=aufgNiklasEmp();return e?'emp:'+e.id:'u:n.hojdem';}
+function aufgStaff(){var C=employees.filter(function(e){return e.active!==false&&e.boardRole!=='admin'&&!/^niklas/i.test(e.name||'')&&isCoachEmp(e);}).sort(function(a,b){return a.name.localeCompare(b.name);});
+  var row=function(e){return {key:'emp:'+e.id,name:e.name,sub:e.role==='SDM'?'Sales Development':'Coach'};},L=[],used={};
+  AUFG_ORDER.forEach(function(n){if(n==='niklas'){var ne=aufgNiklasEmp();L.push({key:aufgNiklasKey(),name:ne?ne.name:'Niklas Hojdem',sub:'Sales Operations'});return;}
+    var e=C.find(function(x){return (x.name||'').toLowerCase().indexOf(n)===0;});if(e){used[e.id]=1;L.push(row(e));}});
+  C.forEach(function(e){if(!used[e.id])L.push(row(e));});return L;}
+function aufgMeKeys(){var k=[];if(currentCoach)k.push('emp:'+currentCoach.id);if(currentUserRole==='admin')k.push('admin');
+  var nk=aufgNiklasKey(),em=String(currentAuthUser&&currentAuthUser.email||'').toLowerCase();if(em==='n.hojdem@wiegand-gmbh.de'&&k.indexOf(nk)<0)k.push(nk);return k;}
+// QA-Bewertungen (Zufallstopf): gleichmäßig auf Dogoro und Niklas, Kathrin nur ohne eigene Erster-Monat-Agents; stabil innerhalb der Woche, neu gemischt jeden Montag
+function aufgQaPool(ohneKathrin){var P=[aufgOwner('dogoro'),ohneKathrin?null:aufgOwner('kathrin'),aufgNiklasKey()].filter(Boolean);return P.length?P:['admin'];}
+function aufgQaHash(s){var h=2166136261;s=String(s);for(var i=0;i<s.length;i++){h^=s.charCodeAt(i);h=Math.imul(h,16777619);}return h>>>0;}
 function aufgName(key){var s=aufgStaff().find(function(x){return x.key===key;});if(s)return s.name;var e=key&&key.indexOf('emp:')===0?kalEmp(key.slice(4)):null;return e?e.name:'–';}
 function aufgOwner(n){var e=employees.find(function(x){return x.active!==false&&(x.name||'').toLowerCase().indexOf(n)===0;});return e?'emp:'+e.id:null;}
 function aufgDefault(e){var mk=today().slice(0,7),bm=e?beschaeftigungsmonat(e,mk):99;var k=bm<=1?aufgOwner('kathrin'):aufgOwner('dogoro');return k||aufgOwner('dogoro')||aufgOwner('kathrin')||'admin';}
 function aufgCoachOf(e){var rt=(kalRules().routinen||[]).find(function(r){return (r.empIds||[]).indexOf(e.id)>=0&&r.coachId;});return rt?'emp:'+rt.coachId:aufgDefault(e);}
 function aufgFmt(d){return kalF(d);}
 // ── Aufgaben berechnen ──
-function aufgAll(){var t=today(),out=[],add=function(o){var m=aufgMeta[o.key]&&aufgMeta[o.key].assignee;o.assignee=(m&&m!=='admin')?m:o.def;out.push(o);};_kalOnIdx=null;
+// Zuständige, die keine Spalte mehr haben (z. B. kein Coach mehr), fallen auf den Standard zurück – sonst wäre die Aufgabe unsichtbar
+function aufgAll(){var t=today(),out=[],_sk=aufgStaff().map(function(p){return p.key;}).concat(['admin']),_fb=aufgOwner('dogoro')||aufgOwner('kathrin')||'admin',add=function(o){var m=aufgMeta[o.key]&&aufgMeta[o.key].assignee;var a=(m&&m!=='admin')?m:o.def;if(_sk.indexOf(a)<0)a=_sk.indexOf(o.def)>=0?o.def:_fb;o.assignee=a;out.push(o);};_kalOnIdx=null;
   // 1) Urlaubsanträge
   absences.filter(function(x){return x.status==='offen';}).forEach(function(x){var e=kalEmp(x.employeeId);if(!e)return;var tg=kalHintTags(x).replace(/<\/span>\s*<span[^>]*>/g,' · ').replace(/<[^>]+>/g,'').replace(/\s+/g,' ').trim();
     add({key:'antrag:'+x.id,art:'Urlaubsantrag',kind:'auto',t:e.name+' · '+kalRange(x),s:tg==='keine Hinweise'?KAL_ART[kalShowArt(x)]+' · '+kalNf(kalAmt(x))+' T':tg,due:x.eingereichtAm>kalAdd(t,-2)?kalAdd(x.eingereichtAm,2):t,born:x.eingereichtAm,def:aufgDefault(e),act:'Genehmigen',go:function(){KAL.loc=kalIsVlc(e)?'VLC':'MUC';KAL.pane='gen';selectKalender();},emp:e.id});});
@@ -14691,9 +14756,17 @@ function aufgAll(){var t=today(),out=[],add=function(o){var m=aufgMeta[o.key]&&a
     if(o>=140&&!kalOn(e.id,fr))add({key:'ausgl:'+e.id+':'+fr,art:'Ausgleichstag eintragen?',kind:'auto',t:e.name,s:Math.round(o)+' Opt. von Mo bis Do',due:th,born:th,def:aufgCoachOf(e),act:'Eintragen',go:function(){kalOpenForm(e.id,fr);if(KF){KF.art='ausgleich';kalDrawForm();}},emp:e.id});});
   // 4) Sessions planen: Performance-Gespräche, Routinen, Weeklys nach Regeln (aus dem Kalender, beide Standorte)
   var sv=KAL.loc;['MUC','VLC'].forEach(function(l){KAL.loc=l;_kalTC.v=null;kalTasks().forEach(function(x){var grp=/^rt/.test(x.id)?'Routine · '+x.art:(x.art==='Weekly'?'Weeklys':null);
-    add({key:'ses:'+x.id,art:x.art==='Performance Review'?'Performance-Gespräch':x.art,kind:grp?'routine':'auto',bundle:grp,t:x.e.name,s:x.src,due:x.art==='Weekly'?kalMon(x.due):x.due,born:kalAdd(x.due,-14),def:x.coachId?'emp:'+x.coachId:aufgCoachOf(x.e),act:'Session planen',go:function(){kalPlanTask(x.id);},emp:x.e.id,task:x});});});KAL.loc=sv;_kalTC.v=null;
-  // 5) QA-Bewertungen (weniger als 5 bewertete Calls in 60 Tagen)
-  teamTargetList().forEach(function(e){if(typeof qaCallsDue!=='function')return;var q=qaCallsDue(e.id);if(q.due>0)add({key:'qa:'+e.id,art:'QA-Bewertung',kind:'routine',bundle:'QA-Bewertungen',t:e.name,s:q.cnt+' von '+q.target+' Calls in 60 Tagen bewertet',due:kalAdd(t,7),born:t,def:aufgCoachOf(e),act:'Mitarbeiter öffnen',go:function(){selectedEmp=e.id;view='emp';activeTab='qa';renderSidebar();renderMain();},emp:e.id});});
+    add({key:'ses:'+x.id,art:x.art==='Performance Review'?'Performance-Gespräch':x.art,kind:grp?'routine':'auto',bundle:grp,t:x.e.name,s:x.src,due:x.art==='Weekly'?kalMon(x.due):x.due,born:kalAdd(x.due,-14),def:x.coachId?'emp:'+x.coachId:((x.art==='Weekly'&&aufgTeamLead(x.e))||aufgCoachOf(x.e)),act:'Session planen',go:function(){kalPlanTask(x.id);},emp:x.e.id,task:x});});});KAL.loc=sv;_kalTC.v=null;
+  // 5) QA-Bewertungen (weniger als 4 bewertete Calls in der laufenden Woche):
+  //    Team-Mitglieder → ihr Teamleiter; erster Beschäftigungsmonat → Kathrin; alle übrigen zufällig auf Dogoro und Niklas
+  //    (Kathrin kommt in den Zufallstopf, wenn sie diese Woche niemanden aus dem ersten Monat hat)
+  var qMo=kalMon(t),qFr=kalAdd(qMo,4),qWho={},qKat=aufgOwner('kathrin'),qMk=qMo.slice(0,7),qRest=[];
+  teamTargetList().filter(function(e){if(e.startDate&&e.startDate>t)return false;for(var i=0;i<5;i++){var d=kalAdd(qMo,i);if(kalWorkday(e,d)&&!kalOn(e.id,d))return true;}return false;})
+    .forEach(function(e){var tl=aufgTeamLead(e);if(tl){qWho[e.id]=tl;return;}if(qKat&&beschaeftigungsmonat(e,qMk)<=1){qWho[e.id]=qKat;return;}qRest.push(e);});
+  var qHatKat=Object.keys(qWho).some(function(k){return qWho[k]===qKat;}),qPool=aufgQaPool(qHatKat);
+  qRest.sort(function(a,b){return aufgQaHash(a.id+'|'+qMo)-aufgQaHash(b.id+'|'+qMo)||String(a.id).localeCompare(String(b.id));})
+    .forEach(function(e,i){qWho[e.id]=qPool[(i+aufgQaHash(qMo))%qPool.length];});
+  teamTargetList().forEach(function(e){if(typeof qaCallsDue!=='function'||!qWho[e.id])return;var q=qaCallsDue(e.id);if(q.due>0)add({key:'qa:'+e.id+':'+qMo,art:'QA-Bewertung',kind:'routine',bundle:'QA-Bewertungen',t:e.name,s:q.cnt+' von '+q.target+' Calls diese Woche bewertet',due:qFr,born:qMo,def:qWho[e.id],act:'Mitarbeiter öffnen',go:function(){selectedEmp=e.id;view='emp';activeTab='qa';renderSidebar();renderMain();},emp:e.id});});
   // 6) Mitarbeiter fehlt? (ab 09:30 an Arbeitstagen: keine Aktivität, keine Abwesenheit)
   var KR=kalRules(),fz=KR.fehltZeit.split(':'),fMin=(+fz[0])*60+(+fz[1]),nw=new Date(),hm=nw.getHours()*60+nw.getMinutes();if(KR.fehltAn&&hm>=Math.min(fMin,AUFG_FEHLT_MIN_OVR==null?fMin:AUFG_FEHLT_MIN_OVR)&&!kalWknd(t))teamTargetList().forEach(function(e){if(e.startDate&&e.startDate>t)return;if(!kalWorkday(e,t))return;var a=kalOn(e.id,t);if(a)return;
     var act=0;(performance[e.id]||[]).forEach(function(r){if(r.date===t)act+=(r.gesamtAktivitaeten||0)+(r.oem_aktivitaeten||0)+(r.optGesamt||0);});if(act>0)return;
@@ -14707,14 +14780,18 @@ function aufgCards(L){var B={},out=[];L.forEach(function(o){if(o.bundle){var k=o
   out.forEach(function(c){if(c.items){var rt=c.items[0].task&&/^rt/.test(c.items[0].task.id)?(kalRules().routinen||[]).find(function(r){return c.items[0].task.id.indexOf('rt'+r.id)===0;}):null;c.total=rt?(rt.empIds||[]).length:null;c.t=c.items.length+' offen'+(c.total?' von '+c.total:'');c.s=c.items.slice(0,3).map(function(o){return kalFirst(o.t);}).join(', ')+(c.items.length>3?' …':'');}});
   return out.sort(function(a,b){var x=aufgState(a).r-aufgState(b).r;return x||(a.due<b.due?-1:a.due>b.due?1:0);});}
 // ── Seite ──
-function renderAufgaben(){var ma=document.getElementById('mainArea');if(!ma)return;var L=aufgAll(),S=aufgStaff(),me=aufgMeKeys(),C=aufgCards(L);
-  var cnt=function(f){return L.filter(f).length;},st=function(o){return aufgState(o).c;};
+// Aufgaben-Folie des Banner-Karussells
+function aufgBannerHtml(L){var me=aufgMeKeys(),cnt=function(f){return L.filter(f).length;},st=function(o){return aufgState(o).c;};
   var big=function(l,v,s){return '<div style="padding-left:14px"><div style="font-size:10.5px;font-weight:600;color:#FFE1D6;letter-spacing:.04em;margin-bottom:4px">'+l+'</div><div style="font-size:30px;font-weight:700;line-height:1">'+v+'</div><div style="font-size:11px;color:#E9B2A6;margin-top:4px">'+s+'</div></div>';};
   var sm=function(l,v,s){return '<div style="padding:4px 14px"><div style="font-size:9.5px;font-weight:600;color:#FFE1D6;letter-spacing:.04em">'+l+'</div><div style="font-size:18px;font-weight:700;margin-top:4px">'+v+'</div><div style="font-size:9.5px;color:#E9B2A6;margin-top:3px">'+s+'</div></div>';};
   var wk=kalAdd(kalMon(today()),4);
-  var h='<div class="content"><div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin:16px 0 22px">'
+  var h='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);box-shadow:0 12px 28px rgba(40,32,15,0.22);border-radius:16px;padding:22px 26px;color:#fff;margin:16px 0 22px;min-height:var(--ban-h);box-sizing:border-box;position:relative;overflow:hidden">'
     +'<div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;padding-bottom:16px;margin-bottom:16px;border-bottom:1px solid rgba(255,255,255,0.14)">'+big('ÜBERFÄLLIG',cnt(function(o){return st(o)==='od';}),'seit Fälligkeit offen')+big('HEUTE FÄLLIG',cnt(function(o){return st(o)==='td';}),'alle Personen')+big('BIS FREITAG',cnt(function(o){return o.due<=wk;}),'diese Woche')+'</div>'
-    +'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">'+sm('ANTRÄGE',cnt(function(o){return o.art==='Urlaubsantrag';}),'offen')+sm('WEEKLYS',cnt(function(o){return o.art==='Weekly';}),'offen')+sm('QA',cnt(function(o){return o.art==='QA-Bewertung';}),'Mitarbeiter')+sm('PERFORMANCE-GESPR.',cnt(function(o){return o.art==='Performance-Gespräch';}),'fällig')+sm('ZIEL ANPASSEN?',cnt(function(o){return o.art==='Ziel anpassen?';}),'prüfen')+sm('MEINE',cnt(function(o){return me.indexOf(o.assignee)>=0;}),'offen')+'</div></div>';
+    +'<div style="display:grid;grid-template-columns:repeat(6,1fr);gap:8px">'+sm('ANTRÄGE',cnt(function(o){return o.art==='Urlaubsantrag';}),'offen')+sm('WEEKLYS',cnt(function(o){return o.art==='Weekly';}),'offen')+sm('QA',cnt(function(o){return o.art==='QA-Bewertung';}),'Mitarbeiter')+sm('PERFORMANCE-GESPR.',cnt(function(o){return o.art==='Performance-Gespräch';}),'fällig')+sm('ZIEL ANPASSEN?',cnt(function(o){return o.art==='Ziel anpassen?';}),'prüfen')+sm('MEINE',cnt(function(o){return me.indexOf(o.assignee)>=0;}),'offen')+'</div>'+bannerDotsBar('aufgaben')+'</div>';
+  return h;}
+function renderAufgaben(){var ma=document.getElementById('mainArea');if(!ma)return;var L=aufgAll(),S=aufgStaff(),me=aufgMeKeys(),C=aufgCards(L);
+  var cnt=function(f){return L.filter(f).length;},st=function(o){return aufgState(o).c;};
+  var h='<div class="content">'+buildGlobalBannerHtml(gbVisible());
   h+='<div class="card card-static"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div class="card-title" style="margin:0"><i class="ti ti-checklist"></i> Aufgaben</div><span class="kal-note">'+(AU.view==='k'?(AU.group==='d'?'nach Fälligkeit · Klick öffnet':AU.group==='a'?'nach Art · Klick öffnet':'eine Spalte je Person · Karte ziehen = neu zuweisen · Klick öffnet'):'oben die Aufgaben der anderen, darunter deine zum Abarbeiten')+'</span>'
     +'<span style="margin-left:auto;display:flex;gap:8px;align-items:center">'+(AU.view==='k'?'<span class="kal-note">Spalten</span><span class="dsh-seg"><button type="button" class="'+(!AU.group||AU.group==='p'?'on':'')+'" onclick="AU.group=\'p\';renderAufgaben()">Person</button><button type="button" class="'+(AU.group==='d'?'on':'')+'" onclick="AU.group=\'d\';renderAufgaben()">Fälligkeit</button><button type="button" class="'+(AU.group==='a'?'on':'')+'" onclick="AU.group=\'a\';renderAufgaben()">Art</button></span>':'')+'<span class="dsh-seg"><button type="button" class="'+(AU.view==='k'?'on':'')+'" onclick="AU.view=\'k\';renderAufgaben()">Kanban</button><button type="button" class="'+(AU.view==='l'?'on':'')+'" onclick="AU.view=\'l\';renderAufgaben()">Liste</button></span></span></div>';
   h+=(AU.view==='k'?aufgKanban(C,S):aufgList(C,me))+'</div>'+aufgRoutineTable()+'</div>';
@@ -14724,8 +14801,10 @@ function aufgCardHtml(c){var s=aufgState(c),items=c.items;
     +'<div class="au-b"><b>'+esc(c.art)+'</b><small>'+esc(c.t)+'</small><div class="ft"><span class="au-tag">'+(items?'Routine':c.kind==='task'?'Task':'automatisch')+'</span>'+(items&&c.total?'<span class="au-pr"><i><b style="width:'+Math.max(0,(c.total-items.length)/c.total*100)+'%"></b></i>'+(c.total-items.length)+'/'+c.total+'</span>':'<small class="au-s">'+esc(c.s||'')+'</small>')+'</div></div></div>';}
 function aufgKanban(C,S){if(AU.group==='d'||AU.group==='a')return aufgKanban2(C);return '<div class="au-kb" style="grid-template-columns:repeat('+S.length+',minmax(250px,1fr))">'+S.map(function(p){var X=C.filter(function(c){return c.assignee===p.key;}),od=X.some(function(c){return aufgState(c).c==='od';});
   return '<div class="au-col" data-acol="'+esc(p.key)+'"><div class="au-ch"><i style="background:'+(od?'#F08566':'#9a9a96')+'"></i>'+esc(p.name)+'<small>'+esc(p.sub)+'</small><span>'+X.length+'</span></div>'+(X.length?X.map(aufgCardHtml).join(''):'<div class="kal-note" style="text-align:center;padding:14px">Keine Aufgaben</div>')+'</div>';}).join('')+'</div>';}
+// Spalte in der Ansicht „Art“: alles außer Performance-Gespräch, Weekly und QA landet unter „Aufgaben“
+function aufgArtCol(c){var a=String(c.art||'');if(/Performance/.test(a))return 'Performance-Gespräche';if(/Weekly/.test(a))return 'Weekly';if(/QA/.test(a))return 'QA-Bewertungen';return 'Aufgaben';}
 function aufgKanban2(C){var cols;if(AU.group==='d'){var wk=kalAdd(kalMon(kalRef()),4);cols=[['Überfällig',function(c){return aufgState(c).c==='od';}],['Heute',function(c){return aufgState(c).c==='td';}],['Bis Freitag',function(c){var s=aufgState(c).c;return s!=='od'&&s!=='td'&&c.due<=wk;}],['Später',function(c){return c.due>wk;}]];}
-  else{var arts=[];C.forEach(function(c){var a=c.items?'Routinen':c.art;if(arts.indexOf(a)<0)arts.push(a);});cols=arts.map(function(a){return [a,function(c){return (c.items?'Routinen':c.art)===a;}];});}
+  else{cols=['Performance-Gespräche','Weekly','QA-Bewertungen','Aufgaben'].map(function(a){return [a,function(c){return aufgArtCol(c)===a;}];});}
   return '<div class="au-kb" style="grid-template-columns:repeat('+cols.length+',minmax(250px,1fr))">'+cols.map(function(cl){var X=C.filter(cl[1]);return '<div class="au-col"><div class="au-ch"><i style="background:'+(cl[0]==='Überfällig'&&X.length?'#F08566':'#9a9a96')+'"></i>'+esc(cl[0])+'<span>'+X.length+'</span></div>'+(X.length?X.map(function(c){return aufgCardHtml(c).replace('<span class="au-tag">','<span class="au-tag">'+esc(kalFirst(aufgName(c.assignee)))+'</span><span class="au-tag">');}).join(''):'<div class="kal-note" style="text-align:center;padding:14px">Keine Aufgaben</div>')+'</div>';}).join('')+'</div>';}
 function aufgRow(c){var s=aufgState(c),km=aufgKomm.find(function(k){return k.key===c.key;});
   return '<tr onclick="aufgClick(\''+esc(c.key).replace(/'/g,"\\'")+'\')" style="cursor:pointer"><td class="au-due '+s.c+'">'+s.l.replace('überfällig seit','seit')+'</td><td><b>'+esc(c.art)+'</b> · '+esc(c.t)+'<small>'+esc(c.s||'')+'</small></td><td>'+esc(aufgName(c.assignee))+'</td><td class="au-cm">'+(km?'<b>'+new Date(km.am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+'</b> '+esc(km.text):'<span class="zt-dim">–</span>')+'</td></tr>';}
@@ -14747,8 +14826,13 @@ function aufgRoutineTable(){var R=kalRules().routinen||[];if(!R.length)return ''
       (rt.empIds||[]).forEach(function(id){var e=kalEmp(id);if(!e)return;soll++;if((protocols[id]||[]).some(function(p){return p.date>=pd.from&&p.date<=pd.to&&(p.type||'')===(rt.art||'Weekly')&&p.status!=='geplant';}))ist++;});
       var p=soll?ist/soll:0,cl=ix===5?'c0':p>=1?'c3':p>=0.75?'c2':'c1';return '<td class="c"><span class="au-cell '+cl+'">'+ist+' / '+soll+'</span></td>';}).join('')+'</tr>';}).join('');
   return '<div class="card card-static"><div class="card-title">Routinen-Übersicht<span class="kal-note" style="font-weight:400;margin-left:6px">erledigt = Session dokumentiert · Routinen pflegst du unter Einstellungen › Kalender</span></div><div class="std-wrap"><table class="std-table"><thead><tr><th>Person · Routine</th>'+W.map(function(w){return '<th class="c">KW '+kalKw(w)+'</th>';}).join('')+'</tr></thead><tbody>'+rows+'</tbody></table></div><div class="kal-legend"><span><span class="au-cell c3">✓</span> vollständig</span><span><span class="au-cell c2">≥ 75 %</span></span><span><span class="au-cell c1">&lt; 75 %</span></span><span>laufende Woche grau</span></div></div>';}
-function aufgBadge(L){var b=document.getElementById('rail-aufgaben');if(!b)return;L=L||aufgAll();var me=aufgMeKeys(),n=L.filter(function(o){return me.indexOf(o.assignee)>=0&&aufgState(o).r<=1;}).length;b.classList.toggle('au-badge',n>0);b.setAttribute('data-n',n>9?'9+':String(n));}
-function selectAufgaben(){view='aufgaben';renderSidebar();renderMain();}
+// Hinweise an den Menü-Icons (Entwurf A): Zahl oben rechts, nur wenn etwas offen ist
+function railSetBadge(id,n,tip){var b=document.getElementById(id);if(!b)return;b.classList.toggle('au-badge',n>0);b.setAttribute('data-n',n>9?'9+':String(n));var t=b.querySelector('.rl-tip');if(t){if(!t.dataset.base)t.dataset.base=t.textContent;t.textContent=t.dataset.base+(n>0?' · '+n+' '+tip:'');}}
+function aufgBadge(L){var adm=currentUserRole==='admin';
+  try{L=L||aufgAll();var me=aufgMeKeys(),n=L.filter(function(o){return (adm||me.indexOf(o.assignee)>=0)&&aufgState(o).r<=1;}).length;railSetBadge('rail-aufgaben',n,'überfällig / heute');}catch(e){}
+  try{var nr=kalCanEdit()?kalOpenReqs().length:0;railSetBadge('rail-kalender',nr,nr===1?'Antrag offen':'Anträge offen');}catch(e){}
+  try{var t=today(),me2=currentCoach?currentCoach.id:null,c=0;if(adm||me2){var grp={};employees.forEach(function(e){if(e.active===false)return;(protocols[e.id]||[]).forEach(function(p){if(p.status!=='geplant'||!p.date||p.date>=t)return;if(!adm&&p.coachId!==me2)return;if(p.groupId){if(grp[p.groupId])return;grp[p.groupId]=1;}c++;});});}railSetBadge('rail-coaching',c,c===1?'Session überfällig':'Sessions überfällig');}catch(e){}}
+function selectAufgaben(){view='aufgaben';bannerViewMode='aufgaben';resetBannerRotation();renderSidebar();renderMain();}
 // ── Öffnen ──
 function aufgFind(key){var L=aufgAll(),C=aufgCards(L);return C.find(function(c){return c.key===key;})||L.find(function(o){return o.key===key;});}
 function aufgOpen(key){var c=aufgFind(key);if(!c)return;AU.open=key;var m=document.getElementById('aufgModal');if(!m){m=document.createElement('div');m.className='modal-ov hidden';m.id='aufgModal';m.innerHTML='<div class="modal" style="width:640px!important;background:#EEEDE9;padding:18px"><div id="aufgBody"></div></div>';m.addEventListener('mousedown',function(ev){if(ev.target===m)closeModal('aufgModal');});document.body.appendChild(m);}
@@ -14775,7 +14859,7 @@ document.addEventListener('dragend',function(){if(view!=='aufgaben')return;AU.dr
 document.addEventListener('dragover',function(ev){if(!AU.drag||view!=='aufgaben')return;var c=ev.target.closest('[data-acol]');document.querySelectorAll('.au-over').forEach(function(x){if(x!==c)x.classList.remove('au-over');});if(c){ev.preventDefault();c.classList.add('au-over');}});
 document.addEventListener('drop',function(ev){if(!AU.drag||view!=='aufgaben')return;var c=ev.target.closest('[data-acol]');if(!c)return;ev.preventDefault();var k=AU.drag;AU.drag=null;if(!kalCanEdit())return;var card=aufgFind(k);if(card&&card.assignee!==c.getAttribute('data-acol'))aufgAssign(k,c.getAttribute('data-acol'));});
 
-var _aufgBT=0;function aufgBadgeLazy(){if(Date.now()-_aufgBT<20000)return;_aufgBT=Date.now();try{aufgBadge();}catch(e){}}
+var _aufgBT=0;function aufgBadgeLazy(){if(Date.now()-_aufgBT<2000)return;_aufgBT=Date.now();try{aufgBadge();}catch(e){}}
 (function(){if(typeof updateRail!=='function')return;var o=updateRail;window.updateRail=function(){var r=o.apply(this,arguments);aufgBadgeLazy();return r;};window.updateRail._sep=true;})();
 
 // ── Aufgaben in der Mitarbeiterkarte (Bereich „Task“) ──
@@ -14830,7 +14914,7 @@ function puBanFor(k,e){var y=today().slice(0,4),mk=today().slice(0,7),mn=MONTH_N
     var G=(goals[e.id]||[]).filter(function(g){return !g.done&&g.status!=='done'&&g.status!=='erreicht';}),s1=f(SK),s2=f(WI),s3=f(RE);
     return puBanHtml(e.name.toUpperCase()+' · ENTWICKLUNG',[['LETZTE',L0&&L0.date?kalF(L0.date):'–',EV.length+(EV.length===1?' Bewertung':' Bewertungen')],['SKILL',s1[0],s1[1]],['WILL',s2[0],s2[1]],['RESULT',s3[0],s3[1]],['ZIELE',G.length,'offen']]);}
   if(k==='ca'){var R=(callRatings[e.id]||[]).slice().sort(function(a,b){return (a.date||'')<(b.date||'')?1:-1;}),q=typeof qaCallsDue==='function'?qaCallsDue(e.id):{cnt:0,target:5},sc=R.filter(function(r){return r.score!=null;}),avg=sc.length?Math.round(sc.reduce(function(a,r){return a+(+r.score||0);},0)/sc.length):null;
-    return puBanHtml(e.name.toUpperCase()+' · CALLS',[['BEWERTET',q.cnt+'/'+q.target,'Calls in 60 Tagen'],['Ø SCORE',avg==null?'–':avg+(avg<=100?' %':''),sc.length+' Bewertungen'],['LETZTE',R[0]&&R[0].date?kalF(R[0].date):'–',R[0]?'Bewertung':'noch keine'],['GESAMT',R.length,'Bewertungen'],['AUFGABEN',open,'offen']]);}
+    return puBanHtml(e.name.toUpperCase()+' · CALLS',[['BEWERTET',q.cnt+'/'+q.target,'Calls diese Woche'],['Ø SCORE',avg==null?'–':avg+(avg<=100?' %':''),sc.length+' Bewertungen'],['LETZTE',R[0]&&R[0].date?kalF(R[0].date):'–',R[0]?'Bewertung':'noch keine'],['GESAMT',R.length,'Bewertungen'],['AUFGABEN',open,'offen']]);}
   if(k==='ov'){var S=ovStats(e);return puBanHtml(e.name.toUpperCase()+(e.role?' · '+e.role:'')+' · '+mn.toUpperCase(),[['ZIEL BIS HEUTE',S.pct==null?'–':S.pct+' %',S.so.ziel?'hochgerechnet '+ztEur(S.hr):'kein Ziel hinterlegt'],['TREND',S.trend==null?'–':(S.trend>=0?'+':'−')+Math.abs(S.trend)+' %','Marge/Tag zum Vormonat'],['NÄCHSTER TERMIN',S.nx?kalF(S.nx.d):'–',S.nx?S.nx.l:'nichts geplant'],['ÜBERFÄLLIG',S.od,S.od?'Aufgaben':'nichts überfällig'],['URLAUB FREI',kalNf(S.frei),'Tage '+mk.slice(0,4)]]);}
   var bm=beschaeftigungsmonat(e,mk),ist=istForEmpMonth(e.id,mk),o=0;(performance[e.id]||[]).forEach(function(r){if(r.date&&r.date.slice(0,7)===mk)o+=r.optGesamt||0;});var k2=kalKonto(e.id,y),s2=puSesStats(e);
   return puBanHtml(e.name.toUpperCase()+(e.role?' · '+e.role:''),[['IM UNTERNEHMEN','Monat '+bm,e.startDate?'seit '+kalF(e.startDate)+e.startDate.slice(2,4):''],['MARGE',ztEur(ist),mn],['OPT.',Math.round(o).toLocaleString('de-DE'),mn],['SESSIONS',s2.mon,mn],['AUFGABEN',open,'offen']]);}
@@ -14874,7 +14958,7 @@ function ovHints(e){var t=today(),S=ovStats(e),H=[],key=function(k){return esc(k
   if(ab){var loc=kalIsVlc(e)?'VLC':'MUC',mx=0;kalDays(ab).forEach(function(d){var n=kalFree(d,loc,e.id).length;if(n>mx)mx=n;});H.push([mx>=kalRules().freiGrenze?'w':'i','<b>'+KAL_ART[kalShowArt(ab)]+'</b> '+(ab.von<=t?'läuft bis '+kalF(ab.bis):'ab '+kalF(ab.von))+' · '+kalNf(kalAmt(ab))+' T'+(ab.status==='offen'?' · Antrag offen':'')+(mx?' · bis zu '+mx+' andere frei':''),go('ab'),'Abwesenheit']);}
   var last=(protocols[e.id]||[]).filter(function(p){return p.status!=='geplant'&&p.date&&p.date<=t;}).sort(function(a,b){return a.date<b.date?1:-1;})[0],dl=last?kalDiff(last.date,t):null;
   if(dl==null||dl>14)H.push(['w',last?'Letzte Session vor <b>'+dl+' Tagen</b> ('+esc(last.type||'Session')+')':'Noch <b>keine Session</b> dokumentiert',go('se'),'Coaching']);
-  if(typeof qaCallsDue==='function'){var q=qaCallsDue(e.id);if(q.due>0)H.push([q.cnt===0?'w':'i','Nur <b>'+q.cnt+' von '+q.target+'</b> Calls in 60 Tagen bewertet',go('ca'),'Call']);}
+  if(typeof qaCallsDue==='function'){var q=qaCallsDue(e.id);if(q.due>0)H.push([q.cnt===0?'w':'i','Nur <b>'+q.cnt+' von '+q.target+'</b> Calls diese Woche bewertet',go('ca'),'Call']);}
   if(!H.some(function(h){return h[0]==='w';}))H.unshift(['ok','<b>Alles im grünen Bereich</b> · nichts Dringendes offen','','']);
   return '<div class="ov-h">'+H.slice(0,6).map(function(h){return '<div class="ov-r '+h[0]+'"'+(h[2]?' onclick="'+h[2]+'"':'')+'><i class="ti '+(h[0]==='w'?'ti-alert-triangle':h[0]==='ok'?'ti-circle-check':'ti-info-circle')+'"></i><span>'+h[1]+'</span>'+(h[3]?'<em>'+h[3]+' <i class="ti ti-chevron-right"></i></em>':'')+'</div>';}).join('')+'</div>';}
 
@@ -14927,7 +15011,7 @@ function ovSteps(e){var t=today(),S=[],L=[];try{L=aufgAll().filter(function(o){r
   var lastD=st.last?kalDiff(st.last.date,t):null;
   if(rs||lastD==null||lastD>14){var wk=L.find(function(o){return o.art==='Weekly';});S.push(['Weekly führen',(rs?rs:'')+(lastD!=null?(rs?' · ':'')+'letzte Session vor '+lastD+' Tagen':' · noch keine Session dokumentiert'),'Session erfassen',wk?'aufgDone(\''+key(wk.key)+'\')':'window._puOpenNew=true;puGo(\'se\')']);}
   L.filter(function(o){return aufgState(o).c==='od'&&o.art!=='Weekly';}).slice(0,2).forEach(function(o){S.push([o.art+(o.kind==='task'?': '+o.t:''),aufgState(o).l+(o.s?' · '+o.s:''),aufgActLabel(o),'aufgDone(\''+key(o.key)+'\')']);});
-  var q=typeof qaCallsDue==='function'?qaCallsDue(e.id):{due:0};if(q.due>0)S.push([q.due+' Call'+(q.due>1?'s':'')+' bewerten',q.cnt+' von '+q.target+' Calls in 60 Tagen bewertet','Call bewerten','window._puOpenNew=true;puGo(\'ca\')']);
+  var q=typeof qaCallsDue==='function'?qaCallsDue(e.id):{due:0};if(q.due>0)S.push([q.due+' Call'+(q.due>1?'s':'')+' bewerten',q.cnt+' von '+q.target+' Calls diese Woche bewertet','Call bewerten','window._puOpenNew=true;puGo(\'ca\')']);
   var pg=L.find(function(o){return o.art==='Performance-Gespräch'&&aufgState(o).c!=='od';});if(pg)S.push(['Performance-Gespräch vorbereiten','fällig '+aufgFmt(pg.due)+' · '+(pg.s||''),'Aufgabe öffnen','aufgOpenEmp(\''+key(pg.key)+'\')']);
   var so=ovStats(e);if(so.pct!=null&&so.pct<85)S.push(['Ziel prüfen','Marge bei '+so.pct+' % des Ziels bis heute · hochgerechnet '+ztEur(so.hr),'Zur Zielvereinbarung','closeModal(\'coachingInfoModal\');view=\'team\';wiegandView=\'ziel\';ZT.open[\'m'+t.slice(0,7)+'\']=true;renderSidebar();renderMain();']);
   if(!S.length)return '<div class="kal-note" style="padding:6px 0">Nichts Dringendes offen. Weiter so.</div>';

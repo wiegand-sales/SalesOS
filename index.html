@@ -609,6 +609,24 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
 .dsh-tc .ex{margin-top:0!important}
 @media (max-width:1100px){.dsh-q{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media (max-width:1100px){.dsh-g3{grid-template-columns:repeat(2,minmax(0,1fr))}.dsh-g12{grid-template-columns:minmax(0,1fr)!important}}
+/* Neue Session: Was/Wie und Fokus */
+.sf-chips{display:flex;flex-wrap:wrap;gap:6px}
+.sf-chip{height:30px;padding:0 11px;border-radius:9px;border:1px solid #E4E0D6;background:#F7F5F0;font:inherit;font-size:12.5px;font-weight:600;color:var(--text);cursor:pointer}
+.sf-chip.on{background:#1d1c1a;border-color:#1d1c1a;color:#fff}
+.sf-chip.t{background:transparent}
+.sf-chip.t.on{background:#1d1c1a;border-color:#1d1c1a;color:#fff}
+.sf-chip .sf-d{display:inline-block;width:6px;height:6px;border-radius:2px;background:#C9502F;margin-right:6px;vertical-align:1px}
+.sf-chip.on .sf-d{background:#F7B39A}
+.sf-sub{font-size:11.5px;color:var(--text3);margin:8px 0 6px}
+.sf-row{display:grid;grid-template-columns:56px minmax(0,1fr);gap:10px;align-items:center}
+.sf-panel{position:absolute;top:64px;left:0;z-index:30;min-width:100%;width:max-content;max-width:300px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;box-shadow:0 10px 24px rgba(40,32,15,0.14);padding:6px 4px}
+.sf-opt{display:flex;align-items:center;gap:8px;padding:6px 10px;margin:0;font-size:13px;font-weight:400;color:var(--text);cursor:pointer;border-radius:7px}
+.sf-opt:hover{background:#F7F5F0}
+.sf-opt input{width:auto;margin:0}
+.sf-n{display:inline-block;min-width:16px;height:16px;line-height:16px;border-radius:5px;background:#1d1c1a;color:#fff;font-size:10.5px;font-weight:700;text-align:center;margin-left:4px;padding:0 3px}
+.sf-seg{height:auto;flex-wrap:wrap;row-gap:2px;justify-self:start;max-width:100%}
+.sf-lbl{width:52px;flex-shrink:0;font-size:12px;font-weight:600;color:var(--text2)}
+.sf-d{display:inline-block;width:6px;height:6px;border-radius:2px;background:#C9502F;margin-right:6px;vertical-align:1px}
 </style>
 <style id="kal-css">
 /* ── KALENDER ── */
@@ -1019,10 +1037,11 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px">
         <div id="atBan"></div>
         <div id="atSec1" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div class="at-newh" onclick="atNewToggle()"><span class="at-pl"><i class="ti ti-plus"></i></span><b>Neue Aufgabe</b><span class="kal-note" style="margin-left:auto" id="atNewHint">zum Aufklappen klicken</span></div><div id="atNewBody" style="display:none;margin-top:12px">
-  <div style="margin-bottom:10px"><label>Aufgabentitel</label><input type="text" id="taskText" placeholder="z.B. Pitch-Skript lesen – pages 1 to 9"></div>
+  <div style="margin-bottom:12px"><label>Art</label><div id="atArtSeg"></div></div>
+  <div style="margin-bottom:10px"><label id="taskTextLbl">Aufgabentitel</label><input type="text" id="taskText" placeholder="z.B. Pitch-Skript lesen – pages 1 to 9"></div>
   <div style="margin-bottom:10px"><label>Beschreibung</label><textarea id="taskDesc" placeholder="Was soll der Mitarbeiter tun..." style="min-height:80px"></textarea></div>
-  <div class="f3"><div><label>Priorität</label><select id="taskPrio"><option value="high">Hoch</option><option value="medium" selected>Mittel</option><option value="low">Niedrig</option></select></div><div><label>Fälligkeitsdatum</label><input type="date" id="taskDue"></div><div><label>Quelle</label><input type="text" id="taskQuelle" placeholder="Session 10.06"></div></div>
-          <div style="margin-top:10px"><label>Zuständig</label><select id="taskAssignee"></select></div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="saveNewTask()"><i class="ti ti-check"></i> Aufgabe hinzufügen</button></div></div>
+  <div class="f3"><div><label>Priorität</label><select id="taskPrio"><option value="high">Hoch</option><option value="medium" selected>Mittel</option><option value="low">Niedrig</option></select></div><div><label id="taskDueLbl">Fälligkeitsdatum</label><div style="display:flex;gap:6px"><input type="date" id="taskDue" style="flex:1;min-width:0"><input type="time" id="taskTime" value="10:00" style="width:110px;display:none" aria-label="Uhrzeit"></div></div><div><label>Quelle</label><input type="text" id="taskQuelle" placeholder="Session 10.06"></div></div>
+          <div style="margin-top:10px"><label>Zuständig</label><select id="taskAssignee"></select></div><div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="saveNewTask()" id="taskSaveBtn"><i class="ti ti-check"></i> Aufgabe hinzufügen</button></div></div>
         </div>
         <div id="atSec2" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Offene Aufgaben <span id="atOpenN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span></div><div id="atOpen"></div></div>
         <div id="atSec3" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06);margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Zuletzt erledigt <span style="font-weight:500;color:var(--text3);font-size:12.5px">die letzten drei</span><button class="btn" type="button" style="margin-left:auto;height:28px;padding:0 10px;font-size:12px" onclick="closeModal('addTaskModal');view='emp';activeTab='tasks';renderSidebar();renderMain();">Alle im Reiter „Task“</button></div><div id="atDone"></div></div>
@@ -1075,7 +1094,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
         <div id="spSecNew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Session planen</div>
 <div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Wer &amp; Wann</div>
     <div style="position:relative;margin-bottom:10px">
-      <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere für Gruppencoaching)</span></label>
+      <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere = Gruppensession)</span></label>
       <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between" onclick="toggleSessionEmpDropdown()">
         <span id="sessionEmpSelLabel">— Mitarbeiter wählen —</span>
         <i class="ti ti-chevron-down" style="font-size:11px"></i>
@@ -1147,22 +1166,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">
         <div id="ncSecNew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px">Neue Session<span id="ncFrom" style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)"></span></div>
-<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Wer &amp; Wann</div>
-    <div style="position:relative;margin-bottom:10px">
-      <label>Mitarbeiter <span style="font-weight:400;color:var(--text3);font-size:11px">(mehrere für Gruppencoaching)</span></label>
-      <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between" onclick="toggleNcEmpDropdown()">
-        <span id="ncEmpSelLabel">— Mitarbeiter wählen —</span>
-        <i class="ti ti-chevron-down" style="font-size:11px"></i>
-      </button>
-      <div id="ncEmpDropdownWrap"></div>
-    </div>
-    <div class="f3" style="gap:8px">
-      <div><label>Datum</label><input type="date" id="sess-date" value=""></div>
-      <div><label>Start</label><input type="time" id="sess-time" value=""></div>
-      <div><label>Ende</label><input type="time" id="sess-end-time" value=""></div>
-    </div>
-        </div>
-<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Was für ein Coaching</div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Was für eine Session</div><div id="sfWas"></div><div style="display:none" aria-hidden="true"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Was für ein Coaching</div>
     <div class="f2" style="margin-bottom:10px">
       <div><label>Kategorie</label><select id="sess-category" onchange="onCoachingCategoryChange('sess-category','sess-type')"></select></div>
       <div><label>Art des Coachings</label><select id="sess-type"></select></div>
@@ -1174,6 +1178,23 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       </div>
     </div>
         </div>
+</div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Wer &amp; Wann</div>
+    <div style="display:grid;grid-template-columns:minmax(0,1.4fr) repeat(3,minmax(0,1fr));gap:8px;align-items:end">
+      <div style="position:relative;min-width:0">
+        <label>Mitarbeiter</label>
+        <button type="button" class="btn" style="width:100%;height:38px;justify-content:space-between;gap:6px" title="Mehrere Mitarbeiter = Gruppensession" onclick="toggleNcEmpDropdown()">
+          <span id="ncEmpSelLabel" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">— Mitarbeiter wählen —</span>
+          <i class="ti ti-chevron-down" style="font-size:11px;flex-shrink:0"></i>
+        </button>
+        <div id="ncEmpDropdownWrap"></div>
+      </div>
+      <div><label>Datum</label><input type="date" id="sess-date" value=""></div>
+      <div><label>Start</label><input type="time" id="sess-time" value=""></div>
+      <div><label>Ende</label><input type="time" id="sess-end-time" value=""></div>
+    </div>
+        </div>
+<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Fokus <span style="letter-spacing:0;text-transform:none;font-weight:500;color:var(--text3)">· optional</span></div><div id="sfFokus"></div></div>
 <div id="ncLastContinueBox" style="display:none"></div>
 <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:0 0 8px"><span>Start</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Was soll neu begonnen werden?</span></div><textarea id="sess-start" rows="2" style="min-height:72px;resize:vertical"></textarea>
 <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;display:flex;justify-content:space-between;margin:12px 0 8px"><span>Stop</span><span style="letter-spacing:0;text-transform:none;color:var(--text3);font-weight:600">Was soll aufgehört werden?</span></div><textarea id="sess-stop" rows="2" style="min-height:72px;resize:vertical"></textarea>
@@ -1197,9 +1218,7 @@ tr.perf-avg-row:hover td{background:rgba(29,28,26,0.07)!important;}
       <div style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px;-webkit-mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%);mask-image:linear-gradient(180deg,transparent 0,#000 8px,#000 calc(100% - 18px),transparent 100%)">
         <div id="qaSecBew" style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;color:var(--text);margin-bottom:10px"><span id="qaCardTitle">Neue Bewertung</span> <span id="qaTotalTxt" style="margin-left:auto;font-size:12px;font-weight:500;color:var(--text3)"></span></div>
           <div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Call-Details</div>
-          <div class="f3" style="gap:10px;margin-bottom:10px"><div><label>Datum</label><input type="date" id="cb-date"></div><div><label>Auftragsnummer</label><input type="text" id="cb-auftrag" placeholder="z.B. 438043417"></div><div><label>Bewertet von</label><input type="text" id="cb-bewerter" placeholder="Name"></div></div>
-          <div class="f3" style="gap:10px;margin-bottom:10px"><div><label>Abschluss?</label><select id="cb-status"><option value="nein">Nein</option><option value="ja">Ja</option></select></div><div><label>B2B / B2C</label><select id="cb-b2b"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div><div><label>Optimierung</label><select id="cb-abschlussart"><option value="">Keine Optimierung</option><option value="TW">Opt.: TW</option><option value="Yes">Opt.: Yes</option><option value="SY">Opt.: SY</option><option value="MY">Opt.: MY</option><option value="Upsell">Opt.: Upsell</option><option value="WKA">Opt.: WKA</option></select></div></div>
-          <div><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div></div>
+          <div style="display:grid;grid-template-columns:minmax(0,1fr) minmax(0,0.8fr) minmax(0,1fr) minmax(0,1.6fr);gap:10px"><div><label>Datum</label><input type="date" id="cb-date"></div><div><label>B2B / B2C</label><select id="cb-b2b"><option value="B2C">B2C</option><option value="B2B">B2B</option></select></div><div><label>Optimierung</label><select id="cb-abschlussart"><option value="">Keine Optimierung</option><option value="TW">Opt.: TW</option><option value="Yes">Opt.: Yes</option><option value="SY">Opt.: SY</option><option value="MY">Opt.: MY</option><option value="Upsell">Opt.: Upsell</option><option value="WKA">Opt.: WKA</option></select></div><div><label>Genannter Einwand</label><input type="text" id="cb-einwand" placeholder="z.B. Preis zu hoch, Kündigung läuft"></div></div><div style="display:none" aria-hidden="true"><input type="text" id="cb-auftrag"><input type="text" id="cb-bewerter"><select id="cb-status"><option value="nein">Nein</option><option value="ja">Ja</option></select></div></div>
           
           <div id="qaScoringSection"></div>
           <div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);background:#EFECE5;border-radius:8px;padding:5px 10px;margin:12px 0 6px">Notiz <span style="letter-spacing:0;text-transform:none;font-weight:600;color:var(--text3)">optional</span></div><textarea id="cb-hinweis" rows="2" style="min-height:56px;resize:vertical" placeholder="Beobachtungen, Verbesserungspotenzial"></textarea>
@@ -1915,19 +1934,24 @@ function setCoachCalMonth(delta){
   renderCoachingAnsicht();
 }
 var COACHING_CATEGORIES={
-  'Coaching':['Einzelcoaching','Gruppencoaching','Call Shadowing (Aktiv)','Call Shadowing (Passiv)','Live Coaching','Call Review','Rollenspiel','Feedbackgespräch'],
-  'Training':['Produkttraining','Pitch-Training','Einwandtraining','Systemtraining','SolidRoad-Training','Wissens-Quiz','Nachschulung'],
-  'Performance':['KPI Review','Performance Review','Zielvereinbarung','Tagesziel','Wochenziel','Monatsziel'],
-  'Power Hour':['Call Blitz','Mega YES','Cross Selling','Neukunden','Bestandskunden','Follow-up','Angebotsnachverfolgung','Einwandtraining','Abschlusstraining','Lead-Abarbeitung','Fokuszeit'],
-  'Motivation & Organisation':['Motivation','Teammeeting','Daily','Weekly','Kick-off'],
-  'Entwicklung':['Onboarding','Mentoring','Karrieregespräch','Entwicklungsplan']
+  'Coaching':['Einzelcoaching'],
+  'Performance':['Weekly','Performance-Gespräch'],
+  'Onboarding':['Onboarding']
 };
+// Eine Reihe „Was für eine Session“: gespeicherte Art → Knopf-Beschriftung
+var SF_ARTS=[['Einzelcoaching','Coaching'],['Weekly','Gespräch Weekly'],['Performance-Gespräch','Gespräch Performance'],['Onboarding','Onboarding']];
+var COACHING_WIE_LABEL={'Einzelcoaching':'Coaching'};
+// Alte Arten aus der Zeit vor Nov 2026: behalten ihren Namen, zählen für Filter und Auswertung zu einer der drei Kategorien
+var COACHING_LEGACY_CAT=(function(){var m={},add=function(cat,l){l.forEach(function(t){m[t]=cat;});};
+  add('Coaching',['Gruppencoaching','Call Shadowing Aktiv','Call Shadowing Passiv','Call Shadowing (Aktiv)','Call Shadowing (Passiv)','1:1 Coaching','Live Coaching','Call Review','Rollenspiel','Feedbackgespräch','Motivation','Mentoring','Call Blitz','Mega YES','Cross Selling','Neukunden','Bestandskunden','Follow-up','Angebotsnachverfolgung','Abschlusstraining','Lead-Abarbeitung','Fokuszeit']);
+  add('Onboarding',['Training','Produkttraining','Pitch-Training','Einwandtraining','Systemtraining','SolidRoad-Training','Wissens-Quiz','Nachschulung']);
+  add('Performance',['KPI Review','Performance Review','Zielvereinbarung','Tagesziel','Wochenziel','Monatsziel','Teammeeting','Daily','Kick-off','Karrieregespräch','Entwicklungsplan']);return m;})();
 function findCoachingCategoryForType(typeValue){
   var cats=Object.keys(COACHING_CATEGORIES);
   for(var i=0;i<cats.length;i++){
     if(COACHING_CATEGORIES[cats[i]].indexOf(typeValue)>=0)return cats[i];
   }
-  return cats[0];
+  return COACHING_LEGACY_CAT[typeValue]||cats[0];
 }
 function populateCoachingCategorySelect(catSelId){
   var catEl=document.getElementById(catSelId);
@@ -1945,9 +1969,11 @@ function populateCoachingTypeSelect(catSelId,typeSelId,preselectType){
     var o=document.createElement('option');o.textContent=t;typeEl.appendChild(o);
   });
   if(preselectType){
+    var _found=false;
     for(var i=0;i<typeEl.options.length;i++){
-      if(typeEl.options[i].value===preselectType||typeEl.options[i].text===preselectType){typeEl.selectedIndex=i;break;}
+      if(typeEl.options[i].value===preselectType||typeEl.options[i].text===preselectType){typeEl.selectedIndex=i;_found=true;break;}
     }
+    if(!_found){var _o=document.createElement('option');_o.textContent=preselectType;typeEl.appendChild(_o);typeEl.value=preselectType;}
   }
 }
 function onCoachingCategoryChange(catSelId,typeSelId){
@@ -1968,6 +1994,7 @@ var FOCUS_METRICS=[
   {key:'convOEM',label:'Conv. OEM'},
   {key:'optGesamt',label:'Opt. Gesamt'},
   {key:'crOEM',label:'CR OEM %'},
+  {key:'optPerH',label:'Opt./Std.'},
   {key:'crTeilweise',label:'CR Teilweise %'},
   {key:'crYes',label:'CR Yes %'},
   {key:'crSuperYes',label:'CR Super Yes %'},
@@ -1992,7 +2019,10 @@ function sparkline(values,color,w,h){
   }).join(' ');
   return '<svg width="'+w+'" height="'+h+'" viewBox="0 0 '+w+' '+h+'" style="display:block"><polyline points="'+pts+'" fill="none" stroke="'+color+'" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 }
-function focusMetricLabel(key){var m=FOCUS_METRICS.find(function(x){return x.key===key;});return m?m.label:key;}
+function focusMetricLabel(key){if(key&&String(key).indexOf('dev:')===0){var k=String(key).slice(4),r=(typeof SF_REVIEW_KEYS!=='undefined'?SF_REVIEW_KEYS:[]).find(function(x){return x[0]===k;});return r?r[1]:k;}var m=FOCUS_METRICS.find(function(x){return x.key===key;});return m?m.label:key;}
+function goalIsDev(key){return !!key&&String(key).indexOf('dev:')===0;}
+function goalUnit(key){if(goalIsDev(key))return '';return /^cr|Yes|optPerH/i.test(String(key))?(String(key)==='optPerH'?'':' %'):'';}
+function goalDevVal(empId,k,beforeDate){var L=(reviews[empId]||[]).filter(function(r){return r&&r.einwand!==undefined&&+r[k]>0&&(!beforeDate||String(r.date)<beforeDate);}).sort(function(a,b){return String(b.date).localeCompare(String(a.date));});return L.length?+L[0][k]:null;}
 function sessionDuration(start,end){
   if(!start||!end)return null;
   var sp=start.split(':'),ep=end.split(':');
@@ -3411,7 +3441,7 @@ function restoreBackupToSupabase(d){
   }
 
   var reviewRows=[],reviewKpiRows=[];
-  var REVIEW_KEYS=['einwand','bedarf','produkt','gespraech','motivation','coach','zuverl','team','crOEM','crTW','crSY','crMY'];
+  var REVIEW_KEYS=['opener','einwand','loop','bedarf','abschluss','gespraech','zusammenfassung','produkt','motivation','coach','zuverl','team','crOEM','crTW','crSY','crMY'];
   Object.keys(d.reviews||{}).forEach(function(empId){
     (d.reviews[empId]||[]).forEach(function(r){
       if(r.einwand===undefined)return;
@@ -3524,6 +3554,7 @@ function openPlannedSessionFromChip(el){
     }
   }
   if(noteEl&&proto&&proto.note) noteEl.value=proto.note;
+  if(typeof sfFromSelects==='function')sfFromSelects(fokus);
 }
 function kalKlickMitZeit(d,hh){
   openSessionModal(0);
@@ -7136,7 +7167,8 @@ function renderTabBar(){
 
 function switchTab(t){activeTab=t;renderTabBar();renderTab();}
 
-var CALL_CATS=[
+// Bis 11.11.2026: alte Phasen und Gewichtung – damit ältere QA-Bewertungen ihre Punktzahl behalten
+var CALL_CATS_V1=[
   {key:'opener',        label:'Einstieg',            short:'Einstieg',   weight:0.05, col:'#F7B39A', fill:'rgba(247,179,154,0.15)',  bg:'rgba(247,179,154,0.18)', items:['intro','ziel']},
   {key:'einwand',       label:'Einwandsentkräftung', short:'Einwand',    weight:0.35, col:'#3a3833', fill:'rgba(29,28,26,0.15)', bg:'rgba(29,28,26,0.10)', items:['qualifizieren','solidarisierung','umgang','entkraeftung','testabschluss','vertrauen']},
   {key:'loop',          label:'Loop',                short:'Loop',       weight:0.10, col:'#F08566', fill:'rgba(29,28,26,0.075)', bg:'rgba(29,28,26,0.05)', items:['dranbleiben']},
@@ -7145,25 +7177,43 @@ var CALL_CATS=[
   {key:'gespraech',     label:'Gesprächsführung',    short:'Gespräch',   weight:0.10, col:'#F7A777', fill:'rgba(247,179,154,0.15)',   bg:'rgba(247,179,154,0.15)', items:['struktur','kontrolle','klarheit','fragequalitaet']},
   {key:'zusammenfassung',label:'Zusammenfassung',    short:'Zusammenf.', weight:0.05, col:'#3a3833', fill:'rgba(29,28,26,0.12)', bg:'rgba(29,28,26,0.10)', items:['naechsteschritte']},
 ];
+// Ab der Umstellung (QA_V2_FROM): Einwandsentkräftung bleibt am stärksten, Produktwissen neu
+var QA_V2_FROM='2026-11-11';
+var CALL_CATS=[
+  {key:'opener',        label:'Einstieg',            short:'Einstieg',   weight:0.05, col:'#F7B39A', fill:'rgba(247,179,154,0.15)',  bg:'rgba(247,179,154,0.18)', items:['intro','ziel']},
+  {key:'einwand',       label:'Einwandsentkräftung', short:'Einwand',    weight:0.30, col:'#3a3833', fill:'rgba(29,28,26,0.15)', bg:'rgba(29,28,26,0.10)', items:['qualifizieren','solidarisierung','entkraeftung','testabschluss']},
+  {key:'loop',          label:'Loop',                short:'Loop',       weight:0.10, col:'#F08566', fill:'rgba(29,28,26,0.075)', bg:'rgba(29,28,26,0.05)', items:['dranbleiben']},
+  {key:'bedarf',        label:'Bedarfserweiterung',  short:'Bedarf',     weight:0.15, col:'#F08566', fill:'rgba(240,133,102,0.15)',  bg:'rgba(240,133,102,0.12)', items:['quantifizieren']},
+  {key:'produkt',       label:'Produktwissen',       short:'Produkt',    weight:0.05, col:'#C9502F', fill:'rgba(201,80,47,0.12)', bg:'rgba(201,80,47,0.10)', items:['produktnutzen','produktfragen']},
+  {key:'abschluss',     label:'Abschluss',           short:'Abschluss',  weight:0.20, col:'#F59A5B', fill:'rgba(245,154,91,0.15)', bg:'rgba(245,154,91,0.12)', items:['abschlussversuch','angebotsqualitaet']},
+  {key:'gespraech',     label:'Gesprächsführung',    short:'Gespräch',   weight:0.10, col:'#F7A777', fill:'rgba(247,179,154,0.15)',   bg:'rgba(247,179,154,0.15)', items:['struktur','kontrolle','fragequalitaet']},
+  {key:'zusammenfassung',label:'Zusammenfassung',    short:'Zusammenf.', weight:0.05, col:'#3a3833', fill:'rgba(29,28,26,0.12)', bg:'rgba(29,28,26,0.10)', items:['naechsteschritte']},
+];
+// Neue Struktur, wenn ab dem Stichtag bewertet oder Produktwissen schon bewertet wurde
+function qaCatsFor(rat){var sc=rat&&rat.scores||{};if(sc.produktnutzen||sc.produktfragen)return CALL_CATS;
+  // Mit dem neuen Formular entstanden (keine der alten, entfallenen Punkte, mindestens ein Wert): neue Struktur
+  var ks=Object.keys(sc).filter(function(k){return sc[k]>0;});if(ks.length&&!ks.some(function(k){return ['umgang','vertrauen','potenzial','klarheit','kaufsignale'].indexOf(k)>=0;}))return CALL_CATS;return rat&&rat.date&&String(rat.date)<QA_V2_FROM?CALL_CATS_V1:CALL_CATS;}
 var ITEM_LABELS={
   intro:'Intro / Einstieg',ziel:'Ziel des Calls',
   qualifizieren:'Einwand qualifizieren',solidarisierung:'Solidarisierung',umgang:'Umgang mit Einwand',
   entkraeftung:'Entkräftung',testabschluss:'Testabschluss',vertrauen:'Vertrauen aufbauen',
   dranbleiben:'Re-Opening / Dranbleiben',
-  quantifizieren:'Bedarf quantifizieren',potenzial:'Potenzial erkennen',
+  quantifizieren:'Bedarf ermitteln',potenzial:'Potenzial erkennen',
   abschlussversuch:'Abschlussversuch',angebotsqualitaet:'Angebotsqualität',kaufsignale:'Kaufsignale nutzen',
-  struktur:'Struktur',kontrolle:'Gesprächskontrolle',klarheit:'Klarheit',fragequalitaet:'Fragequalität',
-  naechsteschritte:'Zusammenfassung & nächste Schritte'
+  struktur:'Gesprächsstruktur',kontrolle:'Gesprächskontrolle',klarheit:'Klarheit',fragequalitaet:'Fragequalität',
+  naechsteschritte:'Zusammenfassung & nächste Schritte',
+  produktnutzen:'Produktnutzen erklären',produktfragen:'Fragen sicher beantworten'
 };
 // ── „Aktuelle Bewertung im Detail“ (Entwurf C): Gesamt oben, je Kriterium ein vierstufiger Balken ──
 function callDetailBodyHtml(call){
+  var CATS=qaCatsFor(call);
   var sc=call.scores||{};
   function f1(x){return x.toFixed(1).replace('.',',');}
   function cAvg(cat){var v=cat.items.map(function(k){return sc[k]||0;}).filter(function(x){return x>0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:null;}
-  var all=[];CALL_CATS.forEach(function(c){all=all.concat(c.items);});
+  var all=[];CATS.forEach(function(c){all=all.concat(c.items);});
   var rated=all.filter(function(k){return sc[k]>0;}).length;
   var ts=totalScore(call);
-  var einw=CALL_CATS.find(function(c){return c.key==='einwand';}),absch=CALL_CATS.find(function(c){return c.key==='abschluss';});
+  var einw=CATS.find(function(c){return c.key==='einwand';}),absch=CATS.find(function(c){return c.key==='abschluss';});
   var h='<div style="display:flex;align-items:flex-end;gap:28px;flex-wrap:wrap;padding:14px 0 12px;margin-bottom:6px;border-bottom:1px solid var(--border)">'
     +'<div><div style="font-size:40px;font-weight:300;line-height:1">'+(rated?Math.round(ts)+' %':'–')+'</div><div style="font-size:12.5px;color:var(--text3);font-weight:600">Gesamtpunktzahl</div></div>';
   [einw,absch].forEach(function(c){if(!c)return;var a=cAvg(c);h+='<div><div style="font-size:28px;font-weight:300;line-height:1.05">'+(a!=null?f1(a):'–')+'</div><div style="font-size:12.5px;color:var(--text3);font-weight:600">'+esc(c.short||c.label)+' ('+Math.round(c.weight*100)+' %)</div></div>';});
@@ -7173,7 +7223,7 @@ function callDetailBodyHtml(call){
     +'<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:#E4E0D6;margin-right:5px;vertical-align:-1px"></i>offen bis 4</span>'
     +'<span style="font-weight:600">'+rated+' von '+all.length+' Kriterien bewertet</span></div></div>';
   if(!rated)h+='<div style="background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);border-radius:10px;padding:10px 12px;margin:10px 0;font-size:13px">Für diesen Call wurden keine Einzelpunkte gespeichert. Über „Neuen Call bewerten“ bzw. Bearbeiten in der Historie kannst du die Punkte nachtragen.</div>';
-  CALL_CATS.forEach(function(cat){
+  CATS.forEach(function(cat){
     var a=cAvg(cat);
     h+='<div style="display:flex;align-items:center;gap:8px;margin:14px 0 4px;font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">'+esc(cat.label)+' · '+Math.round(cat.weight*100)+' %'
       +'<span style="margin-left:auto;font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:10px;letter-spacing:0;text-transform:none;'+(a!=null&&a<2?'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A':'background:#fff;border:1px solid #E4E0D6;color:var(--text2)')+'">Ø '+(a!=null?f1(a):'–')+'</span></div>';
@@ -7199,7 +7249,9 @@ function catAvg(rat,cat){
   return vals.reduce(function(a,b){return a+b;},0)/vals.length;
 }
 function totalScore(rat){
-  var sum=0;CALL_CATS.forEach(function(cat){sum+=catAvg(rat,cat)*cat.weight*25;});return sum;
+  var cats=qaCatsFor(rat);
+  if(cats===CALL_CATS_V1){var sum=0;cats.forEach(function(cat){sum+=catAvg(rat,cat)*cat.weight*25;});return sum;}
+  var s2=0,w=0;cats.forEach(function(cat){var a=catAvg(rat,cat);if(a>0){s2+=a*cat.weight;w+=cat.weight;}});return w?s2/w*25:0;
 }
 // ── Bedarfserkennung: welche QA-Kategorie ist über mehrere Calls hinweg konstant schwach? ──
 // Schwelle: Ø unter 2.0 von 4 (=unter 50%) UND mind. 60% der letzten Calls einzeln unter 2.0
@@ -7616,10 +7668,14 @@ function renderTab(){
   // ── COACHING EVAL TAB ──
   if(activeTab==='coaching-eval'){
     var DIMS=[
-      {key:'einwand',   label:'Einwandsbehandlung', short:'Einwandsb.', cat:'skill'},
-      {key:'bedarf',    label:'Bedarfsanalyse',      short:'Bedarfsana.',cat:'skill'},
+      {key:'opener',    label:'Einstieg',            short:'Einstieg',   cat:'skill'},
+      {key:'einwand',   label:'Einwandsentkräftung', short:'Einwand',    cat:'skill'},
+      {key:'loop',      label:'Loop',                short:'Loop',       cat:'skill'},
+      {key:'bedarf',    label:'Bedarfserweiterung',  short:'Bedarf',     cat:'skill'},
       {key:'produkt',   label:'Produktwissen',       short:'Produktw.',  cat:'skill'},
+      {key:'abschluss', label:'Abschluss',           short:'Abschluss',  cat:'skill'},
       {key:'gespraech', label:'Gesprächsführung',    short:'Gesprächsf.',cat:'skill'},
+      {key:'zusammenfassung',label:'Zusammenfassung',short:'Zusammenf.', cat:'skill'},
       {key:'motivation',label:'Motivation',          short:'Motivation', cat:'will'},
       {key:'coach',     label:'Coachability',        short:'Coachab.',   cat:'will'},
       {key:'zuverl',    label:'Zuverlässigkeit',      short:'Zuverl.',    cat:'will'},
@@ -7868,10 +7924,14 @@ function renderTab(){
     // SESSION_TYPES/SESSION_TOPICS sind jetzt global (siehe oben)
     // Gleiche DIMS wie Coaching Tab
     var SDIMS=[
-      {key:'Einwandsbehandlung', short:'Einwandsb.', cat:'skill'},
-      {key:'Bedarfsanalyse',     short:'Bedarfsana.',cat:'skill'},
-      {key:'Produktwissen',      short:'Produktw.',  cat:'skill'},
+      {key:'Einstieg',           short:'Einstieg',   cat:'skill'},
+      {key:'Einwandsentkräftung',short:'Einwand',    cat:'skill'},
+      {key:'Loop',               short:'Loop',       cat:'skill'},
+      {key:'Bedarfserweiterung', short:'Bedarf',     cat:'skill'},
+      {key:'Abschluss',          short:'Abschluss',  cat:'skill'},
       {key:'Gesprächsführung',   short:'Gesprächsf.',cat:'skill'},
+      {key:'Zusammenfassung',    short:'Zusammenf.', cat:'skill'},
+      {key:'Produktwissen',      short:'Produktw.',  cat:'skill'},
       {key:'Motivation',         short:'Motivation', cat:'will'},
       {key:'Coachability',       short:'Coachab.',   cat:'will'},
       {key:'Zuverlässigkeit',    short:'Zuverl.',    cat:'will'},
@@ -7893,7 +7953,7 @@ function renderTab(){
 
     // Zähle abgeschlossene Sessions pro Topic (geplante zählen noch nicht mit)
     var tc={};SDIMS.forEach(function(d){tc[d.key]=0;});
-    completedSessions.forEach(function(s){(s.topics||[]).forEach(function(t){if(tc[t]!==undefined)tc[t]++;});});
+    completedSessions.forEach(function(s){(s.topics||[]).forEach(function(t){t=TOPIC_ALIAS[t]||t;if(tc[t]!==undefined)tc[t]++;});});
     var maxVal=Math.max(1,Math.max.apply(null,SDIMS.map(function(d){return tc[d.key];})));
     var catSum={skill:0,will:0,result:0};
     SDIMS.forEach(function(d){catSum[d.cat]+=tc[d.key];});
@@ -7914,7 +7974,7 @@ function renderTab(){
     ['skill','will','result'].forEach(function(cat){
       var s=catSum[cat];
       var catDurMin=completedSessions.filter(function(sess){
-        return (sess.topics||[]).some(function(t){var dim=SDIMS.find(function(d){return d.key===t;});return dim&&dim.cat===cat;});
+        return (sess.topics||[]).some(function(t){t=TOPIC_ALIAS[t]||t;var dim=SDIMS.find(function(d){return d.key===t;});return dim&&dim.cat===cat;});
       }).reduce(function(sum,sess){return sum+(sessionDuration(sess.uhrzeit,sess.endUhrzeit)||0);},0);
       html+='<div style="background:'+SCCAT[cat].bg+';border:1px solid '+SCCAT[cat].col+';border-radius:var(--r-lg);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
       html+='<div><div style="font-size:11px;font-weight:700;color:'+SCCAT[cat].col+'">'+SCCAT[cat].l.toUpperCase()+'</div><div style="font-size:11px;color:'+SCCAT[cat].col+';opacity:0.7;margin-top:1px">'+s+' Sessions'+(catDurMin?' · '+formatDuration(catDurMin):'')+'</div></div>';
@@ -10386,8 +10446,10 @@ function buildProvisionTable(empId){
 function openCoachingEval(empId,editEvalId){
   // Entwicklung im gemeinsamen Popup: neue Bewertung (untereinander, mit Vergleich zum letzten Mal) und die letzten Bewertungen
   var DIMS=[
-    {key:'einwand',label:'Einwandsbehandlung',cat:'skill'},{key:'bedarf',label:'Bedarfsanalyse',cat:'skill'},
-    {key:'produkt',label:'Produktwissen',cat:'skill'},{key:'gespraech',label:'Gesprächsführung',cat:'skill'},
+    {key:'opener',label:'Einstieg',cat:'skill'},{key:'einwand',label:'Einwandsentkräftung',cat:'skill'},
+    {key:'loop',label:'Loop',cat:'skill'},{key:'bedarf',label:'Bedarfserweiterung',cat:'skill'},
+    {key:'produkt',label:'Produktwissen',cat:'skill'},{key:'abschluss',label:'Abschluss',cat:'skill'},
+    {key:'gespraech',label:'Gesprächsführung',cat:'skill'},{key:'zusammenfassung',label:'Zusammenfassung',cat:'skill'},
     {key:'motivation',label:'Motivation',cat:'will'},{key:'coach',label:'Coachability',cat:'will'},
     {key:'zuverl',label:'Zuverlässigkeit',cat:'will'},{key:'team',label:'Teamfähigkeit',cat:'will'},
     {key:'crOEM',label:'CR OEM',cat:'result'},{key:'crTW',label:'CR TW',cat:'result'},
@@ -10403,7 +10465,7 @@ function openCoachingEval(empId,editEvalId){
     curName=mu?mu.name:((typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'Admin');
   }
   function evals(){return (reviews[empId]||[]).filter(function(r){return r.einwand!==undefined;}).slice().sort(function(a,b){return String(b.date).localeCompare(String(a.date));});}
-  function avgOf(e,cat){var ks=DIMS.filter(function(d){return !cat||d.cat===cat;});return ks.reduce(function(s,d){return s+(+e[d.key]||0);},0)/ks.length;}
+  function avgOf(e,cat){var v=DIMS.filter(function(d){return !cat||d.cat===cat;}).map(function(d){return +e[d.key]||0;}).filter(function(x){return x>0;});return v.length?v.reduce(function(s,x){return s+x;},0)/v.length:0;}
   function f1(x){return x.toFixed(1).replace('.',',');}
   var st={editId:null,cur:{},base:null};
   var CARD='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;padding:14px 16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)';
@@ -10445,8 +10507,8 @@ function openCoachingEval(empId,editEvalId){
     +'<div id="cevSec3" style="'+CARD+'"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Ziele <span id="cevGoalN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span></div>'
     +'<div style="background:#EFECE5;border:1px solid #E4E0D6;border-radius:12px;padding:10px 12px 12px;margin-bottom:12px"><div style="font-size:11px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);margin-bottom:8px">Neues Ziel</div>'
     +'<div style="margin-bottom:10px"><label>Zielbeschreibung</label><textarea id="cevg-desc" rows="2" placeholder="z. B. Super Yes Rate auf 18 % steigern bis Jahresende" style="min-height:52px;resize:vertical"></textarea></div>'
-    +'<div style="display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:10px"><div><label>KPI <span style="color:var(--text3)">(optional)</span></label><select id="cevg-metric"><option value="">— kein KPI —</option>'+FOCUS_METRICS.map(function(m){return '<option value="'+m.key+'">'+esc(m.label)+'</option>';}).join('')+'</select></div>'
-    +'<div><label>Zielwert</label><input type="number" id="cevg-target" placeholder="z. B. 18"></div><div><label>Ziel-Datum</label><input type="date" id="cevg-date"></div></div>'
+    +'<div id="cevgBezug" style="margin-bottom:10px"></div><select id="cevg-metric" style="display:none" aria-hidden="true"><option value=""></option></select>'
+    +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px"><div><label>Zielwert <span id="cevgUnit" style="color:var(--text3)"></span></label><input type="number" id="cevg-target" placeholder="z. B. 18"></div><div><label>Ziel-Datum</label><input type="date" id="cevg-date"></div></div>'
     +'<div style="display:flex;justify-content:flex-end;margin-top:12px"><button class="btn btn-primary" type="button" id="cevGoalSave" style="height:36px;width:auto"><i class="ti ti-check"></i> Ziel speichern</button></div></div>'
     +'<div id="cevGoalList"></div></div>'
     +'<div id="cevSec2" style="'+CARD+';margin-bottom:4px"><div style="display:flex;align-items:center;gap:8px;font-weight:700;font-size:14px;margin-bottom:10px">Letzte Bewertungen <span id="cevN" style="font-weight:500;color:var(--text3);font-size:12.5px"></span>'
@@ -10464,7 +10526,7 @@ function openCoachingEval(empId,editEvalId){
   function refreshTop(){
     var b=st.base;
     DIMS.forEach(function(d){
-      var v=st.cur[d.key],lv=b?(+b[d.key]||0):null;
+      var v=st.cur[d.key],lv=b&&(+b[d.key]>0)?+b[d.key]:null;
       $('cevv-'+d.key).textContent=v;
       $('cevl-'+d.key).textContent=lv!=null?'zuletzt '+lv:'';
       var de=$('cevd-'+d.key);
@@ -10515,8 +10577,8 @@ function openCoachingEval(empId,editEvalId){
   setEdit(e0||null);renderList();
 
   // ── Ziele ──
-  function goalCur(g){if(!g.metricKey)return null;var rp=getPerf(empId,30);if(!rp.length)return null;var vs=rp.map(function(x){return x[g.metricKey];}).filter(function(v){return v!=null&&!isNaN(v);});return vs.length?vs.reduce(function(a,b){return a+(+b);},0)/vs.length:null;}
-  function goalStart(g){if(!g.metricKey||!g.createdAt)return null;var c=String(g.createdAt).slice(0,10);var d0=new Date(c+'T00:00:00');d0.setDate(d0.getDate()-30);var f0=d0.toISOString().slice(0,10);
+  function goalCur(g){if(!g.metricKey)return null;if(goalIsDev(g.metricKey))return goalDevVal(empId,String(g.metricKey).slice(4));var rp=getPerf(empId,30);if(!rp.length)return null;var vs=rp.map(function(x){return x[g.metricKey];}).filter(function(v){return v!=null&&!isNaN(v);});return vs.length?vs.reduce(function(a,b){return a+(+b);},0)/vs.length:null;}
+  function goalStart(g){if(!g.metricKey||!g.createdAt)return null;if(goalIsDev(g.metricKey))return goalDevVal(empId,String(g.metricKey).slice(4),String(g.createdAt).slice(0,10));var c=String(g.createdAt).slice(0,10);var d0=new Date(c+'T00:00:00');d0.setDate(d0.getDate()-30);var f0=d0.toISOString().slice(0,10);
     var vs=(performance[empId]||[]).filter(function(x){return x.date>=f0&&x.date<c;}).map(function(x){return x[g.metricKey];}).filter(function(v){return v!=null&&!isNaN(v);});
     return vs.length?vs.reduce(function(a,b){return a+(+b);},0)/vs.length:null;}
   function renderGoals(){
@@ -10531,7 +10593,7 @@ function openCoachingEval(empId,editEvalId){
       if(tv!=null&&cur!=null){if(st!=null&&st!==tv)pc=Math.round((cur-st)/(tv-st)*100);else pc=Math.round(cur/tv*100);pc=Math.max(0,Math.min(100,pc));}
       if(done)pc=100;
       var lbl=g.metricKey?focusMetricLabel(g.metricKey):'Ziel';
-      var meta=g.metricKey?[st!=null?'Start '+Math.round(st)+' %':'',cur!=null?'jetzt '+Math.round(cur)+' %':'',tv!=null?'Ziel '+tv+' %':''].filter(Boolean).join(' · '):(g.status||'offen');
+      var _u=goalUnit(g.metricKey);var meta=g.metricKey?[st!=null?'Start '+Math.round(st*10)/10+_u:'',cur!=null?'jetzt '+Math.round(cur*10)/10+_u:'',tv!=null?'Ziel '+tv+_u:''].filter(Boolean).join(' · '):(g.status||'offen');
       var d=g.targetDate?'bis '+g.targetDate.slice(8,10)+'.'+g.targetDate.slice(5,7)+'.':'ohne Datum';
       return '<div style="display:flex;align-items:flex-start;gap:12px;height:98px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:'+(closed?'#F7F5F0':'#EFECE5')+';margin-bottom:6px;overflow:hidden">'
         +'<div style="width:110px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+d+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(lbl)+'</span></div>'
@@ -10547,15 +10609,32 @@ function openCoachingEval(empId,editEvalId){
     [].slice.call(el.querySelectorAll('button[data-act=gdel]')).forEach(function(b){b.onclick=function(){selectedEmp=emp.id;deleteGoal(b.dataset.gid);};});
   }
   window._cevGoalsRender=function(){if(document.getElementById('cevModal'))renderGoals();};
-  window._cevGoalSaved=function(){if(!document.getElementById('cevModal'))return;$('cevg-desc').value='';$('cevg-metric').value='';var ms=$('cevg-metric');if(ms&&ms._uiBtn&&typeof ms._uiSync==='function')ms._uiSync();$('cevg-target').value='';$('cevg-date').value='';renderGoals();toast('Ziel gespeichert');};
+  window._cevGoalSaved=function(){if(!document.getElementById('cevModal'))return;$('cevg-desc').value='';$('cevg-metric').value='';GB={v:'',open:null};gbRender();var ms=$('cevg-metric');if(ms&&ms._uiBtn&&typeof ms._uiSync==='function')ms._uiSync();$('cevg-target').value='';$('cevg-date').value='';renderGoals();toast('Ziel gespeichert');};
   $('cevGoalSave').onclick=function(){
     var gd=document.getElementById('goal-desc'),gm=document.getElementById('goal-metric'),gt=document.getElementById('goal-target'),gdt=document.getElementById('goal-date');
     if(gm&&gm.options.length<=1)FOCUS_METRICS.forEach(function(m){var o=document.createElement('option');o.value=m.key;o.textContent=m.label;gm.appendChild(o);});
-    gd.value=$('cevg-desc').value;gm.value=$('cevg-metric').value;gt.value=$('cevg-target').value;gdt.value=$('cevg-date').value;
+    gd.value=$('cevg-desc').value;var _mv=$('cevg-metric').value;if(gm&&_mv&&![].some.call(gm.options,function(o){return o.value===_mv;})){var _o=document.createElement('option');_o.value=_mv;_o.textContent=focusMetricLabel(_mv);gm.appendChild(_o);}gm.value=_mv;gt.value=$('cevg-target').value;gdt.value=$('cevg-date').value;
     selectedEmp=emp.id;saveNewGoal(emp.id);
   };
+  GB={v:'',open:null};gbRender();
   renderGoals();
 }
+
+// ── Ziel: Bezug Skill · Will · Result (eine Auswahl) ──
+var GB={v:'',open:null};
+function gbItems(a){if(a==='Result')return sfKpiList().map(function(k){return [k[0],k[1]];});var L=a==='Skill'?SF_SKILL:SF_WILL;return L.map(function(t){var r=SF_REVIEW_KEYS.find(function(x){return x[1]===t;});return ['dev:'+(r?r[0]:t),t];});}
+function gbRender(){var w=document.getElementById('cevgBezug');if(!w)return;
+  var h='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'+['Skill','Will','Result'].map(function(a){var it=gbItems(a),sel=it.find(function(x){return x[0]===GB.v;});
+    var c='<div class="sf-cell gb-cell" style="position:relative;min-width:0"><label>'+a+'</label><button type="button" class="btn" aria-expanded="'+(GB.open===a)+'" style="width:100%;height:38px;justify-content:space-between;gap:6px;font-weight:500" onclick="gbOpen(\''+a+'\')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'+(sel?'':'color:var(--text3)')+'">'+(sel?esc(sel[1]):'—')+'</span><i class="ti ti-chevron-down" style="font-size:11px;flex-shrink:0"></i></button>';
+    if(GB.open===a)c+='<div class="sf-panel">'+it.map(function(x){return '<label class="sf-opt"><input type="radio" name="gbsel"'+(x[0]===GB.v?' checked':'')+' onchange="gbPick(this.dataset.v)" data-v="'+esc(x[0])+'"> <span>'+esc(x[1])+'</span></label>';}).join('')+'</div>';
+    return c+'</div>';}).join('')+'</div><div class="sf-sub" style="margin-bottom:0">optional · eine Auswahl'+(GB.v?' · <a href="#" onclick="gbPick(\'\');return false">entfernen</a>':'')+'</div>';
+  w.innerHTML=h;
+  var sel=document.getElementById('cevg-metric');if(sel){if(GB.v&&![].some.call(sel.options,function(o){return o.value===GB.v;})){var o=document.createElement('option');o.value=GB.v;o.textContent=focusMetricLabel(GB.v);sel.appendChild(o);}sel.value=GB.v;}
+  var u=document.getElementById('cevgUnit');if(u)u.textContent=GB.v?(goalIsDev(GB.v)?'(Bewertung 1–10)':(goalUnit(GB.v)?'(%)':'')):'';
+  var t=document.getElementById('cevg-target');if(t)t.placeholder=goalIsDev(GB.v)?'z. B. 7':'z. B. 18';}
+function gbOpen(a){GB.open=GB.open===a?null:a;gbRender();}
+function gbPick(v){GB.v=v||'';GB.open=null;gbRender();}
+document.addEventListener('mousedown',function(ev){if(!GB.open)return;var c=ev.target&&ev.target.closest?ev.target.closest('.gb-cell'):null;if(!c){GB.open=null;gbRender();}});
 function openGoalInPopup(empId){
   openCoachingEval(empId);
   setTimeout(function(){var el=document.getElementById('cevSec3');if(el)el.scrollIntoView({behavior:'smooth',block:'start'});var d=document.getElementById('cevg-desc');if(d)d.focus();},80);
@@ -10563,7 +10642,7 @@ function openGoalInPopup(empId){
 var _savingCoachEval=false;
 function saveCoachEval(empId){
   if(_savingCoachEval)return;
-  var KEYS=['einwand','bedarf','produkt','gespraech','motivation','coach','zuverl','team','crOEM','crTW','crSY','crMY'];
+  var KEYS=['opener','einwand','loop','bedarf','abschluss','gespraech','zusammenfassung','produkt','motivation','coach','zuverl','team','crOEM','crTW','crSY','crMY'];
   var dateEl=document.getElementById('cev-date');
   var noteEl=document.getElementById('cev-note');
   if(!dateEl){alert('Fehler: Formular nicht gefunden.');return;}
@@ -10630,6 +10709,75 @@ function syncSessFocusMetric(){
   var mapped=TOPIC_TO_METRIC[topicEl.value];
   fmEl.value=mapped||'';
 }
+
+// ── Neue Session: Was für eine Session · Fokus (Skill · Will · Result, je mehrere) ──
+var SF={cat:'Coaching',art:'Einzelcoaching',legacy:null,topics:[],metrics:[],metric:'',hint:'',open:null};
+var SF_SKILL=['Einstieg','Einwandsentkräftung','Loop','Bedarfserweiterung','Produktwissen','Abschluss','Gesprächsführung','Zusammenfassung'];
+var SF_WILL=['Motivation','Coachability','Zuverlässigkeit','Teamfähigkeit'];
+var SF_TOPICS=SF_SKILL.concat(SF_WILL);
+var TOPIC_ALIAS={'Einwandsbehandlung':'Einwandsentkräftung','Bedarfsanalyse':'Bedarfserweiterung'};
+var SF_REVIEW_KEYS=[['opener','Einstieg'],['einwand','Einwandsentkräftung'],['loop','Loop'],['bedarf','Bedarfserweiterung'],['abschluss','Abschluss'],['gespraech','Gesprächsführung'],['zusammenfassung','Zusammenfassung'],['produkt','Produktwissen'],['motivation','Motivation'],['coach','Coachability'],['zuverl','Zuverlässigkeit'],['team','Teamfähigkeit']];
+// Result-KPIs: Schlüssel (wie im Feld focus_metric) und Beschriftung
+function sfKpiList(){return KAL_KPIS.map(function(k){return [k[0],k[1]];}).concat([['margeGesamt','Marge']]);}
+function sfKpiLabel(k){var x=sfKpiList().find(function(y){return y[0]===k;});return x?x[1]:k;}
+function sfKpiKey(l){var x=sfKpiList().find(function(y){return y[1]===l;});return x?x[0]:null;}
+function sfEmp(){var id=(ncSelectedEmpIds&&ncSelectedEmpIds.length===1)?ncSelectedEmpIds[0]:(ncSelectedEmpIds&&ncSelectedEmpIds.length?null:selectedEmp);return id?employees.find(function(e){return String(e.id)===String(id);}):null;}
+function sfMissKeys(e){if(!e||typeof kalKpiMisses!=='function')return [];var t=today(),y=addDaysUTC(t,-1),from=t.slice(0,7)+'-01';if(from>y)from=addDaysUTC(t,-7);
+  var lab=kalKpiMisses(e,from,y);return KAL_KPIS.filter(function(k){return lab.indexOf(k[1])>=0;}).map(function(k){return k[0];});}
+// Schwächste bzw. nicht gewachsene Punkte der letzten Entwicklungsbewertung (für das Performance-Gespräch)
+function sfReviewWeak(eid,n){var L=(reviews[eid]||[]).filter(function(r){return r&&r.einwand!==undefined;}).sort(function(a,b){return (a.date||'').localeCompare(b.date||'');});if(!L.length)return [];
+  var cur=L[L.length-1],prev=L.length>1?L[L.length-2]:null;
+  return SF_REVIEW_KEYS.filter(function(k){return +cur[k[0]]>0;}).map(function(k){var v=+cur[k[0]]||0,d=prev&&+prev[k[0]]>0?v-(+prev[k[0]]):0;return {t:k[1],v:v,d:d};}).sort(function(a,b){return a.d-b.d||a.v-b.v;}).slice(0,n||2).map(function(x){return x.t;});}
+function sfSyncHidden(){SF.metric=SF.metrics[0]||'';var c=document.getElementById('sess-category'),ty=document.getElementById('sess-type'),tp=document.getElementById('sess-topic-sel'),fm=document.getElementById('sess-focus-metric');
+  if(c){for(var i=0;i<c.options.length;i++)if(c.options[i].text===SF.cat){c.selectedIndex=i;break;}}
+  if(ty){var f=false;for(var j=0;j<ty.options.length;j++)if(ty.options[j].value===SF.art||ty.options[j].text===SF.art){ty.selectedIndex=j;f=true;break;}if(!f){var o=document.createElement('option');o.textContent=SF.art;ty.appendChild(o);ty.value=SF.art;}}
+  if(tp)tp.value=SF.topics[0]&&SF_TOPICS.indexOf(SF.topics[0])>=0?SF.topics[0]:'';
+  if(fm){var hit=false;for(var m=0;m<fm.options.length;m++)if(fm.options[m].value===SF.metric){hit=true;break;}fm.value=hit?SF.metric:'';}}
+// Gespeichert werden alle Fokus-Punkte als Themen (Skill, Will und die Result-KPIs), die erste KPI zusätzlich als Ziel-KPI
+function sfSaveTopics(){return SF.topics.concat(SF.metrics.map(sfKpiLabel));}
+function sfRender(){var w=document.getElementById('sfWas'),f=document.getElementById('sfFokus');if(!w||!f)return;
+  var h='<span class="dsh-seg">'+SF_ARTS.map(function(a){return '<button type="button" class="'+(a[0]===SF.art?'on':'')+'" onclick="sfArt(this.dataset.a)" data-a="'+esc(a[0])+'">'+esc(a[1])+'</button>';}).join('')
+    +(SF.legacy?'<button type="button" class="'+(SF.art===SF.legacy?'on':'')+'" onclick="sfArt(this.dataset.a)" data-a="'+esc(SF.legacy)+'" title="Art aus der Zeit vor der Umstellung">'+esc(SF.legacy)+' (bisher)</button>':'')+'</span>';
+  var n=(ncSelectedEmpIds||[]).length;if(n>1)h+='<div class="sf-sub" style="margin-bottom:0">Gruppensession mit '+n+' Mitarbeitern</div>';
+  w.innerHTML=h;
+  var e=sfEmp(),miss=sfMissKeys(e),kpis=sfKpiList().slice().sort(function(a,b){return (miss.indexOf(b[0])>=0)-(miss.indexOf(a[0])>=0);});
+  var A={Skill:{items:SF_SKILL.map(function(t){return [t,t];}),sel:SF.topics.filter(function(t){return SF_SKILL.indexOf(t)>=0;})},
+         Will:{items:SF_WILL.map(function(t){return [t,t];}),sel:SF.topics.filter(function(t){return SF_WILL.indexOf(t)>=0;})},
+         Result:{items:kpis,sel:SF.metrics.slice()}};
+  var g='<div style="display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px">'+['Skill','Will','Result'].map(function(a){var o=A[a],lbl=o.sel.map(function(v){return a==='Result'?sfKpiLabel(v):v;});
+    var cell='<div class="sf-cell" style="position:relative;min-width:0"><label>'+a+'</label><button type="button" class="btn" aria-expanded="'+(SF.open===a)+'" style="width:100%;height:38px;justify-content:space-between;gap:6px;font-weight:500" onclick="sfOpen(\''+a+'\')"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;'+(lbl.length?'':'color:var(--text3)')+'">'+(lbl.length?esc(lbl.join(', ')):'— auswählen —')+'</span><i class="ti ti-chevron-down" style="font-size:11px;flex-shrink:0"></i></button>';
+    if(SF.open===a)cell+='<div class="sf-panel">'+o.items.map(function(it){var on=o.sel.indexOf(it[0])>=0,u=a==='Result'&&miss.indexOf(it[0])>=0;return '<label class="sf-opt"><input type="checkbox"'+(on?' checked':'')+' onchange="sfPick(\''+a+'\',this.dataset.v)" data-v="'+esc(it[0])+'"> <span>'+esc(it[1])+'</span>'+(u?'<span class="sf-d" title="unter Ziel" style="margin:0 0 0 auto"></span>':'')+'</label>';}).join('')+'</div>';
+    return cell+'</div>';}).join('')+'</div>';
+  var _gE=sfEmp(),_G=_gE?(goals[_gE.id]||[]).filter(function(x){return x.status!=='erreicht'&&x.status!=='verfehlt'&&x.metricKey;}):[];
+  var info=[];if(_G.length){var _gt=_G.slice(0,3).map(function(x){return focusMetricLabel(x.metricKey)+(x.targetValue!=null?' ≥ '+x.targetValue+goalUnit(x.metricKey):'')+(x.targetDate?' bis '+kalF(x.targetDate):'');});var _all=_G.every(function(x){return goalIsDev(x.metricKey)?SF.topics.indexOf(focusMetricLabel(x.metricKey))>=0:SF.metrics.indexOf(x.metricKey)>=0;});info.push('Ziele: '+esc(_gt.join(', '))+(_all?'':' · <a href="#" onclick="sfGoalsAdopt();return false">übernehmen</a>'));}
+  if(miss.length)info.push('<span class="sf-d"></span>Result: '+esc(miss.map(sfKpiLabel).join(', '))+' unter Ziel im laufenden Monat');if(SF.hint)info.push(esc(SF.hint));
+  if(info.length)g+='<div class="sf-sub" style="margin-bottom:0">'+info.join(' · ')+'</div>';
+  f.innerHTML=g;sfSyncHidden();}
+function sfGoalsAdopt(){var e=sfEmp();if(!e)return;(goals[e.id]||[]).forEach(function(x){if(x.status==='erreicht'||x.status==='verfehlt'||!x.metricKey)return;if(goalIsDev(x.metricKey)){var l=focusMetricLabel(x.metricKey);if(SF.topics.indexOf(l)<0)SF.topics.push(l);}else if(SF.metrics.indexOf(x.metricKey)<0)SF.metrics.push(x.metricKey);});sfRender();}
+function sfOpen(a){SF.open=SF.open===a?null:a;sfRender();}
+function sfPick(a,v){if(a==='Result'){var i=SF.metrics.indexOf(v);if(i>=0)SF.metrics.splice(i,1);else SF.metrics.push(v);}else{var j=SF.topics.indexOf(v);if(j>=0)SF.topics.splice(j,1);else SF.topics.push(v);}sfRender();}
+// Panel schließen bei Klick daneben
+document.addEventListener('mousedown',function(ev){if(!SF.open)return;var c=ev.target&&ev.target.closest?ev.target.closest('.sf-cell'):null;if(!c){SF.open=null;sfRender();}});
+function sfCat(c){SF.cat=c;var a=COACHING_CATEGORIES[c]||[];if(a.indexOf(SF.art)<0)SF.art=a[0];sfRender();}
+function sfArt(a){SF.art=a;if(a!==SF.legacy)SF.cat=findCoachingCategoryForType(a);sfRender();}
+function sfMetric(k){var i=SF.metrics.indexOf(k);if(i>=0)SF.metrics.splice(i,1);else SF.metrics.push(k);sfRender();}
+function sfTopic(t){var i=SF.topics.indexOf(t);if(i>=0)SF.topics.splice(i,1);else SF.topics.push(t);sfRender();}
+function sfNew(){return {cat:'Coaching',art:'Einzelcoaching',legacy:null,topics:[],metrics:[],metric:'',hint:'',open:null};}
+function sfReset(){SF=sfNew();sfRender();}
+function sfSetType(t){if(!t)return;var inNew=Object.keys(COACHING_CATEGORIES).some(function(c){return COACHING_CATEGORIES[c].indexOf(t)>=0;});SF.art=t;SF.cat=findCoachingCategoryForType(t);SF.legacy=inNew?null:t;sfRender();}
+// Aus den (versteckten) Feldern übernehmen, z. B. beim Erfassen einer geplanten Session
+function sfFromSelects(fokusText){var ty=document.getElementById('sess-type'),fm=document.getElementById('sess-focus-metric'),tp=document.getElementById('sess-topic-sel');
+  if(ty&&ty.value)sfSetType(ty.value);
+  var tx=fokusText||(tp&&tp.value)||'',all=tx?tx.split(/\s*,\s*/).filter(function(x){return x;}).map(function(x){return TOPIC_ALIAS[x]||x;}):[];
+  SF.metrics=[];SF.topics=[];all.forEach(function(x){var k=sfKpiKey(x);if(k){if(SF.metrics.indexOf(k)<0)SF.metrics.push(k);}else SF.topics.push(x);});
+  if(fm&&fm.value){var i=SF.metrics.indexOf(fm.value);if(i>0)SF.metrics.splice(i,1);if(i!==0)SF.metrics.unshift(fm.value);}
+  sfRender();}
+// Aus einer Aufgabe: Art setzen, Fokus vorschlagen
+function sfPreset(typ,eid){SF=sfNew();sfSetType(typ);var e=employees.find(function(x){return String(x.id)===String(eid);});
+  var miss=sfMissKeys(e);if(miss.length)SF.metrics=[miss[0]];
+  if(typ==='Performance-Gespräch'&&e){var w=sfReviewWeak(e.id,2);if(w.length){SF.topics=w;SF.hint='Skill/Will aus der Entwicklungsbewertung';}}
+  sfRender();}
+
 var _savingSession=false;
 function saveSession(empId){
   if(_savingSession)return; // verhindert doppeltes Anlegen bei ungeduldigem Doppelklick
@@ -10640,17 +10788,18 @@ function saveSession(empId){
   var endTimeEl=document.getElementById('sess-end-time');
   var endUhrzeit=endTimeEl?endTimeEl.value:'';
   if(uhrzeit&&endUhrzeit&&endUhrzeit<=uhrzeit){alert('Die Endzeit muss nach der Startzeit liegen.');return;}
-  var type=document.getElementById('sess-type').value;
+  var _sf=!!document.getElementById('sfWas');
+  var type=_sf?SF.art:document.getElementById('sess-type').value;
   var start=document.getElementById('sess-start').value.trim();
   var stop=document.getElementById('sess-stop').value.trim();
   var cont=document.getElementById('sess-cont').value.trim();
   var notes=document.getElementById('sess-note').value.trim();
   var topics=[];
   var sel=document.getElementById('sess-topic-sel');
-  if(sel&&sel.value)topics.push(sel.value);
+  if(_sf)topics=sfSaveTopics();else if(sel&&sel.value)topics.push(sel.value);
   var focus=topics.join(', ');
   var fmEl=document.getElementById('sess-focus-metric');
-  var focusMetric=fmEl?fmEl.value:'';
+  var focusMetric=_sf?(SF.metrics[0]||''):(fmEl?fmEl.value:'');
   var editId=_editingSessionId;
   var empIds=(!editId&&ncSelectedEmpIds.length)?ncSelectedEmpIds.slice():[empId];
 
@@ -10728,6 +10877,7 @@ function saveSession(empId){
   });
 }
 function resetSessionFormFields(){
+  if(typeof sfReset==='function')setTimeout(sfReset,0);
   ['sess-start','sess-stop','sess-cont','sess-note'].forEach(function(id){
     var el=document.getElementById(id);if(el)el.value='';
   });
@@ -10844,6 +10994,7 @@ function deleteTask(id){
 var _savingNewTask=false;
 function saveNewTask(){
   if(_savingNewTask)return;
+  if(AT_ART){atPlanSession();return;}
   var text=document.getElementById('taskText').value.trim();
   var desc=document.getElementById('taskDesc').value.trim();
   var prio=document.getElementById('taskPrio').value;
@@ -10879,6 +11030,35 @@ function saveNewTask(){
     alert('Unerwarteter Fehler: '+err.message);
   });
 }
+
+// ── Neue Aufgabe mit Art: „Aufgabe“ = freier Task, sonst eine geplante Session (Termin, Coach = Zuständig) ──
+var AT_ART='';
+function atArtRender(){var w=document.getElementById('atArtSeg');if(!w)return;var opts=[['','Aufgabe']].concat(typeof SF_ARTS!=='undefined'?SF_ARTS:[]);
+  w.innerHTML='<span class="dsh-seg">'+opts.map(function(a){return '<button type="button" class="'+(a[0]===AT_ART?'on':'')+'" onclick="atArtSet(this.dataset.a)" data-a="'+esc(a[0])+'">'+esc(a[1])+'</button>';}).join('')+'</span>';
+  var ses=!!AT_ART,g=function(id){return document.getElementById(id);};
+  if(g('taskTextLbl'))g('taskTextLbl').textContent=ses?'Thema / Anlass (optional)':'Aufgabentitel';
+  if(g('taskText'))g('taskText').placeholder=ses?'z. B. Einwände bei Preisfragen':'z.B. Pitch-Skript lesen – pages 1 to 9';
+  if(g('taskDueLbl'))g('taskDueLbl').textContent=ses?'Termin':'Fälligkeitsdatum';
+  if(g('taskTime'))g('taskTime').style.display=ses?'':'none';
+  if(g('taskPrio'))g('taskPrio').disabled=ses;
+  var b=g('taskSaveBtn');if(b)b.innerHTML=ses?'<i class="ti ti-calendar-plus"></i> Session planen':'<i class="ti ti-check"></i> Aufgabe hinzufügen';}
+function atArtSet(a){AT_ART=a||'';atArtRender();}
+function atPlanSession(){var g=function(id){return document.getElementById(id);};var e=kalEmp(selectedEmp);if(!e)return;
+  var day=(g('taskDue')&&g('taskDue').value)||today(),uz=(g('taskTime')&&g('taskTime').value)||'10:00',key=g('taskAssignee')?g('taskAssignee').value:'';
+  var coach=/^emp:/.test(key)?key.slice(4):(currentCoach?currentCoach.id:null);
+  var note=[g('taskText')?g('taskText').value.trim():'',g('taskDesc')?g('taskDesc').value.trim():''].filter(Boolean).join(' – ');
+  var row={employee_id:e.id,date:day,uhrzeit:uz,end_uhrzeit:kalAddMin(uz,AT_ART==='Weekly'?30:60),art:AT_ART,rating:null,note:note,focus:'',status:'geplant',coach_id:coach,focus_metric:null,group_id:null};
+  var p={id:'t'+Date.now(),date:day,uhrzeit:uz,endUhrzeit:row.end_uhrzeit,type:AT_ART,status:'geplant',rating:null,note:note,notes:note,focus:'',topics:[],coachId:coach};
+  if(!protocols[e.id])protocols[e.id]=[];protocols[e.id].unshift(p);
+  var lbl=(SF_ARTS.find(function(x){return x[0]===AT_ART;})||[0,AT_ART])[1];
+  sb.from('protocols').insert(row).select().single().then(function(res){
+    if(res&&res.error){alert('Planen fehlgeschlagen: '+res.error.message);protocols[e.id]=protocols[e.id].filter(function(q){return q!==p;});atRender();return;}
+    if(res&&res.data&&res.data.id)p.id=res.data.id;
+    if(key&&!/^emp:/.test(key)&&typeof aufgAssign==='function')aufgAssign('plan:'+p.id,key);
+    atRender();});
+  logActivity('session','created','Session geplant: '+lbl,e.id,e.name+' · '+fd(day)+' · '+uz);
+  ['taskText','taskDesc','taskDue'].forEach(function(id){if(g(id))g(id).value='';});
+  atRender();if(typeof atToast==='function')atToast('Geplant: '+lbl+', '+kalF(day)+' '+uz,null);}
 var _savingNewEmp=false;
 function esBuildHtml(emp,asPopup,html){
   html=html||'';
@@ -12280,6 +12460,7 @@ function openPlannedSession(empId, sessionId, typ, fokus, datum, uhrzeit){
       }
     }
     if(noteEl&&proto&&proto.note) noteEl.value=proto.note;
+  if(typeof sfFromSelects==='function')sfFromSelects(fokus);
   },100);
 }
 // ── Gruppensession: gemeinsame Abarbeitung fuer alle Teilnehmer auf einmal ──
@@ -12412,7 +12593,7 @@ function saveNewGoal(empId){
   var targetValue=targetEl&&targetEl.value!==''?parseFloat(targetEl.value):null;
   var dateEl=document.getElementById('goal-date');
   var targetDate=dateEl?dateEl.value||null:null;
-  if(metricKey&&targetValue===null){alert('Bitte einen Zielwert angeben, wenn ein KPI ausgewählt ist.');return;}
+  if(metricKey&&targetValue===null){alert('Bitte einen Zielwert angeben, wenn Skill, Will oder Result gewählt ist.');return;}
   var payload={
     employee_id:empId,description:desc,metric_key:metricKey||null,target_value:targetValue,
     target_date:targetDate,status:'offen',created_by:currentCoach?currentCoach.id:null
@@ -12425,22 +12606,11 @@ function saveNewGoal(empId){
     goals[empId].unshift({id:r.id,description:r.description,metricKey:r.metric_key,targetValue:r.target_value,targetDate:r.target_date,status:r.status,createdAt:r.created_at,createdBy:r.created_by});
     var empForLog3=employees.find(function(e){return e.id===empId;});
     logActivity('goal','created','Neues Ziel angelegt: "'+desc+'"',empId,empForLog3?empForLog3.name:'');
-    // Zugehörige offene Aufgabe im Task-Tab anlegen
-    var taskPayload={
-      employee_id:empId,text:'Ziel: '+desc,description:(metricKey?focusMetricLabel(metricKey)+' auf '+targetValue+'% steigern':'')+(targetDate?' · bis '+fd(targetDate):''),
-      done:false,status:'open',priority:'medium',due_date:targetDate,source:'Zielvereinbarung'
-    };
-    sb.from('tasks').insert(taskPayload).select().single().then(function(tres){
-      if(!tres.error){
-        var tr=tres.data;
-        if(!tasks[empId])tasks[empId]=[];
-        tasks[empId].unshift({id:tr.id,text:tr.text,description:tr.description||'',done:false,status:tr.status||'open',priority:tr.priority,dueDate:tr.due_date,source:tr.source||''});
-      }
-      closeModal('goalModal');
-      renderTab();
-      _savingNewGoal=false;
-      if(typeof window._cevGoalSaved==='function')window._cevGoalSaved();
-    });
+    // Die Aufgabe „Ziel prüfen“ entsteht automatisch zur Frist (siehe aufgAll)
+    closeModal('goalModal');
+    renderTab();
+    _savingNewGoal=false;
+    if(typeof window._cevGoalSaved==='function')window._cevGoalSaved();
   }).catch(function(err){_savingNewGoal=false;alert('Unerwarteter Fehler: '+err.message);});
 }
 function updateGoalStatus(goalId,newStatus){
@@ -12933,14 +13103,16 @@ var _cbScores={};
 
 
 var _qaBase=null;
+// Ein Punkt zählt erst, wenn er bewertet ist (leer = kam im Call nicht vor)
+function qaTap(key,n){setCbScore(key,_cbScores[key]===n?0:n);}
 function setCbScore(key,val){
-  _cbScores[key]=val;
-  var sl=document.getElementById('qas_'+key);if(sl&&+sl.value!==val)sl.value=val;
-  var disp=document.getElementById('cbv_'+key);if(disp)disp.textContent=val;
+  val=+val||0;if(val)_cbScores[key]=val;else delete _cbScores[key];
+  var sg=document.getElementById('qas_'+key);if(sg)[].forEach.call(sg.querySelectorAll('button'),function(b){b.className=(+b.dataset.n===val)?'on':'';});
+  var disp=document.getElementById('cbv_'+key);if(disp){disp.textContent=val?val:'–';disp.style.color=val?'':'var(--text3)';}
   var lv=_qaBase&&_qaBase.scores?_qaBase.scores[key]:null;
   var l=document.getElementById('qal_'+key);if(l)l.textContent=lv?'zuletzt '+lv:'';
   var d=document.getElementById('qad_'+key);
-  if(d){if(!lv)d.textContent='';else{var dd=val-lv;d.textContent=dd>0?'+'+dd:dd<0?String(dd):'±0';d.style.color=dd>0?'#2f6b52':dd<0?'#B5513A':'var(--text3)';}}
+  if(d){if(!lv||!val)d.textContent='';else{var dd=val-lv;d.textContent=dd>0?'+'+dd:dd<0?String(dd):'±0';d.style.color=dd>0?'#2f6b52':dd<0?'#B5513A':'var(--text3)';}}
   updateQaChips();
 }
 function updateQaChips(){
@@ -12966,7 +13138,7 @@ function qaRenderList(){
     var prev=list.slice(i+1).find(function(x){return x.scores&&Object.keys(x.scores).some(function(k){return x.scores[k]>0;});});
     var dl=(ts!=null&&prev)?ts-Math.round(totalScore(prev)):0;
     var d=r.date?r.date.slice(8,10)+'.'+r.date.slice(5,7)+'.':'';
-    var meta=[r.auftragsnr?'Auftrag '+r.auftragsnr:'',r.b2b||'',r.status==='ja'?'Abschluss'+(r.abschlussArt?' · Opt.: '+r.abschlussArt:''):'kein Abschluss'].filter(Boolean).join(' · ');
+    var meta=[r.b2b||'',r.abschlussArt?'Opt.: '+r.abschlussArt:'keine Optimierung',r.bewertetVon?'bewertet von '+r.bewertetVon:''].filter(Boolean).join(' · ');
     var txt=[r.einwand?'Einwand: '+r.einwand:'',r.hinweis||''].filter(Boolean).join(' · ');
     return '<div title="'+esc(txt)+'" style="display:flex;align-items:flex-start;gap:12px;height:84px;padding:12px;border:1px solid #E4E0D6;border-radius:10px;background:#EFECE5;margin-bottom:6px;overflow:hidden">'
       +'<div style="width:96px;flex-shrink:0;display:flex;flex-direction:column;gap:2px"><span style="font-size:12px;font-weight:500;line-height:18px;color:var(--text3)">'+d+'</span><span style="font-size:13.5px;font-weight:600;line-height:19px;color:var(--text)">'+(ts!=null?ts+' %':'–')+(dl?' <span style="font-size:11.5px;font-weight:700;color:'+(dl>0?'#2f6b52':'#B5513A')+'">'+(dl>0?'▲':'▼')+'</span>':'')+'</span></div>'
@@ -12987,6 +13159,8 @@ function qaDelete(rid){
   }
 }
 
+// Name der angemeldeten Person (Coach oder Admin/Betrachter)
+function qaCurrentName(){if(typeof currentCoach!=='undefined'&&currentCoach)return currentCoach.name;if(typeof currentAuthUser!=='undefined'&&currentAuthUser){var mu=(typeof appUsers!=='undefined'?appUsers:[]).find(function(u){return u.email===currentAuthUser.email;});if(mu)return mu.name;if(typeof resolveNonEmployeeName==='function')return resolveNonEmployeeName(currentAuthUser.email)||'';}return '';}
 var _savingCallBewertung=false;
 function saveInlineCallBewertung(empId){
   if(_savingCallBewertung)return;
@@ -13004,8 +13178,8 @@ function saveInlineCallBewertung(empId){
   var payload={
     employee_id:selectedEmp,date:datum.value,
     auftragsnr:auftrag?auftrag.value.trim():'',
-    bewertet_von:bewerter?bewerter.value.trim():'',
-    status:status?status.value:'nein',
+    bewertet_von:(_editingCallRatingId&&bewerter&&bewerter.value.trim())?bewerter.value.trim():qaCurrentName(),
+    status:(abschlussart&&abschlussart.value)?'ja':(_editingCallRatingId&&status?status.value:'nein'),
     b2b:b2b?b2b.value:'B2C',
     abschluss_art:abschlussart&&abschlussart.value?abschlussart.value:null,
     einwand:einwand?einwand.value.trim():'',
@@ -13380,7 +13554,7 @@ function renderNcEmpDropdown(){
   if(labelEl){
     labelEl.textContent=ncSelectedEmpIds.length===0?'— Mitarbeiter wählen —':
       ncSelectedEmpIds.length===1?(employees.find(function(e){return e.id===ncSelectedEmpIds[0];})||{}).name||'1 Mitarbeiter':
-      ncSelectedEmpIds.length+' Mitarbeiter ausgewählt (Gruppencoaching)';
+      ncSelectedEmpIds.length+' Mitarbeiter (Gruppe)';
   }
   if(!ncEmpDropdownOpen){wrap.innerHTML='';return;}
   var ROLE_ORDER={SDM:0,SDC:1,SDL:2,SE:3,SR:4,VLC:5};
@@ -13388,7 +13562,7 @@ function renderNcEmpDropdown(){
     var ra=ROLE_ORDER[a.role]!=null?ROLE_ORDER[a.role]:99,rb=ROLE_ORDER[b.role]!=null?ROLE_ORDER[b.role]:99;
     return ra-rb||a.name.localeCompare(b.name);
   });
-  var h='<div style="position:absolute;top:64px;left:0;z-index:30;background:var(--bg-solid);border:1px solid var(--border2);border-radius:var(--r-md);box-shadow:0 10px 24px rgba(40,32,15,0.14);width:100%;display:flex;flex-direction:column">';
+  var h='<div style="position:absolute;top:64px;left:0;z-index:30;background:var(--bg-solid);border:1px solid var(--border2);border-radius:var(--r-md);box-shadow:0 10px 24px rgba(40,32,15,0.14);width:100%;min-width:280px;display:flex;flex-direction:column">';
   h+='<div style="padding:8px;border-bottom:1px solid var(--border)"><div style="display:flex;align-items:center;gap:6px;background:var(--bg2);border-radius:6px;padding:6px 8px">'
     +'<i class="ti ti-search" style="font-size:13px;color:var(--text3)"></i>'
     +'<input id="ncEmpSearchInput" placeholder="Mitarbeiter suchen…" value="'+esc(ncEmpSearchQuery)+'" oninput="ncEmpSearchQuery=this.value;filterNcEmpList(this.value)" style="border:none;background:none;outline:none;font-size:12.5px;width:100%;color:var(--text)">'
@@ -13423,7 +13597,7 @@ function toggleNcEmpId(id){
 // Einzelcoaching o.ae. gespeichert werden.
 function onNcSelectionChanged(){
   renderNcEmpDropdown();
-  if(ncSelectedEmpIds.length>1)setCoachingTypeSelection('sess-category','sess-type','Gruppencoaching');
+  if(typeof sfRender==='function')sfRender();
 }
 function filterNcEmpList(q){
   q=(q||'').toLowerCase().trim();
@@ -13563,14 +13737,14 @@ function openQaBewertungModal(empId,editRatingId){
         h+='<div style="display:flex;align-items:center;gap:12px;height:36px;padding:0 10px;border-bottom:1px solid #eae7e0">'
           +'<span style="flex:1;min-width:0;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+ITEM_LABELS[k]+'</span>'
           +'<span id="qal_'+k+'" style="width:62px;flex-shrink:0;font-size:12px;color:var(--text3)"></span>'
-          +'<input type="range" min="1" max="4" step="1" id="qas_'+k+'" oninput="setCbScore(\''+k+'\',+this.value)" style="width:150px;flex-shrink:0;accent-color:#3a3833;margin:0;padding:0;height:20px;border:none;background:transparent">'
+          +'<span class="dsh-seg sm" id="qas_'+k+'" role="group" aria-label="'+esc(ITEM_LABELS[k]||k)+'" style="flex-shrink:0">'+[1,2,3,4].map(function(n){return '<button type="button" data-n="'+n+'" onclick="qaTap(\''+k+'\','+n+')" title="'+n+' von 4 – nochmal klicken = leer">'+n+'</button>';}).join('')+'</span>'
           +'<b id="cbv_'+k+'" style="width:18px;text-align:right;font-size:13.5px"></b>'
           +'<span id="qad_'+k+'" style="width:30px;text-align:right;font-size:12px;font-weight:700"></span></div>';
       });
     });
-    box.innerHTML=h;
+    box.innerHTML='<div class="sf-sub" style="margin:0 0 8px">Nur bewerten, was im Call vorkam · leer wird nicht gezählt · nochmal klicken leert den Punkt</div>'+h;
     CALL_CATS.forEach(function(cat){cat.items.forEach(function(k){
-      var v=editingRating&&editingRating.scores&&editingRating.scores[k]?editingRating.scores[k]:(_qaBase&&_qaBase.scores[k]?_qaBase.scores[k]:2);
+      var v=editingRating&&editingRating.scores&&editingRating.scores[k]?editingRating.scores[k]:0;
       setCbScore(k,v);
     });});
   }
@@ -13638,9 +13812,10 @@ function openNeuesCoachingModal(empId){
   var saveBtn=document.getElementById('ncSaveBtn');
   if(saveBtn)saveBtn.dataset.eid=selectedEmp;
   renderLastContinueBox(selectedEmp,'ncLastContinueBox');
+  if(typeof sfReset==='function')sfReset();
   updateNcHdSub();
   ncRenderList();
-  var nf=document.getElementById('ncFrom');if(nf){var cn=(typeof currentCoach!=='undefined'&&currentCoach)?currentCoach.name:((typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'');nf.textContent=cn?'von '+cn:'';}
+  var nf=document.getElementById('ncFrom');if(nf){var cn=(typeof currentCoach!=='undefined'&&currentCoach)?currentCoach.name:((typeof currentAuthUser!=='undefined'&&currentAuthUser&&typeof resolveNonEmployeeName==='function'&&resolveNonEmployeeName(currentAuthUser.email))||'');nf.textContent='';}
   openModal('neuesCoachingModal');
 }
 
@@ -14027,7 +14202,7 @@ function kalSesWho(o){return o.p.groupId?'Gruppencoaching ('+o.n+')':o.e.name;}
 function kalSesAttrs(o){return ' data-eid="'+esc(o.e.id)+'" data-sid="'+esc(o.p.id)+'" data-typ="'+esc(o.p.type||'')+'" data-focus="'+esc(o.p.focus||'')+'" data-datum="'+esc(o.p.date)+'" data-uhrzeit="'+esc(o.p.uhrzeit||'')+'"';}
 function kalSesTip(o){return esc((o.p.uhrzeit?o.p.uhrzeit+(o.p.endUhrzeit?'–'+o.p.endUhrzeit:'')+' ':'')+(o.p.type||'Session'))+'<br>'+esc(kalSesWho(o))+(o.p.focus?' · '+esc(o.p.focus):'')+(o.p.coachId?' mit '+esc(kalCoachName(o.p.coachId)):'')+(o.p.status==='geplant'?'<br>geplant':'');}
 
-// ── Zu planen: Performance-Gespräche (5/11/23 Monate) und Weekly je Agent ohne Session in dieser Woche ──
+// ── Zu planen: Performance-Gespräche (3/5/11/23 Monate) und Weekly je Agent ohne Session in dieser Woche ──
 var KAL_KPIS=[['crOEM','CR OEM'],['crTeilweise','CR TW'],['crSuperYes','CR SY'],['crMegaYes','CR MY'],['crYes','CR YES'],['optPerH','Opt./Std.']];
 function kalKpiMisses(e,from,to){var T=empTargets(e),s=chartSumsForRange([e],from,to),out=[];var rows=(performance[e.id]||[]).filter(function(x){return x.date&&x.date>=from&&x.date<=to;});if(!rows.length)return out;
   KAL_KPIS.forEach(function(k){var t=T[k[0]];if(!t||t.val==null||t.val==='')return;var v;
@@ -14045,10 +14220,12 @@ var _kalTC={at:0,k:'',v:null};
 function kalTasks(){var k=KAL.loc+'|'+view;if(_kalTC.v&&_kalTC.k===k&&Date.now()-_kalTC.at<400)return _kalTC.v;_kalTC.v=kalTasksCalc();_kalTC.k=k;_kalTC.at=Date.now();return _kalTC.v;}
 function kalTasksCalc(){var out=[],t=today(),ref=kalRef(),wk=kalPeriod('woche',ref),R=kalRules(),covered={};
   kalEmps().forEach(function(e){
-    if(e.startDate){[5,11,23].forEach(function(n){var s=kalP(e.startDate);s.setMonth(s.getMonth()+n);var due=kalI(s);
+    if(e.startDate){[3,5,11,23].forEach(function(n){var s=kalP(e.startDate);s.setMonth(s.getMonth()+n);var due=kalI(s);
       if(due<kalAdd(t,-60)||due>kalAdd(t,14))return;
-      var done=(protocols[e.id]||[]).some(function(p){return /Performance/i.test(p.type||'')&&p.date>=kalAdd(due,-30);});
-      if(!done)out.push({id:'pg'+e.id+n,e:e,art:'Performance Review',l:'Performance-Gespräch '+e.name,src:n+' Monate im Unternehmen',due:due});});}});
+      // Zwei Teile: 1) Entwicklungsbewertung (vor dem Gespräch), 2) Session. Erledigt erst, wenn beides da ist.
+      var ses=(protocols[e.id]||[]).some(function(p){return /Performance/i.test(p.type||'')&&p.date>=kalAdd(due,-30);});
+      var rev=(reviews[e.id]||[]).some(function(r){return r&&r.einwand!==undefined&&(r.date||'')>=kalAdd(due,-30);});
+      if(!(ses&&rev))out.push({id:'pg'+e.id+n,e:e,art:'Performance-Gespräch',part:rev?2:1,l:'Performance-Gespräch '+e.name,src:n+' Monate im Unternehmen'+(rev?' · Bewertung ✓, Gespräch offen':' · 1. Entwicklung bewerten, 2. Session'),due:due});});}});
   // Routinen: feste Termine je Mitarbeiter
   R.routinen.forEach(function(rt){(rt.empIds||[]).forEach(function(id){var e=kalEmp(id);if(!e||kalEmps().indexOf(e)<0)return;var pd=kalPeriod(rt.rhythmus,ref),art=rt.art||'Weekly';
     var has=(protocols[e.id]||[]).some(function(p){return p.date>=pd.from&&p.date<=pd.to&&(p.type||'')===art;});if(art==='Weekly')covered[e.id]=1;
@@ -14771,6 +14948,14 @@ function aufgAll(){var t=today(),out=[],_sk=aufgStaff().map(function(p){return p
   var KR=kalRules(),fz=KR.fehltZeit.split(':'),fMin=(+fz[0])*60+(+fz[1]),nw=new Date(),hm=nw.getHours()*60+nw.getMinutes();if(KR.fehltAn&&hm>=Math.min(fMin,AUFG_FEHLT_MIN_OVR==null?fMin:AUFG_FEHLT_MIN_OVR)&&!kalWknd(t))teamTargetList().forEach(function(e){if(e.startDate&&e.startDate>t)return;if(!kalWorkday(e,t))return;var a=kalOn(e.id,t);if(a)return;
     var act=0;(performance[e.id]||[]).forEach(function(r){if(r.date===t)act+=(r.gesamtAktivitaeten||0)+(r.oem_aktivitaeten||0)+(r.optGesamt||0);});if(act>0)return;
     add({key:'fehlt:'+e.id+':'+t,art:'Mitarbeiter fehlt?',kind:'auto',t:e.name,s:'keine Aktivität bis '+KR.fehltZeit+' · keine Abwesenheit eingetragen',due:t,born:t,def:aufgDefault(e),act:'Abwesenheit eintragen',emp:e.id,go:function(){openAbsPopup(e.id,t.slice(0,7));abNewForm();AB.fOpen=true;AB.f.art='krank';AB.f.status='genehmigt';AB.f.von=t;AB.f.bis=t;abRender();}});});
+  // 6a) Ziele: zur Frist „Ziel prüfen“ (ohne Doppel, wenn noch eine alte freie Ziel-Aufgabe offen ist)
+  var gl=kalAdd(t,7);employees.forEach(function(e){if(e.active===false)return;(goals[e.id]||[]).forEach(function(g){if(!g.targetDate||g.targetDate>gl||g.status==='erreicht'||g.status==='verfehlt')return;
+    if((tasks[e.id]||[]).some(function(k){return !(k.done||k.status==='done')&&k.text==='Ziel: '+g.description;}))return;
+    var u=goalUnit(g.metricKey);add({key:'ziel-pr:'+g.id,art:'Ziel prüfen',kind:'auto',t:e.name,s:(g.metricKey?focusMetricLabel(g.metricKey)+(g.targetValue!=null?' ≥ '+g.targetValue+u:'')+' · ':'')+g.description,due:g.targetDate,born:kalAdd(g.targetDate,-7),def:aufgCoachOf(e),act:'Ziel prüfen',go:function(){openGoalInPopup(e.id);},emp:e.id});});});
+  // 6b) Geplante Sessions: erledigt, sobald sie erfasst sind
+  var pl=kalAdd(t,14);employees.forEach(function(e){if(e.active===false)return;(protocols[e.id]||[]).forEach(function(p){if(p.status!=='geplant'||!p.date||p.date>pl)return;
+    var ty=p.type||'Session',art=ty==='Einzelcoaching'?'Coaching':ty;
+    add({key:'plan:'+p.id,art:art,kind:'auto',t:e.name,s:'geplant '+kalF(p.date)+(p.uhrzeit?' · '+String(p.uhrzeit).slice(0,5):'')+(p.note?' · '+p.note:''),due:p.date,born:kalAdd(p.date,-14),def:p.coachId?'emp:'+p.coachId:aufgDefault(e),act:'Session erfassen',go:function(){openPlannedSession(e.id,p.id,p.type,p.focus||'',p.date,p.uhrzeit||'');},emp:e.id});});});
   // 7) Freie Tasks
   Object.keys(tasks||{}).forEach(function(eid){(tasks[eid]||[]).forEach(function(k){if(k.done||k.status==='done')return;var e=kalEmp(eid);if(!e)return;
     add({key:'task:'+k.id,art:'Task',kind:'task',t:k.text,s:e.name+(k.source?' · '+k.source:''),due:k.dueDate||kalAdd(t,7),born:t,def:aufgCoachOf(e),act:'Öffnen',go:function(){selectedEmp=eid;view='emp';activeTab='tasks';renderSidebar();renderMain();},emp:eid,taskId:k.id});});});
@@ -14867,15 +15052,30 @@ var _aufgBT=0;function aufgBadgeLazy(){if(Date.now()-_aufgBT<2000)return;_aufgBT
 function aufgClick(key){var c=aufgFind(key);if(!c)return;if(c.items){aufgOpen(key);return;}aufgOpenEmp(key);}
 function aufgOpenEmp(key){var o=aufgAll().find(function(x){return x.key===key;});if(!o||!o.emp)return;AU.hl=key;openAddTaskModal(o.emp);
   setTimeout(function(){var el=document.querySelector('#atOpen [data-akey="'+key.replace(/"/g,'')+'"]');if(el)el.scrollIntoView({block:'center'});},120);}
-function aufgActLabel(o){return o.art==='Mitarbeiter fehlt?'?'Abwesenheit eintragen':o.art==='Urlaubsantrag'?'Genehmigen':o.art==='Ziel anpassen?'?'Ziel prüfen':o.art==='Ausgleichstag eintragen?'?'Eintragen':'Erledigt';}
+function aufgActLabel(o){if(/^plan:/.test(o.key||''))return 'Session erfassen';if(o.art==='Ziel prüfen')return 'Ziel prüfen';if(o.art==='Performance-Gespräch'||o.art==='Performance Review')return o.task&&o.task.part===2?'Session erfassen':'Entwicklung bewerten';if(o.art==='Weekly')return 'Weekly erfassen';if(o.art==='QA-Bewertung')return 'Call bewerten';if(/^ses:/.test(o.key||''))return 'Session erfassen';return o.art==='Mitarbeiter fehlt?'?'Abwesenheit eintragen':o.art==='Urlaubsantrag'?'Genehmigen':o.art==='Ziel anpassen?'?'Ziel prüfen':o.art==='Ausgleichstag eintragen?'?'Eintragen':'Erledigt';}
 function aufgDone(key){var o=aufgAll().find(function(x){return x.key===key;});if(!o||!kalCanEdit())return;
   if(o.kind==='task'&&o.taskId){atToggle(o.taskId);return;}
   if(/^antrag:/.test(key)){kalDecide(key.slice(7),true);setTimeout(atRender,60);return;}
-  if(/^ses:/.test(key)){var typ=o.task&&o.task.art||'Weekly';closeModal('addTaskModal');window._puOpenNew=true;openNeuesCoachingModal(o.emp);setTimeout(function(){puColOpen('ncSecNew');aufgPrefillSession(typ);},80);return;}
+  if(/^ses:/.test(key)){var typ=o.task&&o.task.art||'Weekly';if(typ==='Performance Review')typ='Performance-Gespräch';
+    if(typ==='Performance-Gespräch'&&o.task&&o.task.part!==2){closeModal('addTaskModal');openCoachingEval(o.emp);return;}
+    closeModal('addTaskModal');window._puOpenNew=true;openNeuesCoachingModal(o.emp);setTimeout(function(){puColOpen('ncSecNew');aufgPrefillSession(typ);if(typeof sfPreset==='function')sfPreset(typ,o.emp);},80);return;}
   if(/^qa:/.test(key)){closeModal('addTaskModal');window._puOpenNew=true;if(typeof openQaBewertungModal==='function')openQaBewertungModal(o.emp);return;}
   closeModal('addTaskModal');if(o.go)o.go();}
 function aufgPrefillSession(typ){var cat=document.getElementById('sess-category'),ty=document.getElementById('sess-type'),dt=document.getElementById('sess-date');if(dt)dt.value=today();if(!cat||!ty)return;
   for(var i=0;i<cat.options.length;i++){cat.selectedIndex=i;populateCoachingTypeSelect('sess-category','sess-type',null);var hit=[].slice.call(ty.options).find(function(op){return op.value===typ||op.textContent===typ;});if(hit){ty.value=hit.value;try{ty.dispatchEvent(new Event('change'));}catch(e){}return;}}}
+// „Zuletzt erledigt“: freie Tasks plus das, womit Aufgaben erledigt wurden (Weekly, Performance-Gespräch, Entwicklungsbewertung, QA-Bewertung)
+function aufgEmpDoneHtml(eid){var L=[],dm=function(d){return d?String(d).slice(8,10)+'.'+String(d).slice(5,7)+'.':'';};
+  (tasks[eid]||[]).forEach(function(t){if(t.status==='done'||t.done)L.push({d:String(t.completedAt||t.createdAt||'').slice(0,10),t:t.text||'Task',s:'Task',id:t.id});});
+  (protocols[eid]||[]).forEach(function(p){if(p.status==='geplant')return;var ty=p.type||'';if(ty==='Weekly'||/Performance/i.test(ty))L.push({d:p.date,t:(ty==='Weekly'?'Weekly':'Performance-Gespräch')+' erfasst',s:p.coachId?kalCoachName(p.coachId):'Session'});});
+  (reviews[eid]||[]).forEach(function(r){if(r&&r.einwand!==undefined)L.push({d:r.date,t:'Entwicklung bewertet',s:'Mitarbeiterentwicklung'});});
+  (callRatings[eid]||[]).forEach(function(c){if(c&&c.date)L.push({d:c.date,t:'Call bewertet',s:c.bewertetVon||'QA-Bewertung'});});
+  L=L.filter(function(x){return x.d;}).sort(function(a,b){return b.d.localeCompare(a.d);}).slice(0,3);
+  if(!L.length)return '<div style="font-size:13px;color:var(--text3);padding:4px 2px">Noch nichts erledigt.</div>';
+  return L.map(function(x){return '<div style="display:flex;align-items:center;gap:12px;min-height:52px;padding:8px 12px;border:1px solid #E4E0D6;border-radius:10px;background:#F7F5F0;margin-bottom:6px">'
+    +(x.id?'<span role="checkbox" aria-checked="true" title="Wieder öffnen" onclick="atToggle(\''+x.id+'\')" style="width:22px;height:22px;border-radius:7px;border:1.5px solid #3a3833;background:#3a3833;flex-shrink:0;cursor:pointer;display:flex;align-items:center;justify-content:center;color:#fff"><i class="ti ti-check" style="font-size:13px"></i></span>'
+      :'<span aria-hidden="true" style="width:22px;height:22px;border-radius:7px;border:1.5px solid #3a3833;background:#3a3833;flex-shrink:0;display:flex;align-items:center;justify-content:center;color:#fff"><i class="ti ti-check" style="font-size:13px"></i></span>')
+    +'<div style="flex:1;min-width:0"><div style="font-size:13.5px;font-weight:500;color:var(--text2)">'+esc(x.t)+'</div><div style="font-size:12px;color:var(--text3)">'+esc(x.s||'')+'</div></div>'
+    +'<span style="font-size:11.5px;font-weight:600;padding:2px 9px;border-radius:10px;background:#fff;border:1px solid #E4E0D6;color:var(--text2);white-space:nowrap">erledigt '+dm(x.d)+'</span></div>';}).join('');}
 function aufgEmpHtml(eid){var L=aufgAll().filter(function(o){return String(o.emp)===String(eid);}).sort(function(a,b){var x=aufgState(a).r-aufgState(b).r;return x||(a.due<b.due?-1:1);}),S=aufgStaff(),ed=kalCanEdit();
   if(!L.length)return {n:0,h:'<div class="kal-note">Keine offenen Aufgaben.</div>'};
   return {n:L.length,h:L.map(function(o){var s=aufgState(o),km=aufgKomm.find(function(k){return k.key===o.key;}),tag=o.kind==='task'?'Task':o.bundle?'Routine':'automatisch',k=esc(o.key).replace(/'/g,"\\'");
@@ -14886,7 +15086,7 @@ function aufgEmpHtml(eid){var L=aufgAll().filter(function(o){return String(o.emp
       +'<div class="at-km">'+(km?'<span><b>'+new Date(km.am).toLocaleDateString('de-DE',{day:'2-digit',month:'2-digit'})+'</b> '+esc(km.text)+' <span class="kal-note">· '+esc(km.von||'')+'</span></span>':'')+(ed?'<input type="text" placeholder="Kommentar schreiben …" onkeydown="if(event.key===\'Enter\'&&this.value.trim()){aufgKommAt(\''+k+'\',this.value);this.value=\'\';}">':'')+'</div></div>';}).join('')};}
 function aufgKommAt(key,txt){var row={key:key,text:txt.trim(),von:kalActor()};aufgKomm.unshift(Object.assign({am:new Date().toISOString()},row));
   sb.from('aufgaben_kommentare').insert(row).then(function(r){if(r&&r.error)alert(/aufgaben_kommentare/i.test(r.error.message||'')?'Die Tabelle „aufgaben_kommentare“ fehlt noch. Bitte 26_aufgaben.sql ausführen.':kalErrText(r));});atRender();}
-(function(){if(typeof atRender!=='function'||atRender._au)return;var o=atRender;window.atRender=function(){var r=o.apply(this,arguments);try{var x=aufgEmpHtml(selectedEmp),el=document.getElementById('atOpen'),n=document.getElementById('atOpenN');if(el)el.innerHTML=x.h;if(n)n.textContent='('+x.n+')';aufgPuBadge();atBanner();atAssigneeSel();}catch(e){console.warn('Aufgaben in Task',e);}return r;};window.atRender._au=true;})();
+(function(){if(typeof atRender!=='function'||atRender._au)return;var o=atRender;window.atRender=function(){var r=o.apply(this,arguments);try{var x=aufgEmpHtml(selectedEmp),el=document.getElementById('atOpen'),n=document.getElementById('atOpenN');if(el)el.innerHTML=x.h;if(n)n.textContent='('+x.n+')';var dn=document.getElementById('atDone');if(dn)dn.innerHTML=aufgEmpDoneHtml(selectedEmp);aufgPuBadge();atBanner();atAssigneeSel();atArtRender();}catch(e){console.warn('Aufgaben in Task',e);}return r;};window.atRender._au=true;})();
 function atNewToggle(force){var b=document.getElementById('atNewBody'),h=document.getElementById('atNewHint');if(!b)return;var open=force!=null?force:b.style.display==='none';b.style.display=open?'':'none';if(h)h.textContent=open?'zuklappen':'zum Aufklappen klicken';if(open){var t=document.getElementById('taskText');if(t)setTimeout(function(){t.focus();},30);}}
 function atAssigneeSel(){var sel=document.getElementById('taskAssignee');if(!sel)return;var e=kalEmp(selectedEmp),d=aufgDefault(e),cur=sel.getAttribute('data-emp')===String(selectedEmp)?sel.value:d;sel.innerHTML=aufgStaff().map(function(p){return '<option value="'+esc(p.key)+'"'+(p.key===cur?' selected':'')+'>'+esc(p.name)+'</option>';}).join('');sel.setAttribute('data-emp',String(selectedEmp));}
 function aufgAfterNewTask(id){var sel=document.getElementById('taskAssignee'),e=kalEmp(selectedEmp);if(!sel||!id)return;var v=sel.value;if(v&&v!==aufgDefault(e))aufgAssign('task:'+id,v);atNewToggle(false);}
@@ -14910,7 +15110,7 @@ function puBanFor(k,e){var y=today().slice(0,4),mk=today().slice(0,7),mn=MONTH_N
   if(k==='se'){var s=puSesStats(e);return puBanHtml(e.name.toUpperCase()+' · COACHING',[['SESSIONS',s.mon,mn],['LETZTE',s.last?kalF(s.last.date):'–',s.last?(s.last.type||'Session'):'noch keine'],['GEPLANT',s.nplan,s.next?'nächste '+kalF(s.next.date):'keine geplant'],['WEEKLYS',s.wk+'/4','letzte 4 Wochen'],['AUFGABEN',open,'offen']]);}
   if(k==='en'){var EV=(reviews[e.id]||[]).filter(function(r){return r.einwand!==undefined;}).sort(function(a,b){return (a.date||'')<(b.date||'')?1:-1;}),L0=EV[0],L1=EV[1];
     var avg=function(r,keys){if(!r)return null;var v=keys.map(function(k){return +r[k];}).filter(function(x){return !isNaN(x)&&x>0;});return v.length?v.reduce(function(a,b){return a+b;},0)/v.length:null;};
-    var SK=['einwand','bedarf','produkt','gespraech'],WI=['motivation','coach','zuverl','team'],RE=['crOEM','crTW','crSY','crMY'];
+    var SK=['opener','einwand','loop','bedarf','abschluss','gespraech','zusammenfassung','produkt'],WI=['motivation','coach','zuverl','team'],RE=['crOEM','crTW','crSY','crMY'];
     var f=function(keys){var a=avg(L0,keys),b=avg(L1,keys);return [a==null?'–':kalNf(Math.round(a*10)/10),a!=null&&b!=null?((a-b>=0?'+':'−')+kalNf(Math.abs(Math.round((a-b)*10)/10))+' zur letzten'):(L0?'erste Bewertung':'')];};
     var G=(goals[e.id]||[]).filter(function(g){return !g.done&&g.status!=='done'&&g.status!=='erreicht';}),s1=f(SK),s2=f(WI),s3=f(RE);
     return puBanHtml(e.name.toUpperCase()+' · ENTWICKLUNG',[['LETZTE',L0&&L0.date?kalF(L0.date):'–',EV.length+(EV.length===1?' Bewertung':' Bewertungen')],['SKILL',s1[0],s1[1]],['WILL',s2[0],s2[1]],['RESULT',s3[0],s3[1]],['ZIELE',G.length,'offen']]);}
@@ -14986,11 +15186,12 @@ function ovTimeline(e){var t=today(),m0=kalMon(t),N=8,W=[];for(var i=N-1;i>=0;i-
   if(!txt){var f=V[0],l=V[V.length-1];txt='Marge/Tag in 8 Wochen: '+ztEur(f)+' → <b>'+ztEur(l)+'</b>'+(si.length?'':' · in diesem Zeitraum keine Session dokumentiert')+'.';}
   return svg+'<div class="kal-note" style="margin-top:4px;font-size:12.5px;color:var(--text2)">'+txt+'</div>';}
 function ovProfile(e){var EV=(reviews[e.id]||[]).filter(function(r){return r.einwand!==undefined;}).sort(function(a,b){return (a.date||'')<(b.date||'')?1:-1;}),L0=EV[0],L1=EV[1];
-  var D=[['einwand','Einwand'],['bedarf','Bedarf'],['produkt','Produkt'],['gespraech','Gespräch'],['motivation','Motivation'],['coach','Coachability'],['zuverl','Zuverl.'],['team','Team']],cx=120,cy=112,R=80;
-  var pt=function(i,v){var a=2*Math.PI*i/8;return (cx+R*v/5*Math.sin(a)).toFixed(1)+','+(cy-R*v/5*Math.cos(a)).toFixed(1);};
+  var D=[['opener','Einstieg'],['einwand','Einwand'],['loop','Loop'],['bedarf','Bedarf'],['abschluss','Abschluss'],['gespraech','Gespräch'],['zusammenfassung','Zusammenf.'],['produkt','Produkt'],['motivation','Motivation'],['coach','Coachability'],['zuverl','Zuverl.'],['team','Team']],cx=120,cy=112,R=80;
+  var _D=D.filter(function(d){return (L0&&+L0[d[0]]>0)||(L1&&+L1[d[0]]>0);});if(_D.length>=3)D=_D;
+  var pt=function(i,v){var a=2*Math.PI*i/D.length;return (cx+R*v/5*Math.sin(a)).toFixed(1)+','+(cy-R*v/5*Math.cos(a)).toFixed(1);};
   var poly=function(r,col,op){return '<polygon points="'+D.map(function(d,i){return pt(i,Math.max(0,Math.min(5,+r[d[0]]||0)));}).join(' ')+'" fill="'+col+'" fill-opacity="'+op+'" stroke="'+col+'" stroke-width="1.6"/>';};
   var rad='<svg viewBox="0 0 240 228" style="width:100%;max-width:240px;display:block;margin:0 auto">'+[1,2,3,4,5].map(function(r){return '<polygon points="'+D.map(function(d,i){return pt(i,r);}).join(' ')+'" fill="none" stroke="#E4E0D6"/>';}).join('')
-    +(L1?poly(L1,'#C9A77E',.18):'')+(L0?poly(L0,'#F08566',.22):'')+D.map(function(d,i){var a=2*Math.PI*i/8;return '<text x="'+(cx+(R+17)*Math.sin(a)).toFixed(1)+'" y="'+(cy-(R+17)*Math.cos(a)+3).toFixed(1)+'" text-anchor="middle" font-size="9.5" fill="#5C554C">'+d[1]+'</text>';}).join('')+'</svg>';
+    +(L1?poly(L1,'#C9A77E',.18):'')+(L0?poly(L0,'#F08566',.22):'')+D.map(function(d,i){var a=2*Math.PI*i/D.length;return '<text x="'+(cx+(R+17)*Math.sin(a)).toFixed(1)+'" y="'+(cy-(R+17)*Math.cos(a)+3).toFixed(1)+'" text-anchor="middle" font-size="9.5" fill="#5C554C">'+d[1]+'</text>';}).join('')+'</svg>';
   if(!L0)rad='<div class="kal-note" style="padding:40px 0;text-align:center">Noch keine Bewertung.<br><a href="#" onclick="puGo(\'en\');return false">Jetzt bewerten</a></div>';
   var S=ovStats(e),t=today(),mk=t.slice(0,7),so=ovSoll(e,mk),io=0;(performance[e.id]||[]).forEach(function(r){if(r.date&&r.date.slice(0,7)===mk&&r.date<t)io+=r.optGesamt||0;});var x=ztEmpMonth(e,mk),optSoll=so.all?x.zielOpt*so.done/so.all:0;
   var st=puSesStats(e),q=typeof qaCallsDue==='function'?qaCallsDue(e.id):{cnt:0,target:5};
@@ -15100,10 +15301,12 @@ function vzCall(e){var has=function(r){return r&&r.scores&&Object.keys(r.scores)
   return vzCard('vzCall','Call · die letzten '+R.length+' Calls','je Kategorie · Skala 1–4 · rechts Ø Team · grün gut, koralle schwach','<span>Letzter Call</span><b>'+f1(vzTot(last))+'</b><span>Ø '+R.length+' Calls '+f1(tot.reduce(function(s,x){return s+(x||0);},0)/R.length)+' · Ø Team '+f1(team.filter(function(x){return x!=null;}).reduce(function(s,x){return s+x;},0)/Math.max(1,team.filter(function(x){return x!=null;}).length))+' · '+q.cnt+' von '+q.target+' Calls in 60 Tagen bewertet</span>',tb,
     [['Größte Lücke',gi>=0?(CALL_CATS[gi].short||CALL_CATS[gi].label):'keine',gi>=0?f1(me[gi])+' · Team '+f1(team[gi])+' · zählt '+Math.round(CALL_CATS[gi].weight*100)+' %':'alle auf Team-Niveau',''],['Stärke',si>=0?(CALL_CATS[si].short||CALL_CATS[si].label):'–',si>=0?f1(me[si])+' · Team '+f1(team[si]):'',si>=0?(sv>=0?'+':'−')+kalNf(Math.abs(Math.round(sv*10)/10)):''],['Trend',tot.length>1?(tot[tot.length-1]>tot[0]+0.05?'↗':tot[tot.length-1]<tot[0]-0.05?'↘':'→'):'–',tot.length>1?'Gesamt '+f1(tot[0])+' → '+f1(tot[tot.length-1]):'erst ein Call',R.length+' Calls'],['Bewertet',q.cnt+'/'+q.target,'Calls in 60 Tagen',q.cnt<q.target?'fällig':'']],why);}
 // Mitarbeiterentwicklung
-var VZ_DIM=[['einwand','Einwand','skill'],['bedarf','Bedarf','skill'],['produkt','Produkt','skill'],['gespraech','Gespräch','skill'],['motivation','Motivation','will'],['coach','Coachab.','will'],['zuverl','Zuverl.','will'],['team','Team','will'],['crOEM','CR OEM','result'],['crTW','CR TW','result'],['crSY','CR SY','result'],['crMY','CR MY','result']];
+var VZ_DIM=[['opener','Einstieg','skill'],['einwand','Einwand','skill'],['loop','Loop','skill'],['bedarf','Bedarf','skill'],['abschluss','Abschluss','skill'],['gespraech','Gespräch','skill'],['zusammenfassung','Zusammenf.','skill'],['produkt','Produkt','skill'],['motivation','Motivation','will'],['coach','Coachab.','will'],['zuverl','Zuverl.','will'],['team','Team','will'],['crOEM','CR OEM','result'],['crTW','CR TW','result'],['crSY','CR SY','result'],['crMY','CR MY','result']];
+var VZ_DIM_ALL=VZ_DIM;
 function vzEvals(id){return (reviews[id]||[]).filter(function(r){return r.einwand!==undefined;}).sort(function(a,b){return (a.date||'')<(b.date||'')?1:-1;});}
 function vzAvg(r,cat){if(!r)return null;var v=VZ_DIM.filter(function(d){return !cat||d[2]===cat;}).map(function(d){return +r[d[0]];}).filter(function(x){return x>0;});return v.length?v.reduce(function(s,x){return s+x;},0)/v.length:null;}
 function vzDev(e){var EV=vzEvals(e.id),L0=EV[0],L1=EV[1],T=vzTeam().filter(function(x){return x.id!==e.id;}).map(function(x){return vzEvals(x.id)[0];}).filter(Boolean),f1=function(v){return v==null?'–':kalNf(Math.round(v*10)/10);};
+  var VZ_DIM=VZ_DIM_ALL.filter(function(d){return (L0&&+L0[d[0]]>0)||(L1&&+L1[d[0]]>0);});if(VZ_DIM.length<3)VZ_DIM=VZ_DIM_ALL;
   var tv=VZ_DIM.map(function(d){var v=T.map(function(r){return +r[d[0]];}).filter(function(x){return x>0;});return v.length?v.reduce(function(s,x){return s+x;},0)/v.length:null;}),tavg=function(cat){var v=T.map(function(r){return vzAvg(r,cat);}).filter(function(x){return x!=null;});return v.length?v.reduce(function(s,x){return s+x;},0)/v.length:null;};
   if(!L0)return vzCard('vzDev','Mitarbeiterentwicklung · Profil','12 Kriterien · Skill, Will, Result','<span>Noch keine Bewertung.</span>','<div class="kal-note" style="padding:14px 4px">Sobald eine Bewertung erfasst ist, erscheint hier das Profil im Vergleich zum Team.</div>',[['Lernfeld','–','',''],['Skill','–','','Team '+f1(tavg('skill'))],['Will','–','','Team '+f1(tavg('will'))],['Result','–','','Team '+f1(tavg('result'))]],'');
   var mv=VZ_DIM.map(function(d){return +L0[d[0]]||0;}),pv=L1?VZ_DIM.map(function(d){return +L1[d[0]]||0;}):null,lo=0;mv.forEach(function(v,i){if(v>0&&(mv[lo]<=0||v-(tv[i]||v)<mv[lo]-(tv[lo]||mv[lo])))lo=i;});
@@ -15112,7 +15315,7 @@ function vzDev(e){var EV=vzEvals(e.id),L0=EV[0],L1=EV[1],T=vzTeam().filter(funct
   var nd=L0.date?kalAdd(L0.date,61):null,G=(goals[e.id]||[]).filter(function(g){return !g.done&&g.status!=='done'&&g.status!=='erreicht';});
   var why=(up.length?'<b>Verbessert:</b> '+up.map(function(x){return esc(x[0])+' (+'+kalNf(x[1])+')';}).join(', ')+' · ':'')+(under.length?'<b>unter dem Team:</b> '+under.map(function(x){return esc(x[0]);}).join(', ')+' · ':'')+(nd?'nächste Bewertung '+(nd<=today()?'<b>fällig</b>':'ab '+kalF(nd)):'');
   var chart='<div class="vz-g2">'+vzRadar(VZ_DIM.map(function(d){return d[1];}),[{v:tv,c:'#C9A77E',o:.12,d:1},{v:pv,c:'#8A7F72',o:.05,d:1},{v:mv,c:'#F08566',o:.25}],5)+'<div>'+vzBars([['Skill',vzAvg(L0,'skill')||0,f1(vzAvg(L0,'skill'))],['Will',vzAvg(L0,'will')||0,f1(vzAvg(L0,'will'))],['Result',vzAvg(L0,'result')||0,f1(vzAvg(L0,'result'))],['Ø Team',tavg()||0,f1(tavg())]],5)+'<div class="vz-leg"><span><i style="background:#F08566"></i>'+kalF(L0.date)+'</span>'+(L1?'<span><i class="d" style="border-color:#8A7F72"></i>'+kalF(L1.date)+'</span>':'')+'<span><i class="d" style="border-color:#C9A77E"></i>Ø Team</span></div></div></div>';
-  return vzCard('vzDev','Mitarbeiterentwicklung · Profil',esc(kalFirst(e.name))+' gegen Ø Team'+(L1?' und die vorherige Bewertung':'')+' · 12 Kriterien','<span>Letzte Bewertung</span><b>'+f1(vzAvg(L0))+'</b><span>'+kalF(L0.date)+(L1?' · '+dlt()+'':'')+' · Ø Team '+f1(tavg())+' · '+G.length+' Ziel'+(G.length===1?'':'e')+' offen</span>',chart,
+  return vzCard('vzDev','Mitarbeiterentwicklung · Profil',esc(kalFirst(e.name))+' gegen Ø Team'+(L1?' und die vorherige Bewertung':'')+' · '+VZ_DIM.length+' Kriterien','<span>Letzte Bewertung</span><b>'+f1(vzAvg(L0))+'</b><span>'+kalF(L0.date)+(L1?' · '+dlt()+'':'')+' · Ø Team '+f1(tavg())+' · '+G.length+' Ziel'+(G.length===1?'':'e')+' offen</span>',chart,
     [['Lernfeld',VZ_DIM[lo][1],mv[lo]+(tv[lo]!=null?' · Team '+f1(tv[lo]):'')+(pv&&mv[lo]!==pv[lo]?' · '+(mv[lo]-pv[lo]>0?'+':'−')+Math.abs(mv[lo]-pv[lo])+' seit '+kalF(L1.date):''),''],['Skill',f1(vzAvg(L0,'skill')),dlt('skill'),'Team '+f1(tavg('skill'))],['Will',f1(vzAvg(L0,'will')),dlt('will'),'Team '+f1(tavg('will'))],['Result',f1(vzAvg(L0,'result')),dlt('result'),'Team '+f1(tavg('result'))]],why);}
 var VZ_AT={neuesCoachingModal:['ncSecNew',vzCoaching],qaBewertungModal:['qaSecBew',vzCall],cevModal:['cevSec1',vzDev]};
 function vzEnsure(id,eid){var cfg=VZ_AT[id];if(!cfg)return;var m=document.getElementById(id);if(!m)return;var e=kalEmp(eid||selectedEmp);var a=document.getElementById(cfg[0]);if(!e||!a||!a.parentElement)return;

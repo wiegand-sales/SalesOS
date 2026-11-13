@@ -1628,7 +1628,7 @@ function loadSalariesFromSupabase(){return sb.from('employee_salary').select('*'
   SALARY_TABLE=true;var by={};(res.data||[]).forEach(function(r){by[String(r.employee_id)]=r;});
   employees.forEach(function(e){var r=by[String(e.id)];var pv=e.provisionSettings||(e.provisionSettings={});delete pv.grundgehalt;delete pv.agSozialabgaben;
     if(r){if(r.grundgehalt!=null)pv.grundgehalt=+r.grundgehalt;if(r.ag_sozialabgaben!=null)pv.agSozialabgaben=+r.ag_sozialabgaben;}});
-  return true;}).catch(function(e){SALARY_TABLE=false;console.warn('employee_salary',e);return true;});}
+  return true;}).catch(function(e){SALARY_TABLE=false;console.warn('employee_salary',e);return true;}).then(function(){return typeof loadProvExtra==='function'?loadProvExtra():true;});}
 function esSdlToggle(v){var b=document.getElementById('es-sdl-team');if(b)b.style.display=v==='SDL'?'':'none';}
 function positionRole(p){ return (p.isPureCoach||p.role==='SDC'||p.role==='SDM'||p.role==='SDL')?'Coach':'Sales Agent'; }
 function personRole(p){ if(p.kind==='app') return p.role==='admin'?'Admin':'Betrachter'; if(p.boardRole&&BOARD_ROLE_LABEL[p.boardRole]) return BOARD_ROLE_LABEL[p.boardRole]; return positionRole(p); }
@@ -9464,6 +9464,19 @@ function renderProvisionTeam(){
   h+='</div>';
   ma.innerHTML=h;
 }
+// Optionaler Zusatzbetrag je Mitarbeiter und Monat: wird ohne Abzug auf die Provision gerechnet (Einstellung provisionExtra)
+// gespeichert in der Tabelle provision_extra (SQL 35); solange es die Tabelle nicht gibt, im Einstellungs-Block
+var PROV_EXTRA={},PROV_EXTRA_TABLE=false;
+function loadProvExtra(){return sb.from('provision_extra').select('employee_id,monat,betrag').then(function(res){
+  if(res&&res.error){PROV_EXTRA_TABLE=false;PROV_EXTRA=JSON.parse(JSON.stringify(settings.provisionExtra||{}));return true;}
+  PROV_EXTRA_TABLE=true;PROV_EXTRA={};(res.data||[]).forEach(function(r){(PROV_EXTRA[r.monat]=PROV_EXTRA[r.monat]||{})[String(r.employee_id)]=+r.betrag||0;});return true;}).catch(function(){PROV_EXTRA_TABLE=false;return true;});}
+function provExtraGet(eid,mk){var x=PROV_EXTRA[mk]||(PROV_EXTRA_TABLE?{}:((settings.provisionExtra||{})[mk]||{}));return +x[String(eid)]||0;}
+function provExtraSet(eid,mk,v){if(currentUserRole!=='admin')return;var n=Math.max(0,Math.round(+String(v).replace(',','.')||0)),e=kalEmp(eid),log='Provision Optional: '+(e?e.name:eid)+' · '+mk+' · €'+n;
+  (PROV_EXTRA[mk]=PROV_EXTRA[mk]||{});if(n)PROV_EXTRA[mk][String(eid)]=n;else delete PROV_EXTRA[mk][String(eid)];
+  if(PROV_EXTRA_TABLE){var q=n?sb.from('provision_extra').upsert({employee_id:eid,monat:mk,betrag:n,geaendert_von:qaCurrentName()||null,geaendert_am:new Date().toISOString()},{onConflict:'employee_id,monat'}):sb.from('provision_extra').delete().eq('employee_id',eid).eq('monat',mk);
+    q.then(function(r){if(r&&r.error)alert('Speichern fehlgeschlagen: '+r.error.message);else logActivity('employee','updated',log);});}
+  else{settings.provisionExtra=JSON.parse(JSON.stringify(PROV_EXTRA));saveSettingJson('provisionExtra',settings.provisionExtra,log);}
+  renderMain();}
 function buildProvisionTeamTable(){
   function stackCell(main,sub){
     var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
@@ -9480,6 +9493,11 @@ function buildProvisionTeamTable(){
       +'</div>';
   }
   function fc(v,t,dir){if(t==null)return '';return(dir==='lte'?v<=t:v>=t)?'color:var(--text)':'color:var(--red);font-weight:700';}
+  function provTage(emp,mk){var r={at:0,url:0,aus:0,fs:0,kra:0,ein:0},d=mk+'-01';
+    while(d.slice(0,7)===mk){if((!emp.startDate||d>=emp.startDate)&&(!emp.endDate||d<=emp.endDate)&&kalWorkday(emp,d)){r.at++;var a=kalOn(emp.id,d);
+      if(a&&!a.fixed&&a.status!=='abgelehnt'&&a.status!=='storniert'){var f=a.halb?0.5:1,k=a.masked?(a.art==='urlaub'?'urlaub':'abwesend'):a.art;
+        if(k==='urlaub'||k==='flex')r.url+=f;else if(k==='ausgleich')r.aus+=f;else if(k==='freistellung')r.fs+=f;else r.kra+=f;}}d=kalAdd(d,1);}
+    r.ein=r.at-r.url-r.aus-r.fs-r.kra;return r;}
   function urlaubKrankTage(empId,monthKey){
     var rec=(zielStore[monthKey]||{})[empId];
     var urlaub=0,krank=0;
@@ -9549,13 +9567,13 @@ function buildProvisionTeamTable(){
     rows.forEach(function(g){allRows.push({emp:emp,g:g});});
   });
   allRows.sort(function(a,b){return a.emp.name.localeCompare(b.emp.name)||b.g.key.localeCompare(a.g.key);});
-  var sumKrank=0,sumUrlaub=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumGesamtAkt=0,sumTotalHoursAll=0,sumNotSOem=0;
+  var sumKrank=0,sumUrlaub=0,sumAus=0,sumExtra=0,sumOEM=0,sumUps=0,sumWka=0,sumOptGes=0,sumRawTw=0,sumRawYes=0,sumRawSy=0,sumRawMy=0,sumMarge=0,sumAbzug=0,sumProvision=0,sumGesamtAkt=0,sumTotalHoursAll=0,sumNotSOem=0;
 
   if(!allRows.length){
     h+='<div style="text-align:center;color:var(--text3);padding:24px"><i class="ti ti-file-upload" style="font-size:26px;display:block;margin-bottom:8px"></i>Keine Daten für diesen Zeitraum</div>';
   } else {
     h+='<div style="overflow-x:auto;border-radius:var(--r-md);border:1px solid var(--border2)"><table style="width:100%;border-collapse:collapse;table-layout:fixed"><thead><tr>';
-    ['Mitarbeiter','Monat','Krankheitstage','Urlaubstage','Akt./Std.','OEM','Upsells','WKA','Opt. Ges.','Opt./Std.','CR OEM','CR TW','CR SY/MY','CR SY','CR MY','Anteil OEM','Marge Ges.','Abzug','Provision'].forEach(function(lbl,i){
+    ['Mitarbeiter','Monat','Aus. T.','Url. T.','Kra. T.','Akt./Std.','OEM','Upsells','WKA','Opt. Ges.','Opt./Std.','CR OEM','CR TW','CR SY/MY','CR MY','Anteil OEM','Marge Ges.','Abzug','Optional','Provision'].forEach(function(lbl,i){
       h+='<th style="background:#EFECE5;padding:9px 14px;text-align:'+(i<=1?'left':'right')+';font-size:10px;font-weight:700;color:#fff;text-transform:uppercase;letter-spacing:.04em;border-bottom:1px solid var(--border2);white-space:nowrap;width:'+(i===0?'150px':i===1?'130px':'80px')+'">'+lbl+'</th>';
     });
     h+='</tr></thead><tbody>';
@@ -9573,7 +9591,7 @@ function buildProvisionTeamTable(){
       var crMY=(rawYes+rawSy+rawMy)>0?Math.round(rawMy/(rawYes+rawSy+rawMy)*100):0;
       var crSyMy=(rawYes+rawSy+rawMy)>0?Math.round((rawSy+rawMy)/(rawYes+rawSy+rawMy)*100):0;
       var anteilOem=optGes>0?Math.round(convOEM/optGes*100):0;
-      var abwTage=urlaubKrankTage(emp.id,g.key);
+      var abwTage=urlaubKrankTage(emp.id,g.key),pt=provTage(emp,g.key);abwTage={krank:pt.kra,urlaub:pt.url,aus:pt.aus+pt.fs};
       var monthDates=(performance[emp.id]||[]).filter(function(x){return (x.date||'').slice(0,7)===g.key;}).map(function(x){return x.date;});
       var rowTotalHours=totalWorkHoursForMonth(emp,g.key,monthDates);
       var gesamtAktivitaeten=row.gesamtAktivitaeten||row.oem_aktivitaeten||0;
@@ -9601,16 +9619,21 @@ function buildProvisionTeamTable(){
           +(calc.mindestleistungGreift?' · Mindestleistung unterschritten (§5)':'')
           +(calc.fehlendeKpis.length?' · Nicht erfüllte KPIs: '+calc.fehlendeKpis.join(', '):' · Alle KPIs erfüllt')+'"';
       }
-      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;sumNotSOem+=notSOemVal;
+      var extra=provExtraGet(emp.id,g.key);if(calc.provision!==null&&extra){provision='€'+Math.round(calc.provision+extra).toLocaleString('de-DE');}
+      // Erklärung als schwarze Info-Box (wie überall im Board) statt Browser-Tooltip
+      if(provisionTitle){provisionTitle=provisionTitle.replace(' title="',' data-ktip="').split(' · ').join('<br>');if(extra)provisionTitle=provisionTitle.replace(/"$/,'<br>inkl. €'+Math.round(extra).toLocaleString('de-DE')+' Optional (ohne Abzug)"');}
+      sumExtra+=extra;
+      sumKrank+=abwTage.krank;sumUrlaub+=abwTage.urlaub;sumAus+=abwTage.aus;sumOEM+=convOEM;sumUps+=ups;sumWka+=wka;sumOptGes+=optGes;sumNotSOem+=notSOemVal;
       sumRawTw+=rawTw;sumRawYes+=rawYes;sumRawSy+=rawSy;sumRawMy+=rawMy;sumMarge+=marge;
-      sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0);
+      sumAbzug+=(calc.abzug||0);sumProvision+=(calc.provision||0)+(calc.provision!==null?extra:0);
       sumGesamtAkt+=gesamtAktivitaeten;sumTotalHoursAll+=rowTotalHours;
       var rowBg=ridx%2===1?'background:var(--s-tint);':'';
       h+='<tr class="perf-data-row" style="'+rowBg+'">'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap;cursor:pointer" onclick="openPerfPopup(\''+emp.id+'\')" title="Popup öffnen">'+esc(emp.name)+'<div style="font-size:11px;color:var(--text3);font-weight:400">'+emp.role+'</div></td>'
-        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap">'+stackCellLeft(g.label,g.count+' Einsatztage')+'</td>'
-        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.krank,null)+'</td>'
-        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(abwTage.urlaub,null)+'</td>'
+        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);font-weight:600;white-space:nowrap">'+'<span title="'+esc(pt.at+' Arbeitstage = '+kalNf(pt.ein)+' Einsatz + '+kalNf(pt.aus+pt.fs)+' Ausgleich'+(pt.fs?' (davon '+kalNf(pt.fs)+' Freistellung)':'')+' + '+kalNf(pt.url)+' Urlaub + '+kalNf(pt.kra)+' Krank'+(g.count!==pt.ein?' · Leistungsdaten an '+g.count+' Tagen':''))+'">'+stackCellLeft(g.label,kalNf(pt.ein)+' Einsatztage'+(g.count!==pt.ein?' · '+g.count+' mit Daten':''))+'</span></td>'
+        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(kalNf(abwTage.aus),null)+'</td>'
+        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(kalNf(abwTage.urlaub),null)+'</td>'
+        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right">'+stackCell(kalNf(abwTage.krank),null)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;'+(gesamtAktivitaeten>0?fc(+aktPerHour_num.toFixed(1),rowKpiSet.aktivitaeten,'gte'):'')+';cursor:help" onmouseenter="showInfoTooltip(event,\'Akt./Std. = Aktivitäten / Stunden\',\'Aktivitäten\','+gesamtAktivitaeten+',\'Stunden\','+rowTotalHours.toFixed(1)+',\'Akt./Std.\',\''+aktProStd+'\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(aktProStd,gesamtAktivitaeten)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;color:var(--text);cursor:help" onmouseenter="showInfoTooltip(event,\'OEM = Opt.OEM / Opt.Ges.\',\'Opt.OEM\','+convOEM+',\'Opt.Ges.\','+optGes+',\'Anteil\',\''+(optGes>0?Math.round(convOEM/optGes*100):0)+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell((optGes>0?Math.round(convOEM/optGes*100)+'%':'—'),(optGes>0?convOEM:'—'))+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;color:var(--text);cursor:help" onmouseenter="showInfoTooltip(event,\'Upsells = Opt.Upsells / Opt.Ges.\',\'Opt.Upsells\','+ups+',\'Opt.Ges.\','+optGes+',\'Anteil\',\''+(optGes>0?Math.round(ups/optGes*100):0)+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell((optGes>0?Math.round(ups/optGes*100)+'%':'—'),(optGes>0?ups:'—'))+'</td>'
@@ -9620,11 +9643,11 @@ function buildProvisionTeamTable(){
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;font-weight:600;'+fc(crOEM,rowKpiSet.crOem,'gte')+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR OEM = Opt.OEM / (Opt.OEM + NERR OEM)\',\'Opt.OEM\','+convOEM+',\'Opt.OEM + NERR OEM\','+oemDenomVal+',\'CR OEM\',\''+crOEM+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crOEM+'%',convOEM)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;'+fc(crTW,rowKpiSet.tw,'lte')+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR TW = TW / (TW+Yes+SY+MY)\',\'TW\','+rawTw+',\'CR TW\',\''+crTW+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crTW+'%',rawTw)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;'+fc(crSyMy,rowKpiSet.syMy,'gte')+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR SY/MY = (SY+MY) / (Yes+SY+MY)\',\'SY+MY\','+(rawSy+rawMy)+',\'CR SY/MY\',\''+crSyMy+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crSyMy+'%',rawSy+rawMy)+'</td>'
-        +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;cursor:help" onmouseenter="showInfoTooltip(event,\'CR SY = SY / (Yes+SY+MY)\',\'SY\','+rawSy+',\'CR SY\',\''+crSY+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crSY+'%',rawSy)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;'+fc(crMY,rowKpiSet.my,'gte')+';cursor:help" onmouseenter="showInfoTooltip(event,\'CR MY = MY / (Yes+SY+MY)\',\'MY\','+rawMy+',\'CR MY\',\''+crMY+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(crMY+'%',rawMy)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);border-right:2px solid var(--border2);background:var(--s-tint);text-align:right;'+fc(anteilOem,rowKpiSet.oemAnteil,'gte')+';cursor:help" onmouseenter="showInfoTooltip(event,\'Anteil OEM = Opt.OEM / Opt.Ges.\',\'Opt.OEM\','+convOEM+',\'Opt.Ges.\','+optGes+',\'Anteil OEM\',\''+anteilOem+'%\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell(anteilOem+'%',convOEM)+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:600;color:var(--text);cursor:help" onmouseenter="showBreakdownTooltip(event,\'Marge Ges. Aufschlüsselung\',\'€'+Math.round(row.margeOEM||0).toLocaleString('de-DE')+'\',\'€'+Math.round(row.margeUpsell||0).toLocaleString('de-DE')+'\',\'€'+Math.round(row.margeWKA||0).toLocaleString('de-DE')+'\')" onmousemove="positionCrTooltip(event)" onmouseleave="hideCrTooltip()">'+stackCell('€'+Math.round(marge).toLocaleString('de-DE'),(optGes>0?'€'+(marge/optGes).toFixed(0)+' Ø/Opt.':null))+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;color:var(--red)"'+provisionTitle+'>'+stackCell(abzug,(abzugPct!==null?abzugPct+'%':null))+'</td>'
+        +'<td style="padding:8px 8px;border-bottom:1px solid var(--border);text-align:right">'+(currentUserRole==='admin'?'<input type="number" step="1" min="0" placeholder="0" value="'+(extra||'')+'" title="Zusatzbetrag in €, wird ohne Abzug auf die Provision gerechnet" style="width:100%;max-width:90px;height:30px;padding:0 6px;text-align:right;font-size:12.5px" data-e="'+esc(String(emp.id))+'" data-m="'+g.key+'" onchange="provExtraSet(this.dataset.e,this.dataset.m,this.value)">':stackCell(extra?'€'+Math.round(extra).toLocaleString('de-DE'):'—',null))+'</td>'
         +'<td style="padding:13px 10px;border-bottom:1px solid var(--border);text-align:right;font-weight:700;color:var(--teal-dark)"'+provisionTitle+'>'+stackCell(provision,(provisionPct!==null?provisionPct+'%':null))+'</td>'
         +'</tr>';
     });
@@ -9643,8 +9666,9 @@ function buildProvisionTeamTable(){
       var sumProvisionPct=100-sumAbzugPct;
       h+='<tr class="perf-sum-row" style="background:#1d1c1a;color:#fff">'
         +'<td style="padding:13px 14px;font-weight:700" colspan="2">Σ Summe</td>'
-        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumKrank,null)+'</td>'
-        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumUrlaub,null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(kalNf(sumAus),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(kalNf(sumUrlaub),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(kalNf(sumKrank),null)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),sumGesamtAkt)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumOEM:'—'))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(sumOptGes>0?sumUps:'—'))+'</td>'
@@ -9654,17 +9678,18 @@ function buildProvisionTeamTable(){
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',sumOEM)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',sumRawTw)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',sumRawSy+sumRawMy)+'</td>'
-        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',sumRawSy)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',sumRawMy)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',sumOEM)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#ffb3b3">'+stackCell('−€'+Math.round(sumAbzug).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumExtra?'€'+Math.round(sumExtra).toLocaleString('de-DE'):'—',null)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:#F7B39A">'+stackCell('€'+Math.round(sumProvision).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
         +'</tr>';
       h+='<tr class="perf-avg-row" style="background:var(--s-tint-strong)">'
         +'<td style="padding:13px 14px;font-weight:700" colspan="2">Ø Durchschnitt</td>'
-        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumKrank/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumAus/n).toFixed(1),null)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumUrlaub/n).toFixed(1),null)+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumKrank/n).toFixed(1),null)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAktPerStd.toFixed(1),Math.round(sumGesamtAkt/n))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumOEM/sumOptGes*100)+'%':'—'),(n>0?(sumOEM/n).toFixed(1):'—'))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell((sumOptGes>0?Math.round(sumUps/sumOptGes*100)+'%':'—'),(n>0?(sumUps/n).toFixed(1):'—'))+'</td>'
@@ -9674,11 +9699,11 @@ function buildProvisionTeamTable(){
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrOEM+'%',(sumOEM/n).toFixed(1))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrTW+'%',(sumRawTw/n).toFixed(1))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSyMy+'%',((sumRawSy+sumRawMy)/n).toFixed(1))+'</td>'
-        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrSY+'%',(sumRawSy/n).toFixed(1))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumCrMY+'%',(sumRawMy/n).toFixed(1))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumAnteilOem+'%',(sumOEM/n).toFixed(1))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell('€'+Math.round(sumMarge/n).toLocaleString('de-DE'),(sumOptGes>0?'€'+sumMargeProOpt.toFixed(0)+' Ø/Opt.':null))+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--red)">'+stackCell('−€'+Math.round(sumAbzug/n).toLocaleString('de-DE'),sumAbzugPct+'%')+'</td>'
+        +'<td style="padding:13px 14px;text-align:right;font-weight:700">'+stackCell(sumExtra?'€'+Math.round(sumExtra/n).toLocaleString('de-DE'):'—',null)+'</td>'
         +'<td style="padding:13px 14px;text-align:right;font-weight:700;color:var(--teal-dark)">'+stackCell('€'+Math.round(sumProvision/n).toLocaleString('de-DE'),sumProvisionPct+'%')+'</td>'
         +'</tr>';
     }

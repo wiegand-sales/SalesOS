@@ -733,6 +733,14 @@ tr.pv-frozen td:first-child{box-shadow:inset 3px 0 0 #1d1c1a}
 .psw{width:34px;height:20px;border-radius:999px;background:#D8D2C6;position:relative;border:0;cursor:pointer;padding:0;vertical-align:middle;transition:background .15s}
 .psw::after{content:'';position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;box-shadow:0 1px 2px rgba(0,0,0,.2);transition:left .15s}
 .psw.on{background:#F08566}.psw.on::after{left:16px}.psw.lock{opacity:.45;cursor:default}
+.pa-grid{display:inline-grid;grid-template-columns:repeat(3,34px);gap:6px;justify-content:end}
+.pa-grid .btn.sbtn{width:34px;padding:0;justify-content:center}
+.pa-slot{display:block;width:34px}
+.pp-box{display:flex;align-items:center;gap:8px;flex-wrap:wrap;font-size:12px;color:var(--text2)}
+.pp-lbl{font-weight:600}.pp-none{color:var(--text3)}
+.pp-chip{display:inline-flex;align-items:center;gap:4px;background:#FDF0EB;border:1px solid rgba(240,133,102,.45);color:#9A3F22;border-radius:999px;padding:2px 4px 2px 10px;font-weight:600}
+.pp-chip button{border:0;background:transparent;color:#9A3F22;cursor:pointer;font-size:14px;line-height:1;padding:0 4px}
+.pp-box select{width:auto;height:28px;font-size:12px;padding:0 8px}
 </style>
 <style id="kal-css">
 /* ── KALENDER ── */
@@ -1532,9 +1540,11 @@ function loadEmployeesFromSupabase(){
         color: e.color_index, startDate: e.start_date, endDate: e.end_date || null,
         team: e.team, contract: e.contract, hours: e.hours, active: e.active,
         auth_user_id: e.auth_user_id || null, notes: e.notes || '',
-        isPureCoach: e.is_pure_coach===true||e.role==='KAL', kalOnly: e.role==='KAL', imKalender: e.im_kalender==null?null:!!e.im_kalender, inProvision: e.in_provision==null?null:!!e.in_provision, boardRole: e.board_role||null, provisionSettings: e.provision_settings || {}, email: e.email || '', workHours: e.work_hours || null, urlaub: e.urlaub || {}
+        isPureCoach: e.is_pure_coach===true||e.role==='KAL', kalOnly: e.role==='KAL', funktion: e.funktion||null, stufe: e.stufe||null, standort: e.standort||null, imKalender: e.im_kalender==null?null:!!e.im_kalender, inProvision: e.in_provision==null?null:!!e.in_provision, boardRole: e.board_role||null, provisionSettings: e.provision_settings || {}, email: e.email || '', workHours: e.work_hours || null, urlaub: e.urlaub || {}
       };
     });
+    // Funktion · Stufe · Standort sind die Wahrheit (SQL 42); die alte Position wird daraus berechnet
+    employees.forEach(function(e){if(!e.funktion)return;e.role=personRoleCode(e.funktion,e.stufe,e.standort||'MUC');e.kalOnly=e.role==='KAL';if(e.kalOnly)e.isPureCoach=true;});
     return loadSalariesFromSupabase();
   });
 }
@@ -1549,7 +1559,7 @@ var provisionTeamDropdownOpen=false;
 var provisionTeamSearchQuery='';
 function toggleProvisionTeamDropdown(){provisionTeamDropdownOpen=!provisionTeamDropdownOpen;if(!provisionTeamDropdownOpen)provisionTeamSearchQuery='';renderProvisionTeam();}
 function toggleProvisionTeamEmpId(id){
-  var visIds=employees.filter(function(e){return provFlag(e)&&canSeeSalary(e)&&(currentUserRole==='admin'||isAgentEmp(e));}).map(function(e){return e.id;});
+  var visIds=employees.filter(function(e){return provFlag(e)&&canSeeSalary(e)&&(currentUserRole==='admin'||isAgentEmp(e)||canSeeArea('provCoaches'));}).map(function(e){return e.id;});
   if(!provisionTeamSelectedIds)provisionTeamSelectedIds=visIds.slice();
   var idx=provisionTeamSelectedIds.indexOf(id);
   if(idx>=0)provisionTeamSelectedIds.splice(idx,1);else provisionTeamSelectedIds.push(id);
@@ -1658,9 +1668,9 @@ function setActivityFilterDays(d){activityFilterDays=d;renderActivity();}
 var settingsNavOpen=true;
 // ── Benutzer & Rechte: eine gemeinsame Liste fuer alle Personen ──
 var userFilter='all', userSearch='', userShowAllAgents=false, loginInfo=null, loginInfoLoading=false, userMsg='';
-var BOARD_ROLE_LABEL={admin:'Admin',coach:'Coach',viewer:'Betrachter',agent:'Sales Agent'};
+var BOARD_ROLE_LABEL={admin:'Admin',coach:'Coach',viewer:'Betrachter',agent:'Sales Agent',none:'Kein Zugang'};
 // Coach im Board: gesetzte Board-Rolle geht vor (Coach = ja, Betrachter/Agent = nein), sonst wie bisher nach Position
-function isCoachEmp(e){ if(!e||e.kalOnly)return false; if(e.boardRole==='coach')return true; if(e.boardRole==='viewer'||e.boardRole==='agent')return false; return !!(e.isPureCoach||e.role==='SDC'||e.role==='SDM'||e.role==='SDL'); }
+function isCoachEmp(e){ if(!e||e.kalOnly)return false; if(e.boardRole==='coach')return true; if(e.boardRole==='viewer'||e.boardRole==='agent'||e.boardRole==='none')return false; return !!(e.isPureCoach||e.role==='SDC'||e.role==='SDM'||e.role==='SDL'); }
 // SDL (Sales Department Lead): sieht Provision und Gehalt nur von sich und seinem Team (Stammdaten › Team)
 function isSdlUser(){return currentUserRole==='coach'&&!!currentCoach&&currentCoach.role==='SDL';}
 function canSeeSalary(emp){if(!emp||!isSdlUser())return true;var id=String(emp.id);return id===String(currentCoach.id)||(currentCoach.sdlTeam||[]).indexOf(id)>=0;}
@@ -1671,8 +1681,19 @@ function loadSalariesFromSupabase(){return sb.from('employee_salary').select('*'
   employees.forEach(function(e){var r=by[String(e.id)];var pv=e.provisionSettings||(e.provisionSettings={});delete pv.grundgehalt;delete pv.agSozialabgaben;
     if(r){if(r.grundgehalt!=null)pv.grundgehalt=+r.grundgehalt;if(r.ag_sozialabgaben!=null)pv.agSozialabgaben=+r.ag_sozialabgaben;}});
   return true;}).catch(function(e){SALARY_TABLE=false;console.warn('employee_salary',e);return true;}).then(function(){return typeof loadProvExtra==='function'?loadProvExtra():true;}).then(function(){return typeof loadProvClosed==='function'?loadProvClosed():true;});}
+// ── Person: Funktion · Stufe · Standort (SQL 42). Das alte Feld role wird daraus abgeleitet, damit alles Bestehende weiterläuft.
+var PERSON_FN=[['agent','Sales Agent'],['sdl','SDL'],['coach','Coach'],['salesops','Sales Ops'],['am','Account Management'],['leitung','Leitung'],['none','keine (nur Betrachter)']];
+function personFn(e){if(!e)return 'agent';if(e.funktion)return e.funktion;var r=e.role;return r==='SDL'?'sdl':(r==='SDC'||r==='SDM')?'coach':r==='KAL'?'am':'agent';}
+function personStufe(e){if(!e)return '';if(e.stufe)return e.stufe;return (e.role==='SR'||e.role==='SE'||e.role==='SDC'||e.role==='SDM')?e.role:'';}
+function personOrt(e){if(!e)return 'MUC';if(e.standort)return e.standort;return e.role==='VLC'?'VLC':'MUC';}
+function personFnLabel(e){var f=personFn(e),l=(PERSON_FN.filter(function(x){return x[0]===f;})[0]||['',''])[1],st=personStufe(e);return l+(st&&(f==='agent'||f==='coach')?' · '+st:'');}
+function personRoleCode(fn,stufe,ort){if(fn==='agent')return ort==='VLC'?'VLC':(stufe==='SE'?'SE':'SR');if(fn==='sdl')return 'SDL';if(fn==='coach')return stufe==='SDM'?'SDM':'SDC';return 'KAL';}
+function esPersonSync(){var f=document.getElementById('es-fn'),st=document.getElementById('es-stufe'),o=document.getElementById('es-ort'),r=document.getElementById('es-role');if(!f||!r)return;
+  var fn=f.value,wrap=document.getElementById('es-stufe-wrap');if(st){var opts=fn==='agent'?[['SR','SR'],['SE','SE']]:fn==='coach'?[['SDC','SDC'],['SDM','SDM']]:[];var cur=st.value;st.innerHTML=opts.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===cur?' selected':'')+'>'+x[1]+'</option>';}).join('');if(wrap)wrap.style.display=opts.length?'':'none';}
+  var code=personRoleCode(fn,st?st.value:'',o?o.value:'MUC');if(![].some.call(r.options,function(x){return x.value===code;})){var op=document.createElement('option');op.value=code;op.text=code;r.add(op);}r.value=code;
+  if(typeof esSdlToggle==='function')esSdlToggle(code);if(typeof toggleProvisionModel==='function')toggleProvisionModel(code);}
 function esSdlToggle(v){var b=document.getElementById('es-sdl-team');if(b)b.style.display=v==='SDL'?'':'none';}
-function positionRole(p){ if(p.role==='KAL')return 'Betrachter'; return (p.isPureCoach||p.role==='SDC'||p.role==='SDM'||p.role==='SDL')?'Coach':'Sales Agent'; }
+function positionRole(p){ if(p.role==='KAL')return 'Kein Zugang'; return (p.isPureCoach||p.role==='SDC'||p.role==='SDM'||p.role==='SDL')?'Coach':'Sales Agent'; }
 function personRole(p){ if(p.kind==='app') return p.role==='admin'?'Admin':'Betrachter'; if(p.boardRole&&BOARD_ROLE_LABEL[p.boardRole]) return BOARD_ROLE_LABEL[p.boardRole]; return positionRole(p); }
 function updateEmpBoardRole(sel){
   var emp=employees.find(function(e){return String(e.id)===String(sel.dataset.eid);});if(!emp)return;
@@ -1691,7 +1712,7 @@ function updateEmpBoardRole(sel){
 }
 // ── Schalter je Person: „Im Urlaubskalender“ / „In Provision“ (Spalten im_kalender / in_provision, leer = Standard nach Position)
 function isAgentEmp(e){return !!e&&!e.isPureCoach&&e.role!=='SDC'&&e.role!=='SDM'&&e.role!=='KAL';}
-function kalFlag(e){if(!e||e.active===false)return false;if(isAgentEmp(e))return true;if(e.imKalender!=null)return e.imKalender;return !!(e.kalOnly||e.role==='SDC'||e.role==='SDM'||(e.isPureCoach&&e.boardRole!=='viewer'));}
+function kalFlag(e){if(!e||e.active===false)return false;if(isAgentEmp(e))return true;if(e.imKalender!=null)return e.imKalender;if(e.funktion==='none'||e.boardRole==='viewer')return false;return !!(e.kalOnly||e.role==='SDC'||e.role==='SDM'||(e.isPureCoach&&e.boardRole!=='viewer'));}
 function provFlag(e){if(!e||e.active===false)return false;if(isAgentEmp(e))return true;if(e.inProvision!=null)return e.inProvision;return e.role==='SDC'||e.role==='SDM';}
 function personEmp(p){if(!p)return null;if(p.kind==='emp')return kalEmp(p.id);var n=String(p.name||'').trim().toLowerCase();return employees.find(function(e){return String(e.name||'').trim().toLowerCase()===n;})||null;}
 function personSwitch(p,flag){var e=personEmp(p),ag=e&&isAgentEmp(e),on=e?(flag==='kal'?kalFlag(e):provFlag(e)):false,lock=ag||currentUserRole!=='admin'||(flag==='prov'&&!e);
@@ -1731,14 +1752,14 @@ function setUserFilter(f){userFilter=f;renderMain();}
 function setUserSearch(v){userSearch=v;renderMain();var el=document.getElementById('userSearch');if(el){el.focus();el.setSelectionRange(v.length,v.length);}}
 function buildUserOverviewHtml(){
   if(loginInfo===null) loadLoginInfo();
-  var RC={'Admin':['var(--purple)','rgba(29,28,26,0.10)'],'Coach':['#F08566','rgba(245,154,91,0.14)'],'Betrachter':['#6b5a12','rgba(214,180,60,0.20)'],'Sales Agent':['var(--text2)','rgba(0,0,0,0.06)']};
-  var ACC={'Admin':['Bearbeiten','var(--purple)'],'Coach':['Bearbeiten','var(--purple)'],'Betrachter':['Nur ansehen','#6b5a12'],'Sales Agent':['Nur Erweiterung','var(--text2)']};
+  var RC={'Admin':['var(--purple)','rgba(29,28,26,0.10)'],'Coach':['#F08566','rgba(245,154,91,0.14)'],'Betrachter':['#6b5a12','rgba(214,180,60,0.20)'],'Sales Agent':['var(--text2)','rgba(0,0,0,0.06)'],'Kein Zugang':['var(--text3)','rgba(0,0,0,0.04)']};
+  var ACC={'Admin':['Bearbeiten','var(--purple)'],'Coach':['Bearbeiten','var(--purple)'],'Betrachter':['Nur ansehen','#6b5a12'],'Sales Agent':['Nur Erweiterung','var(--text2)'],'Kein Zugang':['Kein Zugang','var(--text3)']};
   var persons=allPersons(), q=userSearch.trim().toLowerCase();
-  var counts={all:0,Admin:0,Coach:0,Betrachter:0,'Sales Agent':0};
+  var counts={all:0,Admin:0,Coach:0,Betrachter:0,'Sales Agent':0,'Kein Zugang':0};
   persons.forEach(function(p){ if(p.kind==='emp'&&p.active===false&&personRole(p)==='Sales Agent')return; counts.all++; counts[personRole(p)]++; });
   function chip(key,label){ return '<button class="'+(userFilter===key?'active':'')+'" onclick="setUserFilter(\''+key+'\')">'+label+'&nbsp;<span style="opacity:.7">'+counts[key]+'</span></button>'; }
   var h='';
-  var _tb='<div class="chart-toggle">'+chip('all','Alle')+chip('Admin','Admin')+chip('Coach','Coach')+chip('Betrachter','Betrachter')+chip('Sales Agent','Sales Agents')+'</div>'
+  var _tb='<div class="chart-toggle">'+chip('all','Alle')+chip('Admin','Admin')+chip('Coach','Coach')+chip('Betrachter','Betrachter')+chip('Sales Agent','Sales Agents')+chip('Kein Zugang','Kein Zugang')+'</div>'
     +'<div style="display:flex;gap:8px;align-items:center"><input id="userSearch" value="'+esc(userSearch)+'" oninput="setUserSearch(this.value)" placeholder="Name oder E-Mail suchen" aria-label="Suchen" style="width:230px;height:34px">'
     +'<button class="btn btn-primary" style="width:auto;height:34px" onclick="openModal(\'addAppUserModal\')"><i class="ti ti-plus"></i> Admin / Betrachter</button></div>';
   if(userMsg) h+='<div class="card" style="margin-bottom:16px;padding:12px 16px;font-size:13px;line-height:1.5">'+userMsg+' <button class="btn sbtn" style="margin-left:8px" onclick="userMsg=\'\';renderMain()">Ausblenden</button></div>';
@@ -1748,37 +1769,40 @@ function buildUserOverviewHtml(){
   function row(p,i){
     var r=personRole(p), rc=RC[r], acc=ACC[r], lg=loginOf(p);
     var ini=(p.name||'?').split(' ').map(function(w){return w[0];}).slice(0,2).join('');
-    var roleCell=(p.kind==='emp'&&p.role==='KAL')?'<span style="font-size:12.5px;color:var(--text3)">kein Board-Zugang</span>':p.kind==='app'
+    var roleCell=p.kind==='app'
       ?'<span style="display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:150px"><select data-uid="'+p.id+'" onchange="updateAppUserRole(this)" aria-label="Rolle von '+esc(p.name)+'" style="width:100%;height:34px;padding:4px 10px;font-size:12.5px"><option value="admin"'+(p.role==='admin'?' selected':'')+'>Admin</option><option value="viewer"'+(p.role==='viewer'?' selected':'')+'>Betrachter</option></select></span></span>'
       :(function(){var pr=positionRole(p),set=!!p.boardRole;
         return '<span style="display:inline-flex;align-items:center;gap:8px"><span style="display:inline-block;width:150px"><select data-eid="'+p.id+'" onchange="updateEmpBoardRole(this)" aria-label="Rolle von '+esc(p.name)+'" style="width:100%;height:34px;padding:4px 10px;font-size:12.5px;'+(set?'border-color:rgba(240,133,102,0.7);background:#FDF0EB':'')+'">'
           +'<option value=""'+(set?'':' selected')+'>'+(set?'Automatisch ('+pr+')':pr)+'</option>'
-          +['admin','coach','viewer','agent'].map(function(k){return '<option value="'+k+'"'+(p.boardRole===k?' selected':'')+'>'+BOARD_ROLE_LABEL[k]+'</option>';}).join('')
-          +'</select></span><span style="font-size:11.5px;white-space:nowrap;color:'+(set?'#B5513A':'var(--text3)')+'">'+(set?'gesetzt · Position '+esc(p.role||'–'):'aus Position')+'</span></span>';})();
+          +['admin','coach','viewer','agent','none'].map(function(k){return '<option value="'+k+'"'+(p.boardRole===k?' selected':'')+'>'+BOARD_ROLE_LABEL[k]+'</option>';}).join('')
+          +'</select></span><span style="font-size:11.5px;white-space:nowrap;color:'+(set?'#B5513A':'var(--text3)')+'">'+(set?'gesetzt'+(p.role&&p.role!=='KAL'?' · Position '+esc(p.role):''):'aus Funktion')+'</span></span>';})();
     var target=p.kind==='app'?'app':'emp';
     var lgCell=lg===null?'<span style="font-size:12px;color:var(--text3)">…</span>'
       :lg?'<span style="display:inline-flex;align-items:center;gap:6px;font-size:12.5px"><span style="width:8px;height:8px;border-radius:4px;background:var(--purple)"></span>Aktiv</span>'
       :(p.email?'<button class="btn sbtn" onclick="personLogin(\'create\',\''+target+'\',\''+p.id+'\')"><i class="ti ti-user-plus"></i> Zugang anlegen</button>':'<span style="font-size:12px;color:var(--text3)">E-Mail fehlt</span>');
+    // Feste Plätze: Passwort · Login entfernen · Öffnen/Löschen – damit die Knöpfe in allen Zeilen untereinander stehen
     var actions='';
+    if(!lg) actions+='<span class="pa-slot"></span><span class="pa-slot"></span>';
     if(lg) actions+='<button class="btn sbtn" title="Passwort neu setzen" aria-label="Passwort neu setzen" onclick="personLogin(\'reset\',\''+target+'\',\''+p.id+'\')"><i class="ti ti-key"></i></button>'
       +'<button class="btn sbtn" title="Login entfernen" aria-label="Login entfernen" onclick="personLogin(\'remove\',\''+target+'\',\''+p.id+'\')"><i class="ti ti-user-x"></i></button>';
     if(p.kind==='app') actions+='<button class="btn sbtn" title="Person entfernen" aria-label="Person entfernen" onclick="deleteAppUser(\''+p.id+'\',\''+String(p.name).replace(/'/g,"\\'")+'\')"><i class="ti ti-trash"></i></button>';
     else actions+='<button class="btn sbtn" title="Mitarbeiter öffnen" aria-label="Mitarbeiter öffnen" onclick="selectEmp(\''+p.id+'\')"><i class="ti ti-arrow-right"></i></button>';
     var bg='';
     var lastCell=(lg&&lg.last_sign_in_at)?(function(){var d=new Date(lg.last_sign_in_at);return '<span style="font-size:12.5px;color:var(--text2);white-space:nowrap">'+('0'+d.getDate()).slice(-2)+'.'+('0'+(d.getMonth()+1)).slice(-2)+'.'+d.getFullYear()+' · '+('0'+d.getHours()).slice(-2)+':'+('0'+d.getMinutes()).slice(-2)+'</span>';})():'<span style="font-size:12.5px;color:var(--text3)">–</span>';
-    var ZG={'Admin':'Alles','Coach':'Laut Rollen &amp; Rechte','Betrachter':'Nur ansehen','Sales Agent':'Nur Erweiterung'};
-    var accCell=r==='Sales Agent'?'<span style="font-size:12.5px;color:var(--text2)" title="Sales Agents kommen nicht ins Board, sie sehen ihre Zahlen in der Erweiterung">'+ZG[r]+'</span>'
+    var ZG={'Admin':'Alles','Coach':'Laut Rollen &amp; Rechte','Betrachter':'Nur ansehen','Sales Agent':'Nur Erweiterung','Kein Zugang':'Kein Zugang'};
+    var accCell=(r==='Sales Agent'||r==='Kein Zugang')?'<span style="font-size:12.5px;color:var(--text2)" title="Sales Agents kommen nicht ins Board, sie sehen ihre Zahlen in der Erweiterung">'+ZG[r]+'</span>'
       :'<a href="#" onclick="selectSettingsSub(\'roles\');return false" title="Was diese Rolle darf, legst du unter Rollen &amp; Rechte fest" style="font-size:12.5px;color:'+acc[1]+';text-decoration:none;white-space:nowrap">'+ZG[r]+' ›</a>';
     return '<tr style="'+bg+'"><td style="'+TD+'"><div style="display:flex;align-items:center;gap:10px"><span style="width:30px;height:30px;border-radius:6px;background:#F3ECE8;color:var(--purple);font-size:11px;font-weight:700;display:inline-flex;align-items:center;justify-content:center;flex-shrink:0">'+esc(ini)+'</span><div style="display:flex;flex-direction:column"><span style="font-size:13px;font-weight:600">'+esc(p.name)+'</span><span style="font-size:11.5px;color:var(--text3)">'+esc(p.kind==='app'?(p.role==='admin'?'Admin':'Betrachter'):p.sub)+'</span></div></div></td>'
-      +'<td style="'+TD+'">'+roleCell+'</td><td style="'+TD+';font-size:12.5px;color:var(--text2)">'+esc(p.email||'–')+'</td><td style="'+TD+'">'+lgCell+'</td><td style="'+TD+'">'+lastCell+'</td>'
+      +'<td style="'+TD+'">'+roleCell+'</td><td style="'+TD+';font-size:12.5px;color:var(--text2)">'+esc(p.email||'–')+'</td><td style="'+TD+'">'+lgCell+(lastCell&&lg?'<div style="font-size:11px;color:var(--text3);margin-top:2px">'+lastCell.replace(/<[^>]+>/g,'')+'</div>':'')+'</td>'
+      +'<td style="'+TD+';font-size:12.5px">'+(function(){var e=personEmp(p);return e?esc(personFnLabel(e))+'<div style="font-size:11.5px;color:var(--text3)">'+personOrt(e)+'</div>':'<span style="color:var(--text3)">–</span>';})()+'</td>'
       +'<td style="'+TD+';text-align:center">'+personSwitch(p,'kal')+'</td><td style="'+TD+';text-align:center">'+personSwitch(p,'prov')+'</td>'
-      +'<td style="'+TD+'">'+accCell+'</td><td style="'+TD+';text-align:right;white-space:nowrap"><div style="display:inline-flex;gap:6px">'+actions+'</div></td></tr>';
+      +'<td style="'+TD+'">'+accCell+'</td><td style="'+TD+';text-align:right;white-space:nowrap"><div class="pa-grid">'+actions+'</div></td></tr>';
   }
   function table(list){
-    return '<div class="std-wrap"><table class="std-table" style="min-width:1080px"><colgroup><col style="width:17%"><col style="width:18%"><col style="width:15%"><col style="width:9%"><col style="width:10%"><col style="width:8%"><col style="width:7%"><col style="width:9%"><col style="width:7%"></colgroup><thead><tr style="background:#EFECE5"><th scope="col" style="'+TH+'">Name</th><th scope="col" style="'+TH+'">Rolle</th><th scope="col" style="'+TH+'">E-Mail</th><th scope="col" style="'+TH+'">Login</th><th scope="col" style="'+TH+'">Letzter Login</th><th scope="col" style="'+TH+';text-align:center">Im Urlaubskalender</th><th scope="col" style="'+TH+';text-align:center">In Provision</th><th scope="col" style="'+TH+'">Zugriff</th><th scope="col" style="'+TH+'"></th></tr></thead><tbody>'+list.map(row).join('')+'</tbody></table></div>';
+    return '<div class="std-wrap"><table class="std-table" style="min-width:1080px"><colgroup><col style="width:17%"><col style="width:18%"><col style="width:15%"><col style="width:9%"><col style="width:10%"><col style="width:8%"><col style="width:7%"><col style="width:9%"><col style="width:7%"></colgroup><thead><tr style="background:#EFECE5"><th scope="col" style="'+TH+'">Name</th><th scope="col" style="'+TH+'">Rolle</th><th scope="col" style="'+TH+'">E-Mail</th><th scope="col" style="'+TH+'">Login</th><th scope="col" style="'+TH+'">Funktion · Standort</th><th scope="col" style="'+TH+';text-align:center">Im Urlaubskalender</th><th scope="col" style="'+TH+';text-align:center">In Provision</th><th scope="col" style="'+TH+'">Zugriff</th><th scope="col" style="'+TH+'"></th></tr></thead><tbody>'+list.map(row).join('')+'</tbody></table></div>';
   }
   var match=function(p){ return (!q||(p.name||'').toLowerCase().indexOf(q)>=0||(p.email||'').toLowerCase().indexOf(q)>=0) && (userFilter==='all'||personRole(p)===userFilter); };
-  var order={'Admin':0,'Coach':1,'Betrachter':2};
+  var order={'Admin':0,'Coach':1,'Betrachter':2,'Kein Zugang':3};
   var team=persons.filter(function(p){return personRole(p)!=='Sales Agent'&&match(p);}).sort(function(a,b){return order[personRole(a)]-order[personRole(b)]||a.name.localeCompare(b.name);});
   var agents=persons.filter(function(p){return personRole(p)==='Sales Agent'&&p.active!==false&&match(p);}).sort(function(a,b){return a.name.localeCompare(b.name);});
   // Eine Tabelle für alle: Filter, Suche und Knopf stehen im Kopf der Box
@@ -2567,7 +2591,8 @@ var WIZ_SLIDES={
     return [{type:'stagerow',title:'Worst 3 Mitarbeiter',sub:(c.kpi==='marge'||c.kpi==='opt'?'Summe ':'Ø ')+wizKpiLabel(c.kpi)+' der letzten 30 Tage'+(c.minOpt>0?' · ab '+c.minOpt+' Opt.':'')+'.',
       boxes:r.length?r.map(function(x){return{n:wizKpiFmt(x.v,c.kpi),l:wizFirst(x.e)};}):[{n:'—',l:'Keine Daten'}]}];}},
   dist:{label:'Verteilung über Coaches',desc:'Abgeschlossene Coachings je Coach, gesamt',def:{},build:function(){
-    var coachEmps=employees.filter(function(e){return(e.role==='SDM'||e.role==='SDC')&&e.active!==false;}),cnt={};
+    // alle, die coachen (Coaches und SDL), ohne Betrachter
+    var coachEmps=employees.filter(function(e){return e.active!==false&&isCoachEmp(e);}),cnt={};
     employeeActiveList().forEach(function(e){(protocols[e.id]||[]).forEach(function(p){if(p.status!=='geplant'&&p.coachId)cnt[p.coachId]=(cnt[p.coachId]||0)+1;});});
     var d=coachEmps.map(function(c){return{n:String(cnt[c.id]||0),l:wizFirst(c)};}).sort(function(a,b){return(+b.n)-(+a.n);});
     return [{type:'stagerow',title:'Verteilung über Coaches',sub:'Alle abgeschlossenen Coachings, gesamt.',boxes:d.length?d:[{n:'0',l:'—'}]}];}},
@@ -7821,7 +7846,7 @@ function renderTab(){
   
   // ── EMP SETTINGS TAB ──
   if(activeTab==='emp-settings'){
-    html=esBuildHtml(emp,false,html);
+    html=esBuildHtml(emp,false,html);setTimeout(function(){provLockForm(document.getElementById('mainArea'));},0);
     if(true){
       // ── Zugang zur Sales-OS-Erweiterung (nur Admins, nur fuer Agents) ──
       if(currentUserRole==='admin' && !(emp.isPureCoach||emp.role==='SDC'||emp.role==='SDM')){
@@ -8748,6 +8773,12 @@ var PERM_ROWS=[
   {key:'performance',label:'Dashboard & Performance-Tabelle',group:'Bereiche',fixed:true},
   {key:'ziel',label:'Zielvereinbarung & Ziele',group:'Bereiche',tables:['zielvereinbarung','goals','kpi_targets','employee_kpi_targets'],nav:['nav-team-ziel']},
   {key:'provision',label:'Provision & Gehälter',group:'Bereiche',seeOnly:true,nav:['nav-team-provision'],tabs:['provision']},
+  {key:'provCoaches',label:'Provision: auch Coaches sehen',group:'Bereiche',seeOnly:true},
+  {key:'salary',label:'Gehälter sehen',group:'Bereiche',seeOnly:true},
+  {key:'kalEdit',label:'Abwesenheiten eintragen & genehmigen',group:'Kalender',editOrNone:true,tables:['absences']},
+  {key:'kalGrund',label:'Grund der Abwesenheit sehen',group:'Kalender',fixedRole:{coach:'S',viewer:'-'}},
+  {key:'kalLate',label:'Verspätungen sehen',group:'Kalender',fixedRole:{coach:'S',viewer:'-'}},
+  {key:'provEdit',label:'Provisionsvereinbarung ändern',group:'Verwaltung',editOrNone:true,persons:true},
   {key:'coaching',label:'Coaching-Sessions & Aufgaben',group:'Bereiche',tables:['protocols','tasks'],tabs:['session','tasks']},
   {key:'qa',label:'QA-Bewertungen',group:'Bereiche',tables:['call_ratings','call_rating_scores'],tabs:['call-performance']},
   {key:'dev',label:'Development / Halbjahresgespräch',group:'Bereiche',tables:['reviews','review_kpis'],tabs:['coaching-eval']},
@@ -8756,8 +8787,8 @@ var PERM_ROWS=[
   {key:'histEdit',label:'Bewertungen & Kommentare nachträglich ändern oder löschen',group:'Verwaltung',editOrNone:true},
   {key:'settings',label:'Einstellungen',group:'Verwaltung',adminOnly:true}
 ];
-var PERM_DEFAULT={coach:{performance:'S',ziel:'E',provision:'S',coaching:'E',qa:'E',dev:'E',timeline:'E',solidroad:'E',activity:'S',stammdaten:'E',histEdit:'E',settings:'-'},
-                  viewer:{performance:'S',ziel:'S',provision:'S',coaching:'S',qa:'S',dev:'S',timeline:'S',solidroad:'S',activity:'S',stammdaten:'S',histEdit:'-',settings:'-'}};
+var PERM_DEFAULT={coach:{salary:'S',kalEdit:'E',provEdit:'-',provCoaches:'-',performance:'S',ziel:'E',provision:'S',coaching:'E',qa:'E',dev:'E',timeline:'E',solidroad:'E',activity:'S',stammdaten:'E',histEdit:'E',settings:'-'},
+                  viewer:{salary:'S',kalEdit:'-',provEdit:'-',provCoaches:'-',performance:'S',ziel:'S',provision:'S',coaching:'S',qa:'S',dev:'S',timeline:'S',solidroad:'S',activity:'S',stammdaten:'S',histEdit:'-',settings:'-'}};
 function rolePerms(){ var s=settings.rolePermissions||{}; return {coach:Object.assign({},PERM_DEFAULT.coach,s.coach||{}),viewer:Object.assign({},PERM_DEFAULT.viewer,s.viewer||{})}; }
 function permFor(key,role){
   role=role||currentUserRole;
@@ -8766,6 +8797,8 @@ function permFor(key,role){
   var row=PERM_ROWS.find(function(r){return r.key===key;});
   if(row&&row.adminOnly)return '-';
   if(row&&row.fixed)return 'S';
+  if(row&&row.fixedRole)return row.fixedRole[role]||'-';
+  if(row&&row.persons&&role===currentUserRole&&permPersonHas(key))return 'E';
   var v=rolePerms()[role][key]||'-';
   if(row&&row.editOrNone&&v!=='E')return '-';
   if(row&&row.editOrNone&&role==='viewer')return '-';
@@ -8773,6 +8806,15 @@ function permFor(key,role){
   if(row&&row.seeOnly&&v==='E')v='S';
   return v;
 }
+// Rechte für einzelne Personen zusätzlich zur Rolle (settings.permPersons = {key:['emp:<id>'|'app:<id>', …]})
+function permMyKey(){if(typeof currentCoach!=='undefined'&&currentCoach)return 'emp:'+currentCoach.id;var em=(typeof currentAuthUser!=='undefined'&&currentAuthUser&&currentAuthUser.email||'').toLowerCase();var u=(typeof appUsers!=='undefined'?appUsers:[]).find(function(x){return String(x.email||'').toLowerCase()===em;});return u?'app:'+u.id:'';}
+function permPersonHas(key){var L=((settings.permPersons||{})[key])||[],k=permMyKey();return !!k&&L.indexOf(k)>=0;}
+function permPersonsSet(key,pk,on){if(currentUserRole!=='admin')return;var all=JSON.parse(JSON.stringify(settings.permPersons||{})),L=all[key]||[];L=L.filter(function(x){return x!==pk;});if(on)L.push(pk);all[key]=L;settings.permPersons=all;
+  var p=allPersons().find(function(x){return x.kind+':'+x.id===pk;});saveSettingJson('permPersons',all,'Recht „'+((PERM_ROWS.find(function(r){return r.key===key;})||{}).label||key)+'“ '+(on?'gegeben':'entzogen')+': '+(p?p.name:pk));renderMain();}
+function permPersonsHtml(key){var L=((settings.permPersons||{})[key])||[],P=allPersons().filter(function(p){var r=personRole(p);return (r==='Coach'||r==='Betrachter')&&(p.kind==='app'||p.active!==false);}).sort(function(a,b){return a.name.localeCompare(b.name);});
+  var chips=L.map(function(pk){var p=P.find(function(x){return x.kind+':'+x.id===pk;})||allPersons().find(function(x){return x.kind+':'+x.id===pk;});return '<span class="pp-chip">'+esc(p?p.name:pk)+'<button type="button" aria-label="entfernen" onclick="permPersonsSet(\''+key+'\',\''+pk+'\',false)">×</button></span>';}).join('');
+  var opts=P.filter(function(p){return L.indexOf(p.kind+':'+p.id)<0;}).map(function(p){return '<option value="'+p.kind+':'+p.id+'">'+esc(p.name)+' · '+personRole(p)+'</option>';}).join('');
+  return '<div class="pp-box"><span class="pp-lbl">Zusätzlich erlaubt für:</span>'+(chips||'<span class="pp-none">niemand</span>')+(opts?'<select onchange="if(this.value)permPersonsSet(\''+key+'\',this.value,true)"><option value="">+ Person</option>'+opts+'</select>':'')+'</div>';}
 function canSeeArea(key){return permFor(key)!=='-';}
 function canEditTable(table){
   if(currentUserRole!=='coach')return true;
@@ -8811,10 +8853,9 @@ function permToggle(role,key,col){
   setPerm(role,key,nv);
 }
 function buildRolesHtml(){
-  var GROUPS=[['Auswertungen',['performance','ziel','provision','activity']],['Mitarbeiter',['coaching','qa','dev']],['Verwaltung',['stammdaten','histEdit']]];
-  var cnt={coach:0,viewer:0};
-  employees.forEach(function(e){if(e.active===false||e.role==='KAL')return;var r=personRole({kind:'emp',role:e.role,isPureCoach:e.isPureCoach,boardRole:e.boardRole});if(r==='Coach')cnt.coach++;if(r==='Betrachter')cnt.viewer++;});
-  (typeof appUsers!=='undefined'?appUsers:[]).forEach(function(u){if(u.role==='viewer')cnt.viewer++;});
+  var GROUPS=[['Auswertungen',['performance','ziel','provision','provCoaches','salary','activity']],['Mitarbeiter',['coaching','qa','dev']],['Kalender',['kalEdit','kalGrund','kalLate']],['Verwaltung',['stammdaten','provEdit','histEdit']]];
+  var cnt={admin:0,coach:0,viewer:0,agent:0,none:0},K={'Admin':'admin','Coach':'coach','Betrachter':'viewer','Sales Agent':'agent','Kein Zugang':'none'};
+  allPersons().forEach(function(p){if(p.kind==='emp'&&p.active===false)return;var r=K[personRole(p)];if(r)cnt[r]++;});
   function box(state,avail,lock,onclick,title){
     if(!avail)return '<span style="display:inline-block;width:20px;height:20px"></span>';
     var on=!!state;
@@ -8829,28 +8870,35 @@ function buildRolesHtml(){
   var BL='border-left:1px solid #E4E0D6;';
   var h='<div class="card"><div style="font-weight:700;font-size:14px;color:var(--text)">Was darf welche Rolle?</div>'
     +'<div style="font-size:12.5px;color:var(--text3);margin:2px 0 12px">'+eye()+' sehen · '+pen()+' anlegen und ändern. Häkchen anklicken – gilt sofort für alle Personen mit dieser Rolle. Betrachter können nie speichern, darum nur „Sehen“.</div>'
-    +'<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;padding:8px 12px;margin-bottom:12px"><span><b style="color:var(--text)">Admin</b> darf immer alles</span><span><b style="color:var(--text)">Sales Agent</b> nur eigene Zahlen in der Erweiterung</span><span><b style="color:var(--text)">Einstellungen</b> (Benutzer, Rollen, Wizards, Integrationen, Daten) nur Admins</span></div>'
+    +'<div style="display:flex;gap:16px;flex-wrap:wrap;font-size:12px;color:var(--text2);background:#EFECE5;border:1px solid #E4E0D6;border-radius:10px;padding:8px 12px;margin-bottom:12px"><span><b style="color:var(--text)">Admin, Sales Agent, Kein Zugang</b> sind fest vorgegeben</span><span><b style="color:var(--text)">Kein Zugang</b>: kein Login, z. B. Account Management – erscheint trotzdem im Urlaubskalender, wenn dort eingeschaltet</span><span><b style="color:var(--text)">Einstellungen</b> (Benutzer, Rollen, Wizards, Integrationen, Daten) nur Admins</span></div>'
     +'<div class="std-wrap"><table style="width:100%;border-collapse:collapse;border:1px solid #E4E0D6;border-radius:10px;overflow:hidden">'
-    +'<thead><tr style="background:#EFECE5"><th scope="col" style="text-align:left;padding:9px 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);width:56%">Recht</th>'
+    +'<thead><tr style="background:#EFECE5"><th scope="col" style="text-align:left;padding:9px 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2);width:40%">Recht</th>'
+    +'<th scope="colgroup" colspan="2" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Admin <span style="font-weight:600;color:var(--text3)">· '+cnt.admin+'</span></th>'
     +'<th scope="colgroup" colspan="2" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Coach <span style="font-weight:600;color:var(--text3)">· '+cnt.coach+'</span></th>'
-    +'<th scope="col" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Betrachter <span style="font-weight:600;color:var(--text3)">· '+cnt.viewer+'</span></th></tr>'
-    +'<tr style="background:#EFECE5"><th></th><th style="'+BL+'padding:4px">'+eye()+'</th><th style="padding:4px">'+pen()+'</th><th style="'+BL+'padding:4px">'+eye()+'</th></tr></thead><tbody>';
+    +'<th scope="col" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Betrachter <span style="font-weight:600;color:var(--text3)">· '+cnt.viewer+'</span></th>'
+    +'<th scope="col" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Sales Agent <span style="font-weight:600;color:var(--text3)">· '+cnt.agent+'</span></th>'
+    +'<th scope="col" style="'+BL+'padding:9px 8px;font-size:11.5px;font-weight:700;letter-spacing:.04em;text-transform:uppercase;color:var(--text)">Kein Zugang <span style="font-weight:600;color:var(--text3)">· '+cnt.none+'</span></th></tr>'
+    +'<tr style="background:#EFECE5"><th></th><th style="'+BL+'padding:4px">'+eye()+'</th><th style="padding:4px">'+pen()+'</th><th style="'+BL+'padding:4px">'+eye()+'</th><th style="padding:4px">'+pen()+'</th><th style="'+BL+'padding:4px">'+eye()+'</th><th style="'+BL+'padding:4px;font-size:11px;color:var(--text3);font-weight:500">Erweiterung</th><th style="'+BL+'padding:4px"></th></tr></thead><tbody>';
   GROUPS.forEach(function(g){
-    h+='<tr><td colspan="4" style="height:32px;background:#EFECE5;padding:0 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">'+g[0]+'</td></tr>';
+    h+='<tr><td colspan="8" style="height:32px;background:#EFECE5;padding:0 12px;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--text2)">'+g[0]+'</td></tr>';
     g[1].forEach(function(k){
       var row=PERM_ROWS.find(function(r){return r.key===k;});if(!row)return;
       var c=permFor(k,'coach'),v=permFor(k,'viewer'),lock=!!row.fixed;
-      var desc={performance:'Startseite, Banner, Diagramm, Tabelle',ziel:'Zielplanung, Zielvereinbarung, Ziele im Popup',provision:'Provisionen und Gehälter',activity:'wer hat wann was geändert',coaching:'Sessions erfassen und planen, Aufgaben',qa:'Calls bewerten',dev:'Mitarbeiterentwicklung, Kommentare',stammdaten:'Mitarbeiter anlegen, Person, Vertrag, Provisionsvereinbarung',histEdit:'Bewertungen, Calls, Kommentare'}[k]||'';
+      var desc={performance:'Startseite, Banner, Diagramm, Tabelle',ziel:'Zielplanung, Zielvereinbarung, Ziele im Popup',provision:'Provisionen und Gehälter',provCoaches:'Provision von Coaches/SDM in der Übersicht – sonst nur Sales Agents',salary:'Grundgehalt und Gehaltsdaten',kalEdit:'Urlaub, Krank, Verspätung eintragen, Anträge entscheiden',kalGrund:'sonst nur „abwesend“ – fest durch die Datenbank',kalLate:'fest durch die Datenbank',provEdit:'KPIs, Teiler, Mindestprovision – zusätzlich für einzelne Personen freigebbar',activity:'wer hat wann was geändert',coaching:'Sessions erfassen und planen, Aufgaben',qa:'Calls bewerten',dev:'Mitarbeiterentwicklung, Kommentare',stammdaten:'Mitarbeiter anlegen, Person, Vertrag, Provisionsvereinbarung',histEdit:'Bewertungen, Calls, Kommentare'}[k]||'';
       var label=row.key==='histEdit'?'Nachträglich ändern oder löschen':row.label;
+      lock=lock||!!row.fixedRole;
       var cS=row.editOrNone?box(0,false):box(c!=='-',true,lock,"permToggle('coach','"+k+"','S')",lock?'fest vorgegeben':'');
       var cE=(row.seeOnly||row.fixed)?box(0,false):box(c==='E',true,false,"permToggle('coach','"+k+"','E')");
       var vS=row.editOrNone?box(0,false):box(v!=='-',true,lock,"permToggle('viewer','"+k+"','S')",lock?'fest vorgegeben':'');
       h+='<tr><td style="'+TD+';text-align:left;padding-left:12px;font-size:13px;color:var(--text)">'+esc(label)+(desc?' <span style="font-size:11.5px;color:var(--text3)">· '+esc(desc)+'</span>':'')+'</td>'
-        +'<td style="'+TD+';'+BL+'">'+cS+'</td><td style="'+TD+'">'+cE+'</td><td style="'+TD+';'+BL+'">'+vS+'</td></tr>';
+        +'<td style="'+TD+';'+BL+'">'+box(1,!row.editOrNone,true,'','Admin darf immer alles')+'</td><td style="'+TD+'">'+box(1,!(row.seeOnly),true,'','Admin darf immer alles')+'</td>'
+        +'<td style="'+TD+';'+BL+'">'+cS+'</td><td style="'+TD+'">'+cE+'</td><td style="'+TD+';'+BL+'">'+vS+'</td>'
+        +'<td style="'+TD+';'+BL+';color:var(--text3)">–</td><td style="'+TD+';'+BL+';color:var(--text3)">–</td></tr>'
+        +(row.persons?'<tr><td colspan="8" style="padding:6px 12px 10px;border-bottom:1px solid #eae7e0">'+permPersonsHtml(k)+'</td></tr>':'');
     });
   });
   h+='</tbody></table></div>'
-    +'<div style="font-size:12.5px;line-height:1.55;color:var(--text2);background:var(--s-sub);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 13px;margin-top:12px"><b style="color:var(--text)">So wird es durchgesetzt:</b> Board und Datenbank prüfen dieselben Rechte: Betrachter können nichts speichern, Coaches nur, wo „ändern“ angehakt ist – auch wer sich direkt mit der Datenbank verbindet. Ohne Häkchen bei „sehen“ wird der Bereich in Menü und Mitarbeiterprofil ausgeblendet. Sales Agents kommen nicht ins Board und sehen in der Erweiterung nur ihre eigenen Zahlen.</div></div>';
+    +'<div style="font-size:12.5px;line-height:1.55;color:var(--text2);background:var(--s-sub);border:1px solid var(--border);border-radius:var(--r-md);padding:10px 13px;margin-top:12px"><b style="color:var(--text)">So wird es durchgesetzt:</b> Board und Datenbank prüfen dieselben Rechte: Betrachter können nichts speichern, Coaches nur, wo „ändern“ angehakt ist – auch wer sich direkt mit der Datenbank verbindet. Ohne Häkchen bei „sehen“ wird der Bereich in Menü und Mitarbeiterprofil ausgeblendet. Sales Agents kommen nicht ins Board und sehen in der Erweiterung nur ihre eigenen Zahlen. „Kein Zugang“ hat weder Board noch Erweiterung.</div></div>';
   return h;
 }
 // ══ Wizards ══════════════════════════════════════════════════════════════════
@@ -9662,7 +9710,7 @@ function buildProvisionTeamTable(){
     return {urlaub:urlaub,krank:krank};
   }
   // Coaches (SDC/SDM) mit eigener Provision sehen nur Admins
-  var visible=employees.filter(function(e){return provFlag(e)&&canSeeSalary(e)&&(currentUserRole==='admin'||isAgentEmp(e));});
+  var visible=employees.filter(function(e){return provFlag(e)&&canSeeSalary(e)&&(currentUserRole==='admin'||isAgentEmp(e)||canSeeArea('provCoaches'));});
   var selectedEmps=provisionTeamSelectedIds?visible.filter(function(e){return provisionTeamSelectedIds.indexOf(e.id)>=0;}):visible;
   var isAll=!provisionTeamSelectedIds||provisionTeamSelectedIds.length===visible.length;
   var selLabel=isAll?'Alle Mitarbeiter':(selectedEmps.length===1?selectedEmps[0].name:selectedEmps.length+' Mitarbeiter ausgewählt');
@@ -10733,7 +10781,12 @@ function esBuildHtml(emp,asPopup,html){
 
         html+='<div style="display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px;margin-bottom:10px">';
         html+='<div><label>Vollständiger Name</label><input type="text" id="es-name" value="'+esc(emp.name)+'"></div>';
-        html+='<div><label>Position</label>'
+        (function(){var ad=currentUserRole==='admin'||(asPopup&&asPopup!=='panels'),dis=ad?'':' disabled title="Nur Admins"',fn=personFn(emp),st=personStufe(emp),ort=personOrt(emp);
+          html+='<div><label>Funktion</label><select id="es-fn"'+dis+' onchange="esPersonSync()">'+PERSON_FN.map(function(x){return '<option value="'+x[0]+'"'+(x[0]===fn?' selected':'')+(x[0]==='sdl'&&currentUserRole!=='admin'&&fn!=='sdl'?' disabled':'')+'>'+x[1]+'</option>';}).join('')+'</select></div>';
+          html+='<div id="es-stufe-wrap"'+((fn==='agent'||fn==='coach')?'':' style="display:none"')+'><label>Stufe</label><select id="es-stufe"'+dis+' onchange="esPersonSync()">'+(fn==='coach'?['SDC','SDM']:['SR','SE']).map(function(x){return '<option'+(x===st?' selected':'')+'>'+x+'</option>';}).join('')+'</select></div>';
+          html+='<div><label>Standort</label><select id="es-ort"'+dis+' onchange="esPersonSync()"><option value="MUC"'+(ort==='MUC'?' selected':'')+'>MUC</option><option value="VLC"'+(ort==='VLC'?' selected':'')+'>VLC</option></select></div>';
+          if(emp.id&&currentUserRole==='admin'){var br=emp.boardRole||'',pr=positionRole(emp);html+='<div><label>Zugang zum Board</label><select data-eid="'+emp.id+'" onchange="updateEmpBoardRole(this)"><option value=""'+(br?'':' selected')+'>Automatisch ('+pr+')</option>'+['admin','coach','viewer','agent','none'].map(function(k){return '<option value="'+k+'"'+(br===k?' selected':'')+'>'+BOARD_ROLE_LABEL[k]+'</option>';}).join('')+'</select></div>';}})();
+        html+='<div style="display:none"><label>Position</label>'
           +'<select id="es-role"'+(currentUserRole!=='admin'&&(!asPopup||asPopup==='panels')?' disabled title="Position ändern nur Admins"':'')+' onchange="esSdlToggle(this.value);var cv=this.value;if(cv===\'__new__\'){var nv=prompt(\'Neue Position eingeben:\');if(nv&&nv.trim()){var opt=document.createElement(\'option\');opt.value=nv.trim();opt.text=nv.trim();this.add(opt);this.value=nv.trim();}}toggleProvisionModel(this.value);">'
           +'<option'+(emp.role==='SR'?' selected':'')+'>SR</option>'
           +'<option'+(emp.role==='SE'?' selected':'')+'>SE</option>'
@@ -10828,7 +10881,7 @@ function esBuildHtml(emp,asPopup,html){
         }
         html+='<div class="pv-de-block" style="'+(isVlcModel?'display:none':'')+'">';
         html+='<div style="background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);border-radius:12px;padding:16px 20px;display:grid;grid-template-columns:repeat(4,1fr);gap:0;margin-bottom:16px">';
-        if(canSeeSalary(emp)){
+        if(canSeeSalary(emp)&&(currentUserRole==='admin'||canSeeArea('salary'))){
         html+=stripField('Grundgehalt/Mon.','pv-grundgehalt',2800,'€',10);
         html+=stripField('AG-Sozialabgaben','pv-agSozialabgaben',21,'%',1);
         } else {
@@ -11075,6 +11128,7 @@ function saveNewEmpFull(){
   if(!name){alert('Bitte einen Namen eingeben.');var n=document.getElementById('es-name');if(n)n.focus();return;}
   var role=v('es-role')||'SE',phase=v('es-phase')||'Onboarding',contract=v('es-contract')||'full';
   var startDate=v('es-start')||null;
+  var _fn=v('es-fn'),_st=v('es-stufe'),_or=v('es-ort');if(_fn)role=personRoleCode(_fn,_st,_or);
   var payload={name:name,role:role,phase:phase,start_date:startDate,team:'Deutschland',contract:contract,hours:40,active:phase!=='Inaktiv',
     color_index:_aeNew?_aeNew.color:employees.length%COLORS.length};
   _savingNewEmpFull=true;
@@ -11455,7 +11509,7 @@ function openEmpSetModal(empId){
   // Felder-IDs eindeutig halten: offene Stammdaten im Hauptbereich vorübergehend ausblenden
   var ex=document.getElementById('es-name');
   if(ex&&!body.contains(ex)){var ma=document.getElementById('mainArea');if(ma){ma.innerHTML='';_esHidMain=true;}}
-  body.innerHTML=esBuildHtml(emp,'panels','');
+  body.innerHTML=esBuildHtml(emp,'panels','');provLockForm(body);
   var sub=document.getElementById('esHdSub');if(sub)sub.textContent=emp.name+(emp.role?' · '+emp.role:'');
   espRenderHist();
   openModal('empSetModal');
@@ -11731,7 +11785,7 @@ function loadSettingsFromSupabase(){
       if(r.key==='ftpLastSync')settings.ftpLastSync=r.value||'';
       if(r.key==='tokenExpiry')settings.tokenExpiry=r.value||'';
       if(r.key==='extensionUrl')settings.extensionUrl=r.value||'';
-      if(r.key==='rolePermissions'||r.key==='kalenderRules'||r.key==='wizardSettings'||r.key==='wizardConfig'||r.key==='dashboardTargets'||r.key==='ftpUnmatched'||r.key==='ftpRange'){ try{ settings[r.key]=JSON.parse(r.value||'null'); }catch(e){} }
+      if(r.key==='rolePermissions'||r.key==='kalenderRules'||r.key==='wizardSettings'||r.key==='wizardConfig'||r.key==='dashboardTargets'||r.key==='ftpUnmatched'||r.key==='ftpRange'||r.key==='permPersons'){ try{ settings[r.key]=JSON.parse(r.value||'null'); }catch(e){} }
       if(r.key.indexOf('ziel_nl_')===0)zielNlTargets[r.key.slice(8)]=parseFloat(r.value)||0;
     });
     return true;
@@ -12409,6 +12463,7 @@ function saveEmpEinstellungen(){
   var oldSnapshot={name:emp.name,role:emp.role,phase:emp.phase,contract:emp.contract,hours:emp.hours,startDate:emp.startDate,endDate:emp.endDate,email:emp.email};
   emp.name=document.getElementById('es-name').value.trim()||emp.name;
   emp.role=document.getElementById('es-role').value;
+  (function(){var f=document.getElementById('es-fn'),st=document.getElementById('es-stufe'),o=document.getElementById('es-ort');if(f){emp.funktion=f.value;emp.stufe=(f.value==='agent'||f.value==='coach')&&st?st.value:null;emp.standort=o?o.value:'MUC';}})();
   var oldSdlTeam=JSON.stringify(emp.sdlTeam||[]);
   if(emp.role==='SDL'){var cbs=document.querySelectorAll('#es-sdl-team .es-sdl-cb');if(cbs.length||document.getElementById('es-sdl-team'))emp.sdlTeam=Array.prototype.filter.call(cbs,function(c){return c.checked;}).map(function(c){return String(c.value);});}
   else emp.sdlTeam=[];
@@ -12452,7 +12507,9 @@ function saveEmpEinstellungen(){
     contract:emp.contract,hours:emp.hours,notes:emp.notes||null,color_index:emp.color,email:emp.email||null,work_hours:emp.workHours||null
   };
   if(sdlTeamChanged)empUpd.sdl_team=emp.sdlTeam||[];
+  if(emp.funktion){empUpd.funktion=emp.funktion;empUpd.stufe=emp.stufe;empUpd.standort=emp.standort;}
   sb.from('employees').update(empUpd).eq('id',emp.id).then(function(res){
+    if(res&&res.error&&/funktion|stufe|standort/.test(res.error.message||'')){delete empUpd.funktion;delete empUpd.stufe;delete empUpd.standort;return sb.from('employees').update(empUpd).eq('id',emp.id);}return res;}).then(function(res){
     _savingEmpEinstellungen=false;
     if(res.error){alert('Fehler beim Speichern in Supabase: '+res.error.message+'\n\nDie Änderung ist lokal sichtbar, aber NICHT gespeichert -- bitte nochmal versuchen.');return;}
     var stammChanges=[];
@@ -12632,8 +12689,12 @@ function toggleProvisionModel(role){
   document.querySelectorAll('.pv-de-block').forEach(function(el){el.style.display=vlc?'none':'';});
   document.querySelectorAll('.pv-vlc-block').forEach(function(el){el.style.display=vlc?'':'none';});
 }
+function provCanEdit(){return currentUserRole==='admin'||permFor('provEdit')==='E';}
+// Formular: ohne Recht „Provisionsvereinbarung ändern“ nur ansehen
+function provLockForm(root){if(provCanEdit()||!root)return;root.querySelectorAll('[id^="pv-"]').forEach(function(el){if('disabled' in el)el.disabled=true;});root.querySelectorAll('tr[data-kpi]').forEach(function(tr){tr.removeAttribute('draggable');});var b=root.querySelector('.pv-ab-box');if(b)b.outerHTML='<div class="pv-ab-box"><div><b>Nur ansehen</b><span class="pv-ab-hint">Provisionsvereinbarungen ändern dürfen Admins und Personen, denen das Recht gegeben wurde (Rollen &amp; Rechte).</span></div></div>';}
 function saveProvisionSettings(empId){
   if(_savingProvisionSettings)return;
+  if(!provCanEdit())return;
   var emp=employees.find(function(e){return e.id===empId;});
   if(!emp)return;
   var oldSettings=JSON.parse(JSON.stringify(emp.provisionSettings||{}));
@@ -13651,7 +13712,7 @@ function kalMapRow(r){return {id:r.id||('t'+Math.random().toString(36).slice(2))
   verschobenVon:r.verschoben_von||null,notiz:r.notiz||'',eingereichtAm:(r.eingereicht_am||'').slice(0,10)||today(),eingereichtVon:r.eingereicht_von||'',entschiedenVon:r.entschieden_von||'',entschiedenAm:r.entschieden_am||null,masked:!!r.masked};}
 function kalHalb(x){return x.halb?(x.halbTeil==='nm'?' ½ NM':' ½ VM'):'';}
 function kalIsViewer(){return currentUserRole==='viewer';}
-function kalCanEdit(){return !kalIsViewer();}
+function kalCanEdit(){return currentUserRole==='admin'||(!kalIsViewer()&&permFor('kalEdit')==='E');}
 function loadAbsencesFromSupabase(){
   if(kalIsViewer()){
     var y=+today().slice(0,4);
@@ -13713,7 +13774,7 @@ function kalWdBetween(e,a,b){var n=0,d=kalAdd(a,1);while(d<b){if(kalWorkday(e,d)
 // ── Mitarbeiter je Standort ──
 // Wer im Kalender (Monat, Woche, Jahr, Team, Urlaubskonto, Formular) steht – Aufgaben, Weeklys, QA und „frei“-Zählung nutzen weiter kalEmps (nur Agenten)
 // Anzeige der Position im Kalender (Personen ohne Board-Zugang als „Büro“)
-function kalRoleLbl(e){return !e?'':e.role==='KAL'?'Büro':(e.role||'');}
+function kalRoleLbl(e){if(!e)return '';var f=personFn(e);return f==='am'?'AM':f==='salesops'?'Ops':f==='leitung'?'Leitung':f==='none'?'–':(e.role||'');}
 function kalPeople(loc){var A=kalEmps(loc).filter(kalFlag),seen={};kalEmps(loc).forEach(function(e){seen[e.id]=1;});var X=employees.filter(function(e){return !seen[e.id]&&kalLocMatch(e,loc)&&kalFlag(e);});
   var ord=function(e){return e.kalOnly?2:(e.role==='SDC'||e.role==='SDM'||e.isPureCoach)?1:0;};return A.concat(X.sort(function(a,b){return ord(a)-ord(b)||a.name.localeCompare(b.name);}));}
 function kalLocMatch(e,loc){loc=loc||KAL.loc;if(loc==='ALL')return true;if(loc==='NONE')return false;return loc==='VLC'?kalIsVlc(e):!kalIsVlc(e);}
@@ -14193,7 +14254,7 @@ function kalSaveCfg(eid){var e=kalEmp(eid);if(!e||!kalCanEdit())return;var y=tod
 
 
 // ── Verspätungen ──
-function latCanSee(){return typeof kalCanEdit==='function'&&kalCanEdit();}
+function latCanSee(){return currentUserRole==='admin'||(!kalIsViewer()&&permFor('kalLate')!=='-');}
 function latOn(eid,d){return lateness.filter(function(x){return String(x.employeeId)===String(eid)&&x.von===d;});}
 function latMinOn(eid,d){return latOn(eid,d).reduce(function(s,x){return s+(+x.minuten||0);},0);}
 function latStats(eid,from,to){var L=lateness.filter(function(x){return String(x.employeeId)===String(eid)&&x.von>=from&&x.von<=to;});return {n:L.length,min:L.reduce(function(s,x){return s+(+x.minuten||0);},0)};}

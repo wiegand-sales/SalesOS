@@ -1130,7 +1130,7 @@ tr.pv-empty td{background:repeating-linear-gradient(-45deg,transparent 0 6px,rgb
 <div class="modal-ov hidden" id="perfPopModal"><div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">
   <div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Performance</div><div id="ppHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal('perfPopModal')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>
   <div style="display:flex;min-height:0;flex:1">
-    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Wichtigste KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecB');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-star"></i><span class="rl-tip" style="left:48px">Wichtigste KPIs</span></button><button class="rl-btn" type="button" aria-label="Verlauf" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecV');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-chart-bar"></i><span class="rl-tip" style="left:48px">Verlauf</span></button><button class="rl-btn" type="button" aria-label="Marge" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecM');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-currency-euro"></i><span class="rl-tip" style="left:48px">Marge</span></button><button class="rl-btn" type="button" aria-label="KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecK');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-table"></i><span class="rl-tip" style="left:48px">KPIs</span></button></div>
+    <div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3"><button class="rl-btn on" type="button" aria-label="Wichtigste KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecB');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-star"></i><span class="rl-tip" style="left:48px">Wichtigste KPIs</span></button><button class="rl-btn" type="button" aria-label="Verlauf" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecV');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-chart-bar"></i><span class="rl-tip" style="left:48px">Verlauf</span></button><button class="rl-btn" type="button" aria-label="Marge" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecM');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-currency-euro"></i><span class="rl-tip" style="left:48px">Marge</span></button><button class="rl-btn" type="button" aria-label="KPIs" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById('ppSecK');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-table"></i><span class="rl-tip" style="left:48px">KPIs</span></button><button class="rl-btn" id="ppRailP" type="button" aria-label="Provision" style="width:38px;height:38px;font-size:18px;display:none" onclick="var el=document.getElementById('ppSecP');if(el)el.scrollIntoView({behavior:'smooth',block:'start'})"><i class="ti ti-cash"></i><span class="rl-tip" style="left:48px">Provision</span></button></div>
     <div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0">
       <div id="ppBody" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px"></div>
       <div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn btn-primary" type="button" style="height:36px;width:auto" onclick="var e=_puEmp||selectedEmp;closeModal('perfPopModal');selectedEmp=e;view='emp';activeTab='performance';renderSidebar();renderMain();"><i class="ti ti-arrow-right"></i> Zur KPI Performance</button><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal('perfPopModal')">Schließen</button></div>
@@ -9662,8 +9662,8 @@ function openCommentModal(empId,editCommentId){
 // ── PROVISION: komplett eigenstaendige Tabelle, unabhaengig von buildOverviewTab (keine geteilte Zustandsvariable) ──
 var provisionMode='month'; // Standard: aktueller Monat // 'month' | 'year' | 'custom'
 var provisionCustomMonth=today().slice(0,7);
-function setProvisionCustomMonth(val){provisionMode='custom';provisionCustomMonth=val;if(view==='provisionTeam')renderMain();else renderTab();}
-function setProvisionMode(m){provisionMode=m;if(view==='provisionTeam')renderMain();else renderTab();}
+function setProvisionCustomMonth(val){provisionMode='custom';provisionCustomMonth=val;if(document.getElementById('ppSecP'))ppRenderProv();if(view==='provisionTeam')renderMain();else renderTab();}
+function setProvisionMode(m){provisionMode=m;if(document.getElementById('ppSecP'))ppRenderProv();if(view==='provisionTeam')renderMain();else renderTab();}
 // ── Provisionsberechnung nach der Provisionsvereinbarung (§2-§5) ──
 var WEEKDAY_KEYS=['so','mo','di','mi','do','fr','sa']; // JS getDay(): 0=So,1=Mo,...6=Sa
 var DEFAULT_WORK_HOURS={
@@ -9916,7 +9916,7 @@ function calculateProvision(emp,monthKey,row,dayCount){
   }
 
   var abzug=regulaer-finalProvision;
-  return {basis:basis,umsatz:umsatz,regulaer:regulaer,abzug:abzug,provision:finalProvision,fehlendeKpis:fehlendeKpis.map(function(c){return c.label;}),mindestleistungGreift:mindestleistungGreift,beschaeftigungsmonat:bm};
+  return {checks:checks,mindestleistung:mindestleistung,reduktionProKpi:reduktionProKpi,basis:basis,umsatz:umsatz,regulaer:regulaer,abzug:abzug,provision:finalProvision,fehlendeKpis:fehlendeKpis.map(function(c){return c.label;}),mindestleistungGreift:mindestleistungGreift,beschaeftigungsmonat:bm};
 }
 function renderProvisionTeam(){
   var ma=document.getElementById('mainArea');if(!ma)return;
@@ -9938,7 +9938,7 @@ function provExtraSet(eid,mk,v){if(currentUserRole!=='admin')return;var n=Math.m
   if(PROV_EXTRA_TABLE){var q=n?sb.from('provision_extra').upsert({employee_id:eid,monat:mk,betrag:n,geaendert_von:qaCurrentName()||null,geaendert_am:new Date().toISOString()},{onConflict:'employee_id,monat'}):sb.from('provision_extra').delete().eq('employee_id',eid).eq('monat',mk);
     q.then(function(r){if(r&&r.error)alert('Speichern fehlgeschlagen: '+r.error.message);else logActivity('employee','updated',log);});}
   else{settings.provisionExtra=JSON.parse(JSON.stringify(PROV_EXTRA));saveSettingJson('provisionExtra',settings.provisionExtra,log);}
-  renderMain();}
+  renderMain();if(document.getElementById('ppSecP'))ppRenderProv();if(document.getElementById('pvpBody'))pvpRender();}
 // Aus der Provision in den Kalender: Team-Ansicht des Monats, nur Abwesenheiten, Zeile des Mitarbeiters markiert
 function provGoKal(eid,mk){var f=kalFilterCats();KAL.hide={};f.ses.forEach(function(o){KAL.hide[o[0]]=1;});KAL.loc='ALL';KAL.chf={};KAL.view='team';KAL.cur=mk+'-01';KAL.focusEmp=String(eid);selectKalender();
   setTimeout(function(){var n=document.querySelector('.kal-tl .kal-nmc[data-eid="'+eid+'"]');if(n){n.scrollIntoView({block:'center',behavior:'smooth'});n.classList.add('kal-focus');setTimeout(function(){n.classList.remove('kal-focus');},2500);}},80);}
@@ -9971,6 +9971,10 @@ function provFocusTd(kind,key,emp,mk,row,hours,days,padding){var n=function(f){r
   var pv=effectiveProvisionSettings(emp,mk),bm=beschaeftigungsmonat(emp,mk),z=(pv.kpis||[]).indexOf(key)>=0?provisionKpiSetFor(pv,bm)[key]:null,c=provKpiCat(key),bad=z!=null&&(c.dir==='lte'?v>z:v<z);
   var fam=kind==='cr'?['crOem','crUps','crWka']:['oemAnteil','anteilUps','anteilWka'],tip='<b>'+(kind==='cr'?'CR (Fokus)':'Anteil (Fokus)')+': '+c.lbl+'</b>'+fam.map(function(k){var x=Math.round(provKpiIst(k,row,hours,days));return '<br>'+(k===key?'<b>':'')+provKpiCat(k).lbl+' '+x+' %'+(k===key?'</b>':'');}).join('')+(z!=null?'<br>Ziel: '+(c.dir==='lte'?'≤ ':'≥ ')+z+' % · '+(bad?'verfehlt':'erfüllt'):'');
   return '<td style="padding:'+(padding||'13px 10px')+';border-bottom:1px solid var(--border);background:var(--s-tint);text-align:right;font-weight:600;'+(bad?'color:var(--red);font-weight:700':'color:var(--text)')+';cursor:help" data-ktip="'+esc(tip)+'"><div style="display:flex;flex-direction:column;align-items:flex-end;line-height:1.15"><span>'+v+'%</span><span style="font-size:11px;color:var(--text3);margin-top:1px"><span class="pf-tag pf-'+PROV_FOCUS_TAG[key].toLowerCase()+'">'+PROV_FOCUS_TAG[key]+'</span>'+cnt+'</span></div></td>';}
+function provTageFor(emp,mk){var r={at:0,url:0,aus:0,fs:0,kra:0,ein:0,leer:[],doppelt:[]},d=mk+'-01',dd={};(performance[emp.id]||[]).forEach(function(x){if((x.date||'').slice(0,7)===mk)dd[x.date]=1;});
+  var end=null;
+  while(d.slice(0,7)===mk){if((!end||d<=end)&&(!emp.startDate||d>=emp.startDate)&&(!emp.endDate||d<=emp.endDate)&&kalWorkday(emp,d)){r.at++;var a=kalOn(emp.id,d),f=0;if(a&&!a.fixed&&a.status!=='abgelehnt'&&a.status!=='storniert'){f=a.halb?0.5:1;var k=a.art;if(k==='urlaub'||k==='flex')r.url+=f;else if(k==='ausgleich')r.aus+=f;else if(k==='freistellung')r.fs+=f;else r.kra+=f;}var e=dd[d]?(f===0.5?0.5:1):0;r.ein+=e;}d=kalAdd(d,1);}
+  r.sum=r.ein+r.url+r.aus+r.fs+r.kra;return r;}
 function buildProvisionTeamTable(){
   function stackCell(main,sub){
     var hasSubValue=(sub!==null&&sub!==undefined&&sub!=='');
@@ -11483,6 +11487,7 @@ function saveNewEmpFull(){
 // und werden beim Wechseln ausgeblendet statt geschlossen, damit Eingaben erhalten bleiben.
 var PU=[
   {k:'pf',n:'Performance',i:'ti-chart-line',ids:['perfPopModal']},
+  {k:'pv',n:'Provision',i:'ti-cash',ids:['provPopModal']},
   {k:'ov',n:'Übersicht',i:'ti-layout-grid',ids:['coachingInfoModal']},
   {k:'se',n:'Coaching',i:'ti-users',ids:['neuesCoachingModal','sessionPlanenModal']},
   {k:'ca',n:'Call',i:'ti-phone',ids:['qaBewertungModal']},
@@ -11490,7 +11495,7 @@ var PU=[
   {k:'ta',n:'Task',i:'ti-checkbox',ids:['addTaskModal']},
   {k:'es',n:'Einstellungen',i:'ti-settings',ids:['empSetModal']}
 ];
-var PU_OPEN={perfPopModal:'openPerfPopup',coachingInfoModal:'openCoachingInfoModal',neuesCoachingModal:'openNeuesCoachingModal',sessionPlanenModal:'openSessionModal',
+var PU_OPEN={provPopModal:'openProvPopup',perfPopModal:'openPerfPopup',coachingInfoModal:'openCoachingInfoModal',neuesCoachingModal:'openNeuesCoachingModal',sessionPlanenModal:'openSessionModal',
   qaBewertungModal:'openQaBewertungModal',cevModal:'openCoachingEval',commentModal:'openCommentModal',addTaskModal:'openAddTaskModal',empSetModal:'openEmpSetModal'};
 var PU_SUBICONS={cevModal:[['ti-calendar','Datum'],['ti-adjustments-horizontal','Bewertung'],['ti-notes','Notiz']],
   commentModal:[['ti-user','Wer & Wann'],['ti-tag','Art des Kommentars'],['ti-message-circle','Kommentar']]};
@@ -11619,7 +11624,7 @@ function puDecorate(id){
     foot.appendChild(bar);
   }
   // Reihenfolge wie im Hauptmenü: Zahlen | Arbeiten | Verwaltung (Striche dazwischen)
-  var PU_ORDER=['ov','pf','|','ta','ab','se','ca','en','|','es'],seen={},lst=[];PU_ORDER.forEach(function(k){if(k==='|'){lst.push('|');return;}var p=PU.find(function(x){return x.k===k;});if(p){lst.push(p);seen[k]=1;}});PU.forEach(function(p){if(!seen[p.k])lst.splice(lst.lastIndexOf('|'),0,p);});
+  var PU_ORDER=['ov','pf','pv','|','ta','ab','se','ca','en','|','es'],seen={},lst=[],_pe=employees.find(function(e){return String(e.id)===String(_puEmp||selectedEmp);});PU_ORDER.forEach(function(k){if(k==='|'){lst.push('|');return;}var p=PU.find(function(x){return x.k===k;});if(p&&k==='pv'&&!(typeof ppProvAllowed==='function'&&ppProvAllowed(_pe))){seen[k]=1;return;}if(p){lst.push(p);seen[k]=1;}});PU.forEach(function(p){if(!seen[p.k])lst.splice(lst.lastIndexOf('|'),0,p);});
   top.innerHTML=lst.map(function(p){if(p==='|')return '<span style="width:26px;height:1px;background:#E4E0D6;margin:4px 0;flex-shrink:0"></span>';return '<button class="rl-btn'+(p.k===key?' on':'')+'" type="button" aria-label="'+p.n+'" style="width:38px;height:38px;font-size:18px;flex-shrink:0" onclick="puGo(\''+p.k+'\')"><i class="ti '+p.i+'"'+(p.k==='pf'?' style="color:#F08566"':'')+'></i><span class="rl-tip" style="left:48px">'+p.n+'</span></button>';}).join('');
   // Session: Schalter „Erfassen | Planen“ im Kopf
   if(key==='se'){
@@ -11695,6 +11700,9 @@ function ppRenderChart(){
 }
 function ppSetMetric(k){_ppMetric=k;ppRenderChart();}
 function ppSetPeriod(k){_ppPeriod=k;ppRenderChart();}
+// Provision im Mitarbeiter-Popup (gleiche Tabelle wie die Übersicht, nur diese Person)
+function ppProvAllowed(emp){return !!emp&&(currentUserRole==='admin'||canSeeArea('provision'))&&canSeeSalary(emp)&&provFlag(emp)&&(currentUserRole==='admin'||isAgentEmp(emp)||canSeeArea('provCoaches'));}
+function ppRenderProv(){var el=document.getElementById('ppSecP');if(!el||!_ppEmp)return;el.innerHTML=buildProvisionTable(_ppEmp);}
 function openPerfPopup(empId){
   var emp=employees.find(function(e){return String(e.id)===String(empId);});if(!emp)return;
   _ppEmp=emp.id;
@@ -11745,7 +11753,9 @@ function openPerfPopup(empId){
   });
   tb+='</table></div>';
   var body=document.getElementById('ppBody');
-  body.innerHTML=ban+verl+mg+tb;
+  var pvOk=false;var rp=document.getElementById('ppRailP');if(rp)rp.style.display='none';
+  body.innerHTML=ban+verl+mg+tb+(pvOk?'<div id="ppSecP" style="margin-top:14px"></div>':'');
+  if(pvOk)ppRenderProv();
   ppRenderChart();
   body.scrollTop=0;
   openModal('perfPopModal');
@@ -15516,6 +15526,74 @@ document.addEventListener('visibilitychange',function(){if(!document.hidden&&Dat
     for(var j=0;j<K.length;j++){var rr=Math.floor(j/n),cc=j%n;if(r>0&&rr===r&&!K[j].classList.contains('ft'))K[j].classList.add('kg-row');if(c>0&&cc===c)K[j].classList.add('kg-col');}
     if(r>0&&c>0)cell.classList.add('kg-x');},true);
   document.addEventListener('mouseleave',function(){if(cur)clear();});})();
+
+// ══ Karte „Provision“ in der Mitarbeiterkarte (Aufbau wie Übersicht/Performance) ══
+var _pvpEmp=null;
+function pvpMonth(emp,mk){var cl=PROV_CLOSED[mk],fz=cl&&cl.rows[String(emp.id)];if(fz)return {mk:mk,calc:fz.calc,extra:+fz.extra||0,pt:fz.pt,closed:true,data:true};
+  var rows=(performance[emp.id]||[]).filter(function(x){return (x.date||'').slice(0,7)===mk;});var g=rows.length?groupPerfRows(rows,'month')[0]:{row:{},count:0};
+  var calc=calculateProvision(emp,mk,g.row,g.count);return {mk:mk,calc:calc,extra:provExtraGet(emp.id,mk),pt:null,closed:false,data:rows.length>0};}
+function pvpEur(v){return '€'+Math.round(v||0).toLocaleString('de-DE');}
+function pvpVal(c,v){if(v==null)return '–';return c.k==='optH'||c.unit===''?(Math.round(v*100)/100).toLocaleString('de-DE'):Math.round(v)+' %';}
+function openProvPopup(empId){var emp=employees.find(function(e){return String(e.id)===String(empId);});if(!emp)return;_pvpEmp=emp.id;
+  var m=document.getElementById('provPopModal');
+  if(!m){m=document.createElement('div');m.className='modal-ov hidden';m.id='provPopModal';
+    m.innerHTML='<div class="modal" style="padding:0;display:flex;flex-direction:column;background:#EEEDE9;overflow:hidden">'
+      +'<div style="display:flex;align-items:center;padding:14px 16px 6px"><div style="min-width:0"><div style="font-size:10.5px;font-weight:700;letter-spacing:.08em;color:var(--text3);text-transform:uppercase">Provision</div><div id="pvpHdSub" style="font-size:14px;font-weight:600;color:var(--text2);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">—</div></div><button class="btn" type="button" style="margin-left:auto;width:34px;height:34px;padding:0;justify-content:center" onclick="closeModal(\'provPopModal\')" aria-label="Schließen"><i class="ti ti-x"></i></button></div>'
+      +'<div style="display:flex;min-height:0;flex:1"><div style="width:56px;flex-shrink:0;align-self:stretch;margin:6px 0 14px 14px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 0;background:#F7F5F0;border:1px solid #E4E0D6;border-radius:14px;box-shadow:0 10px 24px rgba(40,32,15,.10);position:relative;z-index:3">'
+      +'<button class="rl-btn on" type="button" aria-label="Provision und Verlauf" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'pvpSec1\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-chart-line"></i><span class="rl-tip" style="left:48px">Provision und Verlauf</span></button>'
+      +'<button class="rl-btn" type="button" aria-label="KPIs und Abzug" style="width:38px;height:38px;font-size:18px" onclick="var el=document.getElementById(\'pvpSec2\');if(el)el.scrollIntoView({behavior:\'smooth\',block:\'start\'})"><i class="ti ti-target"></i><span class="rl-tip" style="left:48px">KPIs und Abzug</span></button></div>'
+      +'<div style="flex:1;min-width:0;display:flex;flex-direction:column;min-height:0"><div id="pvpBody" style="flex:1;overflow-y:auto;padding:6px 18px 12px 14px"></div>'
+      +'<div style="display:flex;justify-content:flex-end;gap:8px;padding:4px 18px 14px"><button class="btn" type="button" style="height:36px;width:auto" onclick="var e=_pvpEmp;closeModal(\'provPopModal\');provisionTeamSelectedIds=[e];provisionMode=\'year\';selectProvisionTeam();"><i class="ti ti-arrow-right"></i> Zur Provisionsübersicht</button><button class="btn" type="button" style="height:36px;width:auto" onclick="closeModal(\'provPopModal\')">Schließen</button></div></div></div></div>';
+    document.body.appendChild(m);}
+  var sub=document.getElementById('pvpHdSub');if(sub)sub.textContent=emp.name+(emp.role?' · '+emp.role:'');
+  pvpRender();openModal('provPopModal');}
+function pvpRender(){var emp=kalEmp(_pvpEmp),body=document.getElementById('pvpBody');if(!emp||!body)return;
+  var y=today().slice(0,4),cm=today().slice(0,7),M=[];for(var i=1;i<=12;i++){var mk=y+'-'+('0'+i).slice(-2);if(mk>cm)break;if(emp.startDate&&mk<emp.startDate.slice(0,7))continue;if(emp.endDate&&mk>emp.endDate.slice(0,7))continue;M.push(pvpMonth(emp,mk));}
+  var cur=M.filter(function(x){return x.mk===cm;})[0]||pvpMonth(emp,cm),c=cur.calc||{},ad=currentUserRole==='admin',ML=KAL_MON,mn=ML[+cm.slice(5,7)-1];
+  var pv=function(x){return (x.calc&&x.calc.provision||0)+(x.extra||0);},rg=function(x){return (x.calc&&x.calc.regulaer||0)+(x.extra||0);};
+  var pt=cur.pt||provTageFor(emp,cm),fail=(c.fehlendeKpis||[]),abzP=rg(cur)>0?Math.round((c.abzug||0)/rg(cur)*100):0;
+  var CARD='background:#F7F5F0;border:1px solid #E4E0D6;border-radius:16px;padding:16px;margin-bottom:14px;box-shadow:0 12px 30px rgba(40,32,15,0.06)',PAN='background:#EFECE5;border-radius:12px;padding:10px 14px 8px';
+  var H=function(t,r){return '<div style="display:flex;align-items:baseline;margin-bottom:12px"><b style="font-size:15px">'+t+'</b><span style="margin-left:auto;font-size:12px;color:var(--text3)">'+r+'</span></div>';};
+  // 1) Banner wie in der Übersicht
+  var tile=function(lbl,val,sub,first){return '<div style="padding:0 14px;min-width:0;'+(first?'padding-left:0;':'border-left:1px solid rgba(255,255,255,.25);')+'"><div style="font-size:11px;font-weight:700;letter-spacing:.08em">'+lbl+'</div><div style="font-size:30px;font-weight:300;line-height:1.15;white-space:nowrap">'+val+'</div><div style="font-size:12px;color:rgba(255,255,255,.9);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+sub+'</div></div>';};
+  var h='<div style="border-radius:14px;padding:14px 18px;margin-bottom:14px;color:#fff;background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%)"><div style="font-size:11px;font-weight:700;letter-spacing:.09em;margin-bottom:10px">'+esc(emp.name.toUpperCase())+' · '+esc((emp.role||'').toUpperCase())+' · '+mn.toUpperCase()+(cur.closed?' · ABGESCHLOSSEN':'')+'</div><div style="display:grid;grid-template-columns:repeat(5,minmax(0,1fr))">'
+    +tile('PROVISION',pvpEur(pv(cur)),'nach Abzug',true)+tile('REGULÄR',pvpEur(rg(cur)),'Basis '+pvpEur(c.basis)+' + Umsatz '+pvpEur(c.umsatz))+tile('ABZUG','−'+abzP+' %',fail.length?fail.length+' KPI'+(fail.length>1?'s':'')+' verfehlt':'alle KPIs erfüllt')+tile('OPTIONAL',pvpEur(cur.extra),'ohne Abzug')+tile('TAGE',kalNf(pt.sum)+'/'+pt.at,pt.sum===pt.at?'alle belegt':'⚠ prüfen')+'</div></div>';
+  // 2) Verlauf, kompakt
+  var W=640,Hh=150,L=40,B=20,cw=(W-L-6)/12,vals=M.map(rg).concat(M.map(pv)),mx=Math.max.apply(null,vals.concat([100]));
+  var st=[100,250,500,1000,2500,5000].filter(function(s){return mx/s<=4;})[0]||5000;mx=Math.ceil(mx/st)*st;
+  var yy=function(v){return Hh-B-(v/mx)*(Hh-B-8);},xx=function(mk){return L+cw*(+mk.slice(5,7)-1)+cw/2;},svg='';
+  for(var v=0;v<=mx+1;v+=st){svg+='<line x1="'+L+'" x2="'+(W-4)+'" y1="'+yy(v).toFixed(1)+'" y2="'+yy(v).toFixed(1)+'" stroke="#E4E0D6"/><text x="'+(L-6)+'" y="'+(yy(v)+3).toFixed(1)+'" font-size="10" fill="#8a8478" text-anchor="end">€'+v.toLocaleString('de-DE')+'</text>';}
+  ML.forEach(function(n,i){var c_=(y+'-'+('0'+(i+1)).slice(-2))===cm;svg+='<text x="'+(L+cw*i+cw/2).toFixed(1)+'" y="'+(Hh-5)+'" font-size="10" text-anchor="middle" fill="'+(c_?'#1d1c1a':'#8a8478')+'" font-weight="'+(c_?700:500)+'">'+n.slice(0,3)+'</text>';});
+  var D=M.filter(function(x){return x.data||x.closed;});
+  if(D.length){svg+='<polygon points="'+D.map(function(x){return xx(x.mk).toFixed(1)+','+yy(rg(x)).toFixed(1);}).join(' ')+' '+D.slice().reverse().map(function(x){return xx(x.mk).toFixed(1)+','+yy(pv(x)).toFixed(1);}).join(' ')+'" fill="#FBE3DA" opacity=".85"/>';
+    var path=function(f,col,dash){var s2='<path d="M'+D.map(function(x){return xx(x.mk).toFixed(1)+','+yy(f(x)).toFixed(1);}).join(' L')+'" fill="none" stroke="'+col+'" stroke-width="2.2"'+(dash?' stroke-dasharray="5 4"':'')+'/>';D.forEach(function(x){s2+='<circle cx="'+xx(x.mk).toFixed(1)+'" cy="'+yy(f(x)).toFixed(1)+'" r="3.2" fill="#fff" stroke="'+col+'" stroke-width="2"><title>'+ML[+x.mk.slice(5,7)-1]+': '+pvpEur(f(x))+'</title></circle>';});return s2;};
+    svg+=path(rg,'#C9B9A3',true)+path(pv,'#3a3833',false);
+    if(cur.data||cur.closed)svg+='<circle cx="'+xx(cm).toFixed(1)+'" cy="'+yy(pv(cur)).toFixed(1)+'" r="4.5" fill="#F08566"/>';}
+  var leg='<div style="display:flex;gap:12px;justify-content:flex-end;font-size:11.5px;color:var(--text2);margin-bottom:2px">'+[['#3a3833','Provision'],['#C9B9A3','Regulär'],['#FBE3DA','Abzug']].map(function(l){return '<span><i style="display:inline-block;width:10px;height:10px;border-radius:3px;background:'+l[0]+';margin-right:5px;vertical-align:-1px"></i>'+l[1]+'</span>';}).join('')+'</div>';
+  var prev=M.filter(function(x){return x.mk<cm;}).slice(-4);
+  var mBox=function(x,i){var r=rg(x),ap=r>0?Math.round((x.calc&&x.calc.abzug||0)/r*100):0,hot=i===prev.length-1;return '<div style="'+(hot?'background:linear-gradient(135deg,#E9773F 0%,#DE5A5E 50%,#C23B66 100%);color:#fff;':'background:#EFECE5;')+'border-radius:12px;padding:9px 12px;min-width:0"><div style="display:flex;font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase"><span>'+ML[+x.mk.slice(5,7)-1]+'</span><span style="margin-left:auto">'+(x.closed?'🔒':'')+'</span></div><div style="font-size:22px;font-weight:300;line-height:1.2;margin-top:2px">'+pvpEur(pv(x))+'</div><div style="font-size:11.5px;color:'+(hot?'rgba(255,255,255,.9)':'var(--text3)')+'">'+(x.data||x.closed?'Abzug −'+ap+' %':'keine Daten')+(x.extra?' · Opt. '+pvpEur(x.extra):'')+'</div></div>';};
+  var sumP=M.reduce(function(a,x){return a+pv(x);},0),sumR=M.reduce(function(a,x){return a+rg(x);},0);
+  h+='<div id="pvpSec1" style="'+CARD+'">'+H('Verlauf',y)+'<div style="'+PAN+'">'+leg+'<svg viewBox="0 0 '+W+' '+Hh+'" width="100%" style="display:block;max-height:170px">'+svg+'</svg></div>'
+    +(prev.length?'<div style="display:grid;grid-template-columns:repeat('+prev.length+',minmax(0,1fr));gap:10px;margin-top:12px">'+prev.map(mBox).join('')+'</div>':'')
+    +'<div style="border-top:1px solid #E4E0D6;margin-top:12px;padding-top:10px;font-size:12.5px;color:var(--text2)"><b>Summe '+y+':</b> '+pvpEur(sumP)+' Provision · '+pvpEur(sumR-sumP)+' durch Abzug verloren'+(sumR>0?' · Ø Abzug '+Math.round((sumR-sumP)/sumR*100)+' %':'')+'.</div></div>';
+  // 3) KPIs und Abzug als Tabelle
+  var CH=(c.checks||[]).filter(function(x){return x.ziel!=null;}),red=Math.round((c.reduktionProKpi||0.2)*100);
+  var fmt=function(x,v){return /Std/.test(x.label)?(Math.round(v*100)/100).toLocaleString('de-DE'):(Math.round(v*10)/10).toLocaleString('de-DE')+' %';};
+  var TH='padding:8px 10px;font-size:10px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--text3);border-bottom:1px solid #E4E0D6',TD='padding:9px 10px;border-bottom:1px solid #EFECE5;font-size:13px';
+  var rows=CH.map(function(x){var good=x.dir==='gte'?x.ist>=x.ziel:x.ist<=x.ziel,d=x.dir==='gte'?x.ist-x.ziel:x.ziel-x.ist;
+    return '<tr><td style="'+TD+';font-weight:600">'+esc(x.label)+'</td><td style="'+TD+';text-align:right;font-weight:700;color:'+(good?'var(--text)':'#C9502F')+'">'+fmt(x,x.ist)+'</td><td style="'+TD+';text-align:right;color:var(--text3)">'+(x.dir==='lte'?'≤ ':'≥ ')+fmt(x,x.ziel)+'</td><td style="'+TD+';text-align:right;color:'+(good?'var(--text3)':'#C9502F')+'">'+(d>=0?'+':'−')+fmt(x,Math.abs(d)).replace(' %',' Pkt.')+'</td><td style="'+TD+';text-align:right;font-weight:700;color:'+(good?'var(--text3)':'#C9502F')+'">'+(good?'✓':'−'+red+' %')+'</td></tr>';}).join('');
+  var lever=CH.filter(function(x){return x.dir==='gte'?x.ist<x.ziel:x.ist>x.ziel;}).map(function(x){return {x:x,rel:x.dir==='gte'?(x.ziel-x.ist)/(x.ziel||1):(x.ist-x.ziel)/(x.ziel||1)};}).sort(function(a,b){return a.rel-b.rel;})[0];
+  var gain=lever?(c.regulaer||0)*(c.reduktionProKpi||0.2):0;
+  var ml=c.mindestleistung!=null?c.mindestleistung:2.5,bm=c.beschaeftigungsmonat||0;
+  var lastClosed=Object.keys(PROV_CLOSED).filter(function(k){return k<=cm&&PROV_CLOSED[k].rows[String(emp.id)];}).sort().pop(),lc=lastClosed?PROV_CLOSED[lastClosed]:null;
+  h+='<div id="pvpSec2" style="'+CARD+'">'+H('KPIs und Abzug',mn+' · '+(bm>=3?'ab Monat 3':'Monat '+bm)+' · je verfehlter KPI −'+red+' %')
+    +(CH.length?'<table style="width:100%;border-collapse:collapse"><thead><tr><th style="'+TH+';text-align:left">Kennzahl</th><th style="'+TH+';text-align:right">Ist</th><th style="'+TH+';text-align:right">Ziel</th><th style="'+TH+';text-align:right">Abstand</th><th style="'+TH+';text-align:right">Abzug</th></tr></thead><tbody>'+rows
+      +'<tr><td style="'+TD+';font-weight:700;border-bottom:0">Gesamt</td><td colspan="3" style="'+TD+';border-bottom:0;color:var(--text3)">'+(c.mindestleistungGreift?'Mindestleistung verfehlt – nur Mindestprovision':fail.length+' von '+CH.length+' verfehlt')+'</td><td style="'+TD+';text-align:right;font-weight:700;border-bottom:0;color:'+(abzP?'#C9502F':'var(--text)')+'">−'+abzP+' %</td></tr></tbody></table>':'<div class="kal-note">Keine Ziele hinterlegt.</div>')
+    +'<div style="display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:12px">'
+    +'<div style="background:#EFECE5;border-radius:12px;padding:10px 12px"><div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Optional · '+mn+'</div><div style="font-size:12px;color:var(--text3);margin-top:2px">Betrag ohne Abzug</div>'+(ad&&!cur.closed?'<input type="number" min="0" step="1" placeholder="0" value="'+(cur.extra||'')+'" style="margin-top:8px;height:32px;width:100%;font-size:13px" onchange="provExtraSet(\''+emp.id+'\',\''+cm+'\',this.value)">':'<div style="font-size:20px;font-weight:300;margin-top:4px">'+pvpEur(cur.extra)+'</div>')+'</div>'
+    +'<div style="background:#EFECE5;border-radius:12px;padding:10px 12px"><div style="font-size:10.5px;font-weight:700;letter-spacing:.06em;text-transform:uppercase">Abschluss</div><div style="font-size:12px;color:var(--text3);margin-top:2px">'+(lc?ML[+lastClosed.slice(5,7)-1]+' abgeschlossen'+(lc.am?' am '+lc.am.slice(8,10)+'.'+lc.am.slice(5,7)+'.':'')+(lc.von?' · '+esc(lc.von):''):'noch kein Monat abgeschlossen')+'</div><div style="font-size:12px;color:var(--text3);margin-top:6px">'+mn+': '+(cur.closed?'🔒 abgeschlossen':'offen · rechnet live')+'</div></div></div>'
+    +'<div style="border-top:1px solid #E4E0D6;margin-top:12px;padding-top:10px;font-size:12.5px;color:var(--text2)">'+(lever?'<b>Größter Hebel:</b> '+esc(lever.x.label)+' auf '+(lever.x.dir==='lte'?'≤ ':'≥ ')+fmt(lever.x,lever.x.ziel)+' bringen – spart −'+red+' % Abzug, ≈ +'+pvpEur(gain)+'. ':'<b>Alle KPIs erfüllt.</b> ')+(bm<2?'Im ersten Monat gilt noch keine Mindestleistung.':'Mindestleistung '+String(ml).replace('.',',')+' Opt./Std. '+(c.mindestleistungGreift?'<b>verfehlt</b>.':'erreicht.'))+'</div></div>';
+  body.innerHTML=h;}
 </script>
 </body>
 </html>

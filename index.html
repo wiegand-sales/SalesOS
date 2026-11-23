@@ -130,10 +130,10 @@ body.sb-collapsed .sb-rail{border-right:none;}
 #espBody>div>*:last-child{margin-bottom:0!important}
 #ncSecNew>div[style*="#EFECE5"]>*:last-child,#spSecNew>div[style*="#EFECE5"]>*:last-child,#qaSecBew>div[style*="#EFECE5"]>*:last-child{margin-bottom:0!important}
 /* Mitarbeiter-Kopf: Reiter als Schalter */
-#empTabBar.emp-seg,#setTabBar.emp-seg{display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:11px;padding:2px;height:34px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
-#empTabBar.emp-seg .tab,#setTabBar.emp-seg .tab{height:28px;padding:0 13px;border-radius:9px;display:flex;align-items:center;font-size:13px;font-weight:500;color:var(--text2);background:transparent;white-space:nowrap}
-#empTabBar.emp-seg .tab.active,#setTabBar.emp-seg .tab.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
-#empTabBar.emp-seg .tab:hover:not(.active),#setTabBar.emp-seg .tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.55)}
+#empTabBar.emp-seg,#setTabBar.emp-seg,#liveTabBar.emp-seg{display:inline-flex;gap:2px;background:#EFECE5;border:1px solid #E4E0D6;border-radius:11px;padding:2px;height:34px;align-items:center;flex-wrap:nowrap;overflow-x:auto;max-width:100%;scrollbar-width:none}
+#empTabBar.emp-seg .tab,#setTabBar.emp-seg .tab,#liveTabBar.emp-seg .tab{height:28px;padding:0 13px;border-radius:9px;display:flex;align-items:center;font-size:13px;font-weight:500;color:var(--text2);background:transparent;white-space:nowrap}
+#empTabBar.emp-seg .tab.active,#setTabBar.emp-seg .tab.active,#liveTabBar.emp-seg .tab.active{background:#fff;color:var(--text);font-weight:600;box-shadow:0 1px 3px rgba(0,0,0,.08)}
+#empTabBar.emp-seg .tab:hover:not(.active),#setTabBar.emp-seg .tab:hover:not(.active),#liveTabBar.emp-seg .tab:hover:not(.active){color:var(--text);background:rgba(255,255,255,.55)}
 .emp-seg-badge{font-size:10.5px;font-weight:700;background:#F08566;color:#fff;border-radius:8px;padding:0 6px;line-height:16px;margin-left:6px}
 .tab-bar{background:transparent;backdrop-filter:none;-webkit-backdrop-filter:none;border-bottom:none;padding:0 24px 10px;display:flex;gap:3px;flex-shrink:0;}
 .tab{padding:7px 14px;font-size:12px;font-weight:600;cursor:pointer;border-radius:9px;color:var(--text2);border-bottom:none;transition:all .12s;white-space:nowrap;}
@@ -747,6 +747,8 @@ tr.pv-frozen td:first-child{box-shadow:inset 3px 0 0 #1d1c1a}
 .at-ar .btn{width:auto;height:34px;white-space:nowrap}
 .at-ar .at-selw{display:flex;align-items:center;gap:6px;min-width:150px}
 tr.pv-empty td{background:repeating-linear-gradient(-45deg,transparent 0 6px,rgba(120,110,95,.05) 6px 8px)}
+
+@media (min-width:1101px){.dsh-q{grid-template-columns:repeat(5,minmax(0,1fr))!important}.dsh-tcs{grid-template-columns:repeat(5,minmax(0,1fr))!important}}
 </style>
 <style id="kal-css">
 /* ── KALENDER ── */
@@ -1045,12 +1047,12 @@ tr.pv-empty td{background:repeating-linear-gradient(-45deg,transparent 0 6px,rgb
     <button class="rl-btn" id="rail-overview" onclick="selectWiegandSub('overview')"><i class="ti ti-chart-bar"></i><span class="rl-tip">Performance</span></button>
     <button class="rl-btn" id="rail-ziel" onclick="selectWiegandSub('ziel')"><i class="ti ti-target"></i><span class="rl-tip">Zielvereinbarung</span></button>
     <button class="rl-btn" id="rail-provision" onclick="selectProvisionTeam()"><i class="ti ti-coin-euro"></i><span class="rl-tip">Provision</span></button>
-    <button class="rl-btn" id="rail-live" onclick="selectLive()"><i class="ti ti-device-tv"></i><span class="rl-tip">Live</span></button>
     <div class="rl-sep"></div>
     <button class="rl-btn" id="rail-aufgaben" onclick="selectAufgaben()"><i class="ti ti-checklist"></i><span class="rl-tip">Aufgaben</span></button>
     <button class="rl-btn" id="rail-kalender" onclick="selectKalender()"><i class="ti ti-calendar"></i><span class="rl-tip">Kalender</span></button>
     <!-- Menü Coaching entfällt (Nov 2026): alles im Kalender -->
     <div class="rl-sep" id="rail-sep-admin"></div>
+    <button class="rl-btn" id="rail-live" onclick="selectLive()"><i class="ti ti-device-tv"></i><span class="rl-tip">Live</span></button>
     <button class="rl-btn" id="rail-activity" onclick="selectCoachingActivity()"><i class="ti ti-activity"></i><span class="rl-tip">Aktivitäten</span></button>
     <button class="rl-btn" id="rail-settings" onclick="selectSettingsSub(settingsView||'users')" style="display:none"><i class="ti ti-settings"></i><span class="rl-tip">Einstellungen</span></button>
     <div style="flex:1"></div>
@@ -4513,34 +4515,81 @@ function liveSaveCfg(){if(currentUserRole!=='admin')return;var g=function(id){va
   sb.from('settings').upsert({key:'liveConfig',value:JSON.stringify(c)},{onConflict:'key'}).then(function(res){
     if(res&&res.error){alert('Speichern fehlgeschlagen: '+res.error.message);return;}
     settings.liveConfig=c;LIVE.msg='Einstellungen gespeichert. Die Fernseher übernehmen sie innerhalb einer Minute.';renderLive();});}
-function renderLive(){var ma=document.getElementById('mainArea');if(!ma)return;setTimeout(liveZieleSync,500);
-  var adm=currentUserRole==='admin',k=settings.liveKey||'',c=liveCfg(),u=liveUrl(false);
-  var inp=function(id,v,step,dis){return '<input type="number" id="'+id+'" value="'+(v==null?'':v)+'" step="'+step+'" min="0"'+(dis?' disabled':'')+' style="width:90px;height:34px;box-sizing:border-box;font-size:13px;padding:0 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">';};
-  var fld=function(l,h){return '<label style="display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--text3)">'+l+h+'</label>';};
-  var h='<div class="content">'+buildGlobalBannerHtml(gbVisible());
-  h+='<div class="card card-static"><div style="display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap"><div class="card-title" style="margin:0"><i class="ti ti-device-tv"></i> Live-Ansicht</div><span class="kal-note">So sieht es auf dem Fernseher aus · aktualisiert sich jede Minute</span>'
-    +'<span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="kal-note">Standort</span><span class="dsh-seg">'
-    +[['','Alle'],['MUC','Olching'],['VLC','Valencia']].map(function(o){return '<button type="button" class="'+(LIVE.ort===o[0]?'on':'')+'" onclick="liveSetOrt(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</span></span></div>';
-  if(k){h+='<div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#EEEDE9;border:1px solid var(--border)"><iframe src="'+esc(liveUrl(true))+'" title="Live-Ansicht" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>';}
-  else{h+='<div class="kal-note" style="padding:30px;text-align:center">Noch keine Adresse vorhanden. '+(adm?'Bitte unten „Adresse erzeugen“ klicken (vorher 45_live_ansicht.sql in Supabase ausführen).':'Ein Admin muss die Adresse zuerst erzeugen.')+'</div>';}
+var LIVE_TAB='uebersicht';
+function liveTab(t){LIVE_TAB=t;renderLive();}
+function liveTest(k){LIVE.test=k;LIVE.testN=(LIVE.testN||0)+1;var f=document.getElementById('liveFrame');if(f)f.src=liveUrl(true)+'&test='+encodeURIComponent(k)+'&r='+LIVE.testN;}
+function liveTodayList(){var L=[],wd=new Date().getDay(),t=today();
+  ZPB_ROWS.forEach(function(r){var z=zpbGet(r[0]);if(!z.on)return;if(z.wd!=null&&+z.wd!==wd)return;if(wd===0||wd===6)return;
+    var test={dori:'dori12',woche:'woche',monat:'woche',top3:'top3',do:'donnerstag',fr:'freitag'}[r[0]];L.push({t:z.t,txt:r[1]+(z.bis?' bis '+z.bis:''),test:test});});
+  (PHB.all||[]).filter(function(h){return h.datum===t;}).forEach(function(h){L.push({t:phbHM(h.start_zeit),txt:'Power Hour · '+PHB_KPI[h.kpi]+' bis '+phbHM(h.end_zeit),test:'intro'});});
+  return L.sort(function(a,b){return a.t<b.t?-1:1;});}
+function liveSettingsSave(){if(currentUserRole!=='admin')return;var g=function(id){var el=document.getElementById(id);return el?el.value.replace(',','.'):'';},n=function(id){var v=g(id);return v===''?null:+v;},cb=function(id){var el=document.getElementById(id);return !!(el&&el.checked);};
+  var fo={};figPeople().forEach(function(e){var el=document.getElementById('set_fokus_'+e.id);fo[e.id]=el?el.value:figFokus(e);});
+  var c=Object.assign({},settings.liveConfig||{},{crOEM:n('ls_fo'),knappOEM:n('ls_fok'),crMY:n('ls_my'),knappMY:n('ls_myk'),crTW:n('ls_tw'),knappTW:n('ls_twk'),crSM:n('ls_sm'),knappSM:n('ls_smk'),crAO:n('ls_ao'),knappAO:n('ls_aok'),optProStd:n('ls_oph'),fokus:fo,
+    feiern:{aufstieg:cb('lf_auf'),ziel:cb('lf_ziel'),marge:cb('lf_marge'),margeSchwelle:n('lf_margeS')||2000,auftrag:cb('lf_auftrag'),auftragSchwelle:n('lf_auftragS')||500,team:cb('lf_team'),teamSchritt:n('lf_teamS')||100,zaehlen:cb('lf_zaehl'),kippen:cb('lf_kipp')},dori:{cameo:cb('ld_cameo')}});
+  sb.from('settings').upsert({key:'liveConfig',value:JSON.stringify(c)},{onConflict:'key'}).then(function(res){if(res&&res.error){alert('Speichern fehlgeschlagen: '+res.error.message);return;}settings.liveConfig=c;LIVE.msg='Einstellungen gespeichert. Die Fernseher übernehmen sie innerhalb einer Minute.';renderLive();});}
+function liveFokusSet(id,v){var el=document.getElementById('set_fokus_'+id);if(el)el.value=v;var g=document.getElementById('fk_'+id);if(g)g.querySelectorAll('button').forEach(function(x){x.className=x.textContent===v?'on':'';});}
+function liveSettingsHtml(){var adm=currentUserRole==='admin',dis=adm?'':' disabled',c=settings.liveConfig||{},F=c.feiern||{},Dr=c.dori||{};
+  var inp='height:32px;box-sizing:border-box;font-size:13px;padding:0 8px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);width:80px';
+  var num=function(id,v,ph){return '<input type="number" step="any" id="'+id+'" value="'+(v==null?'':v)+'" placeholder="'+(ph||'')+'"'+dis+' style="'+inp+'">';};
+  var on=function(v){return v!==false;};
+  var cbx=function(id,v,l){return '<label style="display:flex;align-items:center;gap:8px;font-size:13px;cursor:pointer;min-width:0"><input type="checkbox" id="'+id+'"'+(on(v)?' checked':'')+dis+' style="width:16px;height:16px;margin:0;flex-shrink:0"><span>'+l+'</span></label>';};
+  var R='display:grid;grid-template-columns:1fr 80px 80px;gap:8px 14px;align-items:center;min-height:32px';
+  var line=function(l,a,b){return '<div style="'+R+'"><span style="font-size:13px">'+l+'</span>'+(a||'<span></span>')+(b||'<span></span>')+'</div>';};
+  var CARD='class="card card-static" style="margin:0;height:100%;box-sizing:border-box;display:flex;flex-direction:column"';
+  var h='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px"><span class="kal-note">Gilt für alle Fernseher · Änderungen kommen innerhalb einer Minute an</span>'+(adm?'<button class="btn btn-primary" type="button" onclick="liveSettingsSave()"><i class="ti ti-device-floppy"></i> Einstellungen speichern</button>':'')+'</div>';
+  h+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:stretch;margin-bottom:16px">';
+  h+='<div '+CARD+'><div class="card-title"><i class="ti ti-target"></i> Ziele und Farben</div><div class="kal-note" style="margin-bottom:12px">Es gelten die <b>persönlichen Ziele aus der Provisionsvereinbarung</b> (inkl. Onboarding). Die Ersatz-Ziele nur für Personen ohne eigene Vereinbarung. Ziele erscheinen nicht auf den Fernsehern.</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px"><div style="'+R+'"><b style="font-size:11px;color:var(--text3)">KENNZAHL</b><b style="font-size:11px;color:var(--text3)">ERSATZ-ZIEL</b><b style="font-size:11px;color:var(--text3)">„KNAPP“</b></div>'
+    +line('CR Fokus (%)',num('ls_fo',c.crOEM,'55'),num('ls_fok',c.knappOEM,'5'))+line('CR MY (%)',num('ls_my',c.crMY,'20'),num('ls_myk',c.knappMY,'3'))
+    +line('CR TW (%, max.)',num('ls_tw',c.crTW,'25'),num('ls_twk',c.knappTW,'5'))+line('CR SY/MY (%)',num('ls_sm',c.crSM,'60'),num('ls_smk',c.knappSM,'5'))
+    +line('Anteil OEM (%)',num('ls_ao',c.crAO,'–'),num('ls_aok',c.knappAO,'5'))+line('Opt. je Stunde (Soll-Linie)',num('ls_oph',c.optProStd,'3,5'))+'</div></div>';
+  h+='<div '+CARD+'><div class="card-title"><i class="ti ti-confetti"></i> Feiern und Dori</div><div class="kal-note" style="margin-bottom:12px">was eine Animation auslöst · Schwellen in € bzw. Optimierungen</div>'
+    +'<div style="display:flex;flex-direction:column;gap:6px">'
+    +line(cbx('lf_auf',F.aufstieg,'Aufstieg im Ranking'))+line(cbx('lf_ziel',F.ziel,'Tages- / Wochen- / Monatsziel erreicht'))
+    +line(cbx('lf_marge',F.marge,'Marge am Tag über'),num('lf_margeS',F.margeSchwelle,'2000'))+line(cbx('lf_auftrag',F.auftrag,'Top-Auftrag über'),num('lf_auftragS',F.auftragSchwelle,'500'))
+    +line(cbx('lf_team',F.team,'Team-Meilenstein alle'),num('lf_teamS',F.teamSchritt,'100'))+line(cbx('lf_zaehl',F.zaehlen,'Zahlen im Banner zählen hoch'))
+    +line(cbx('lf_kipp',F.kippen,'CR-Kästchen kippen bei Farbwechsel'))+line(cbx('ld_cameo',Dr.cameo,'Dori schaut in große Animationen rein'))+'</div></div>';
   h+='</div>';
-  h+='<div class="card card-static"><div class="card-title"><i class="ti ti-link"></i> Auf dem Fernseher öffnen</div>'
-    +'<div class="kal-note" style="margin-bottom:10px">Diese Adresse im Browser des Fernsehers öffnen und auf Vollbild stellen. Eine Anmeldung ist dort nicht nötig. Wer die Adresse kennt, sieht die Live-Zahlen, deshalb nur auf den Fernsehern verwenden.</div>'
-    +'<div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap"><input id="liveUrlField" readonly value="'+esc(u)+'" onclick="this.select()" style="flex:1;min-width:320px;height:34px;box-sizing:border-box;font-size:13px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
-    +'<button class="btn btn-primary" type="button" onclick="liveCopy()"'+(u?'':' disabled')+'><i class="ti ti-copy"></i> Adresse kopieren</button>'
-    +'<button class="btn" type="button" onclick="liveOpen()"'+(u?'':' disabled')+'><i class="ti ti-arrows-maximize"></i> Im neuen Fenster öffnen</button>'
-    +(adm?'<button class="btn" type="button" onclick="liveNewKey()"><i class="ti ti-refresh"></i> '+(k?'Neue Adresse erzeugen':'Adresse erzeugen')+'</button>':'')+'</div>'
-    +(LIVE.msg?'<div class="kal-note" style="margin-top:10px;color:var(--text)"><i class="ti ti-check"></i> '+esc(LIVE.msg)+'</div>':'')+'</div>';
-  h+='<div class="card card-static"><div class="card-title"><i class="ti ti-adjustments"></i> Ziele in der Live-Ansicht</div>'
-    +'<div class="kal-note" style="margin-bottom:12px">Orange = Ziel erreicht, hell-orange = knapp dran, grau = deutlich darunter. Soll-Linie und Tagesziel der Optimierungen = Optimierungen je Arbeitsstunde × Arbeitszeit laut Stammdaten. Das Marge-Soll kommt aus der Zielvereinbarung.</div>'
-    +'<div style="display:flex;gap:18px;align-items:flex-end;flex-wrap:wrap">'
-    +fld('CR OEM Ziel (%)',inp('liveCrOem',c.crOEM,1,!adm))+fld('knapp dran (Pkt.)',inp('liveKnOem',c.knappOEM,1,!adm))
-    +fld('CR MY Ziel (%)',inp('liveCrMy',c.crMY,1,!adm))+fld('knapp dran (Pkt.)',inp('liveKnMy',c.knappMY,1,!adm))
-    +fld('Optimierungen je Std.',inp('liveOph',c.optProStd,0.1,!adm))
-    +(adm?'<button class="btn btn-primary" type="button" onclick="liveSaveCfg()"><i class="ti ti-device-floppy"></i> Einstellungen speichern</button>':'')+'</div></div>';
-  h+=zpbHtml();
-  h+=phbHtml();
-  h+=figHtml();
+  var P=figPeople();
+  h+='<div class="card card-static" style="margin:0"><div class="card-title"><i class="ti ti-focus-2"></i> CR Fokus je Agent</div><div class="kal-note" style="margin-bottom:10px">welche CR in der Zeile „CR Fokus“ zählt</div>'
+    +'<div style="display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:6px 18px">'
+    +P.map(function(e){var f=figFokus(e);return '<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:5px 0;border-top:1px solid var(--border);min-width:0"><span style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(e.name)+'</span><input type="hidden" id="set_fokus_'+e.id+'" value="'+f+'"><span class="dsh-seg" id="fk_'+e.id+'" style="height:28px;margin:0;flex-shrink:0">'+['OEM','UPS','WKA'].map(function(o){return '<button type="button" class="'+(o===f?'on':'')+'"'+(adm?' onclick="liveFokusSet(\''+e.id+'\',\''+o+'\')"':' disabled')+' style="padding:0 8px;font-size:11.5px">'+o+'</button>';}).join('')+'</span></div>';}).join('')
+    +'</div></div>';
+  return h;}
+function renderLive(){var ma=document.getElementById('mainArea');if(!ma)return;setTimeout(liveZieleSync,500);if(!PHB.loaded)phbLoad();
+  var adm=currentUserRole==='admin',k=settings.liveKey||'',u=liveUrl(false),c=settings.liveConfig||{};
+  var TABS=[['uebersicht','Übersicht'],['zeitplan','Zeitplan'],['powerhour','Power Hour'],['figuren','Figuren'],['einstellungen','Einstellungen']];
+  var last=settings.ftpLastSync?new Date(settings.ftpLastSync):null,ago=last?Math.round((Date.now()-last.getTime())/60000):null;
+  var hint=function(txt,warn){return '<span style="height:34px;display:inline-flex;align-items:center;gap:6px;padding:0 12px;border-radius:10px;font-size:12.5px;white-space:nowrap;'+(warn?'background:#FDF0EB;border:1px solid rgba(240,133,102,0.55);color:#B5513A':'background:#fff;border:1px solid #E4E0D6;color:var(--text2)')+'"><span style="width:8px;height:8px;border-radius:50%;background:'+(warn?'#F08566':'#3a3833')+'"></span>'+txt+'</span>';};
+  var hints=hint('Daten '+(ago==null?'unbekannt':ago<60?'vor '+ago+' Min.':last.toLocaleDateString('de-DE')),ago==null||ago>30)+hint('Ziele '+(c.zieleStand===today()?'aktuell':'nicht übergeben'),c.zieleStand!==today());
+  var h='<div style="padding:22px 24px 8px;flex-shrink:0"><div style="background:#F7F5F0;border:1px solid #E4E0D6;border-radius:16px;padding:16px;box-shadow:0 12px 30px rgba(40,32,15,0.06)">'
+    +'<div style="display:flex;align-items:center;gap:12px"><div style="width:40px;height:40px;border-radius:11px;background:#EFECE5;border:1px solid #E4E0D6;display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:20px;color:var(--text)"><i class="ti ti-device-tv"></i></div>'
+    +'<div style="min-width:0"><div style="font-size:18px;font-weight:800;line-height:1.2">Live</div><div style="font-size:12.5px;color:var(--text2);line-height:1.3">Was auf den Fernsehern läuft · Vorschau, Zeitplan, Power Hours und Figuren</div></div></div>'
+    +'<div style="display:flex;align-items:center;gap:8px;margin-top:14px"><div class="emp-seg" id="liveTabBar">'+TABS.map(function(t){return '<div class="tab'+(t[0]===LIVE_TAB?' active':'')+'" onclick="liveTab(\''+t[0]+'\')">'+t[1]+'</div>';}).join('')+'</div><span style="margin-left:auto;display:flex;gap:6px">'+hints+'</span></div></div></div>'
+    +'<div class="content" style="max-width:100%;padding-top:6px">';
+  if(LIVE.msg)h+='<div class="kal-note" style="margin:0 0 10px;color:var(--text)"><i class="ti ti-check"></i> '+esc(LIVE.msg)+'</div>';
+  if(LIVE_TAB==='uebersicht'){
+    h+='<div class="card card-static"><div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap"><div class="card-title" style="margin:0"><i class="ti ti-device-tv"></i> Vorschau</div><span class="kal-note">genau wie auf dem Fernseher · aktualisiert sich jede Minute</span>'
+      +'<span style="margin-left:auto;display:flex;gap:8px;align-items:center"><span class="dsh-seg">'+[['','Alle'],['MUC','Olching'],['VLC','Valencia']].map(function(o){return '<button type="button" class="'+(LIVE.ort===o[0]?'on':'')+'" onclick="liveSetOrt(\''+o[0]+'\')">'+o[1]+'</button>';}).join('')+'</span>'
+      +'<button class="btn" type="button" onclick="liveOpen()"'+(u?'':' disabled')+'><i class="ti ti-arrows-maximize"></i> Vollbild</button><button class="btn" type="button" onclick="'+(u?'window.open(\''+esc(liveUrl(false))+'&demo=1\',\'_blank\',\'noopener\')':'')+'"'+(u?'':' disabled')+'><i class="ti ti-player-play"></i> Vorführ-Modus</button></span></div>';
+    h+=k?'<div style="position:relative;width:100%;aspect-ratio:16/9;border-radius:14px;overflow:hidden;background:#EEEDE9;border:1px solid var(--border)"><iframe id="liveFrame" src="'+esc(liveUrl(true))+'" title="Live-Ansicht" style="position:absolute;inset:0;width:100%;height:100%;border:0"></iframe></div>'
+      :'<div class="kal-note" style="padding:30px;text-align:center">Noch keine Adresse vorhanden.'+(adm?' Unten „Adresse erzeugen“ klicken.':' Ein Admin muss die Adresse zuerst erzeugen.')+'</div>';
+    h+='</div><div style="display:flex;flex-direction:column;gap:16px">';
+    var TL=liveTodayList();
+    h+='<div class="card card-static" style="margin:0"><div class="card-title"><i class="ti ti-clock"></i> Heute auf den Fernsehern</div><div class="kal-note" style="margin-bottom:6px">aus Zeitplan und Power Hours · „Testen“ zeigt es sofort oben in der Vorschau</div>'
+      +(TL.length?TL.map(function(x){return '<div style="display:grid;grid-template-columns:56px 1fr auto;gap:10px;align-items:center;padding:6px 0;border-top:1px solid var(--border)"><b style="font-size:13px">'+esc(x.t)+'</b><span style="font-size:13px">'+esc(x.txt)+'</span><button class="btn" type="button" style="height:28px;padding:0 10px;font-size:12px" onclick="liveTest(\''+x.test+'\')">Testen</button></div>';}).join(''):'<div class="kal-note">Heute ist nichts geplant.</div>')
+      +'<div style="display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:10px;padding-top:10px;border-top:1px solid var(--border)"><span class="kal-note">Weitere testen:</span>'
+      +[['aufstieg','Aufstieg'],['ziel','Tagesziel'],['marge','€-Marge'],['auftrag','Top-Auftrag'],['team','Team'],['halbzeit','Zwischenstand'],['endspurt','Endspurt'],['sieger','Siegerehrung']].map(function(x){return '<button class="btn" type="button" style="height:28px;padding:0 10px;font-size:12px" onclick="liveTest(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</div></div>';
+    h+='<div class="card card-static" style="margin:0"><div class="card-title"><i class="ti ti-link"></i> Adresse für die Fernseher</div><div class="kal-note" style="margin-bottom:10px">im Browser des Fernsehers öffnen und auf Vollbild stellen · keine Anmeldung nötig · nur auf den Fernsehern verwenden</div>'
+      +'<div style="display:flex;gap:8px;align-items:center"><input id="liveUrlField" readonly value="'+esc(u)+'" onclick="this.select()" style="flex:1;min-width:0;height:34px;box-sizing:border-box;font-size:13px;padding:0 10px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text)">'
+      +'<button class="btn btn-primary" type="button" onclick="liveCopy()"'+(u?'':' disabled')+'><i class="ti ti-copy"></i> Kopieren</button>'
+      +(adm?'<button class="btn" type="button" onclick="liveNewKey()"><i class="ti ti-refresh"></i> '+(k?'Neue Adresse erzeugen':'Adresse erzeugen')+'</button>':'')+'</div></div>';
+    h+='</div>';
+  } else if(LIVE_TAB==='zeitplan')h+=zpbHtml();
+  else if(LIVE_TAB==='powerhour')h+=phbHtml();
+  else if(LIVE_TAB==='figuren')h+=figHtml();
+  else h+=liveSettingsHtml();
   h+='</div>';
   ma.innerHTML=h;}
 
@@ -4715,7 +4764,7 @@ function figFokus(e){var f=((settings.liveConfig||{}).fokus||{})[e.id];if(f)retu
 function figSave(){if(currentUserRole!=='admin')return;var fo={};figPeople().forEach(function(e){var el=document.getElementById('fig_fokus_'+e.id);fo[e.id]=el?el.value:figFokus(e);});var c=Object.assign({},settings.liveConfig||{},{figuren:figRead(),fokus:fo});
   sb.from('settings').upsert({key:'liveConfig',value:JSON.stringify(c)},{onConflict:'key'}).then(function(res){
     if(res&&res.error){alert('Speichern fehlgeschlagen: '+res.error.message);return;}settings.liveConfig=c;FIG.msg='Figuren gespeichert. Die Fernseher übernehmen sie innerhalb einer Minute.';renderLive();});}
-function figMore(id){var d=document.getElementById('fig_m_'+id);if(d)d.style.display=d.style.display==='none'?'grid':'none';}
+function figMore(id){var d=document.getElementById('fig_m_'+id);if(d){var op=d.style.display==='none';d.style.display=op?'grid':'none';FIG.open=FIG.open||{};FIG.open[id]=op;}}
 function figHtml(){var adm=currentUserRole==='admin',dis=adm?'':' disabled',P=figPeople();
   var inp='height:30px;box-sizing:border-box;font-size:12px;padding:0 6px;border:1px solid var(--border);border-radius:var(--r-md);background:var(--bg);color:var(--text);min-width:0';
   var sel=function(k,id,val,opts){return '<select id="fig_'+k+'_'+id+'"'+dis+' style="'+inp+'" onchange="figPreview(\''+id+'\')">'+opts.map(function(o){return '<option value="'+o[0]+'"'+(String(o[0])===String(val==null?'':val)?' selected':'')+'>'+o[1]+'</option>';}).join('')+'</select>';};
@@ -4723,13 +4772,13 @@ function figHtml(){var adm=currentUserRole==='admin',dis=adm?'':' disabled',P=fi
   var chk=function(k,id,val,l){return '<label style="display:flex;align-items:center;gap:4px;font-size:12px;color:var(--text2)"><input type="checkbox" id="fig_'+k+'_'+id+'"'+(val?' checked':'')+dis+' onchange="figPreview(\''+id+'\')">'+l+'</label>';};
   var lab=function(t,x){return '<label style="display:flex;flex-direction:column;gap:3px;font-size:11px;color:var(--text3);min-width:0">'+t+x+'</label>';};
   var h='<style>.kidp svg .mh,.kidp svg .mw,.kidp svg .ba,.kidp svg .mg{display:none}</style><div class="card card-static"><div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:12px"><div class="card-title" style="margin:0"><i class="ti ti-mood-kid"></i> Figuren</div><span class="kal-note">So erscheint jede Person in den Animationen · „Mehr“ öffnet weitere Einstellungen</span>'+(adm?'<button class="btn btn-primary" type="button" style="margin-left:auto" onclick="figSave()"><i class="ti ti-device-floppy"></i> Figuren speichern</button>':'')+'</div>';
-  h+='<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:12px;align-items:start">';
+  h+='<div style="display:flex;flex-direction:column;gap:0">';
   P.forEach(function(e,i){var f=figOf(e,i),id=e.id;
-    h+='<div style="border:1px solid var(--border);border-radius:12px;padding:8px 10px;background:var(--bg)"><div style="display:flex;gap:10px;align-items:center"><div class="kidp" id="fig_p_'+id+'" style="width:52px;height:104px;flex-shrink:0">'+kidSvg(f)+'</div><div style="display:flex;flex-direction:column;gap:5px;min-width:0;flex:1"><b style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(e.name)+'</b>'
-      +'<div style="display:grid;grid-template-columns:1fr 1fr;gap:5px">'+sel('g',id,f.g,[['m','Junge'],['w','Mädchen']])+sel('s',id,f.skin,[['hell','Haut hell'],['mittel','Haut mittel'],['dunkel','Haut dunkel']])+'</div>'
-      +'<div style="display:flex;gap:5px;align-items:center">'+sel('h',id,f.hair,[['kurz','kurze Haare'],['scheitel','Seitenscheitel'],['igel','Igel'],['locken','Locken'],['zopf','Pferdeschwanz'],['zoepfe','zwei Zöpfe'],['lang','lange Haare'],['bob','Bob'],['dutt','Dutt'],['puffs','Puffs'],['glatze','Glatze']])+col('c',id,f.shirt||'#F2884F',true)
-      +'<button type="button" class="btn" style="height:30px;padding:0 8px;font-size:12px" onclick="figMore(\''+id+'\')">Mehr</button></div></div></div>'
-      +'<div id="fig_m_'+id+'" style="display:none;grid-template-columns:1fr 1fr;gap:6px;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)">'
+    h+='<div style="border-top:1px solid var(--border);padding:4px 0"><div style="display:grid;grid-template-columns:36px minmax(150px,220px) 110px 130px 150px 34px 1fr;gap:10px;align-items:center"><div class="kidp" id="fig_p_'+id+'" style="width:30px;height:60px">'+kidSvg(f)+'</div><b style="font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(e.name)+'</b>'
+      +sel('g',id,f.g,[['m','Junge'],['w','Mädchen']])+sel('s',id,f.skin,[['hell','Haut hell'],['mittel','Haut mittel'],['dunkel','Haut dunkel']])
+      +sel('h',id,f.hair,[['kurz','kurze Haare'],['scheitel','Seitenscheitel'],['igel','Igel'],['locken','Locken'],['zopf','Pferdeschwanz'],['zoepfe','zwei Zöpfe'],['lang','lange Haare'],['bob','Bob'],['dutt','Dutt'],['puffs','Puffs'],['glatze','Glatze']])+col('c',id,f.shirt||'#F2884F',true)
+      +'<span style="justify-self:end"><button type="button" class="btn" style="height:30px;padding:0 10px;font-size:12px" onclick="figMore(\''+id+'\')">Mehr</button></span></div>'
+      +'<div id="fig_m_'+id+'" style="display:'+(FIG.open&&FIG.open[id]?'grid':'none')+';grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin:6px 0 6px 46px;padding:10px;border-radius:10px;background:#EFECE5">'
       +lab('Haarfarbe',sel('hc',id,f.hc||'',[['','automatisch'],['schwarz','schwarz'],['dunkelbraun','dunkelbraun'],['braun','braun'],['blond','blond'],['rot','rot'],['grau','grau']]))
       +lab('Augen',sel('eye',id,f.eye||'',[['','braun'],['blau','blau'],['gruen','grün']]))
       +lab('Unten',sel('unten',id,f.unten||'',[['','automatisch'],['hose','Hose'],['rock','Rock/Kleid']]))
@@ -4737,7 +4786,6 @@ function figHtml(){var adm=currentUserRole==='admin',dis=adm?'':' disabled',P=fi
       +lab('Brille',sel('brille',id,f.brille||'',[['','keine'],['rund','rund'],['eckig','eckig']]))
       +lab('Kopfbedeckung',sel('hut',id,f.hut||'',[['','keine'],['cap','Cap'],['muetze','Mütze'],['kopftuch','Kopftuch'],['stirnband','Stirnband']]))
       +lab('Hose/Rock · Schuhe','<div style="display:flex;gap:6px">'+col('hose',id,f.hose||'#3E5C8A',!!f.hose)+col('schuh',id,f.schuh||'#7A4A2A',!!f.schuh)+'</div>')
-      +lab('CR Fokus',sel('fokus',id,figFokus(e),[['OEM','OEM'],['UPS','UPS'],['WKA','WKA']]))
       +'<div style="display:flex;flex-direction:column;gap:3px">'+chk('headset',id,f.headset,'Headset')+chk('freck',id,f.freck,'Sommersprossen')+chk('ohrringe',id,f.ohrringe,'Ohrringe')+chk('bart',id,f.bart,'Bärtchen')+'</div>'
       +'</div></div>';});
   h+='</div>'+(FIG.msg?'<div class="kal-note" style="margin-top:10px;color:var(--text)">'+esc(FIG.msg)+'</div>':'')+'</div>';return h;}
@@ -8883,6 +8931,92 @@ function dshChart(list,p){
   return '<div class="dsh-chart"><div class="hd"><span class="inf">'+info+'</span><span class="dsh-lg">'+leg+'</span></div>'
     +'<div class="area">'+grid+'<div class="cols" style="gap:'+gap+'px">'+cols+'</div></div><div class="xl" style="gap:'+gap+'px">'+lab+'</div></div>';
 }
+
+// ── Dashboard-Kachel „Live“: eigene, ruhige Ansicht (Tag / Woche / Monat) aus den Board-Daten ──
+var DSH_LIVE='tag';
+function dshLiveSet(v){DSH_LIVE=v;var el=document.getElementById('dshLiveBox');if(el)el.outerHTML=dshLiveCard();}
+function dshLiveRows(v){var t=today(),dw=(new Date(t+'T12:00:00').getDay()+6)%7,from=v==='tag'?t:v==='woche'?kalAdd(t,-dw):t.slice(0,8)+'01',out=[];
+  (employees||[]).forEach(function(e){if(e.active===false||!isAgentEmp(e))return;var rows=(performance[e.id]||[]).filter(function(x){return x.date>=from&&x.date<=t;});if(!rows.length)return;
+    var q={oem:0,my:0,ye:0,sy:0,tw:0,ne:0,ups:0,une:0,wka:0,wne:0,m:0},hrs=0,seen={};
+    rows.forEach(function(x){q.oem+=x.convOEM||0;q.my+=x.convMY||0;q.ye+=x.convYes||0;q.sy+=x.convSY||0;q.tw+=x.convTW||0;q.ne+=x.notSuccessful||0;q.ups+=x.ups_yes||0;q.une+=x.upsNichtErfolgreich||0;q.wka+=x.wka_gesamt_yes||0;
+      q.wne+=(x.wkaOemNichtErfolgreich||0)+(x.wkaUpsNichtErfolgreich||0)+(x.wkaOemBeendet||0)+(x.wkaUpsBeendet||0);q.m+=x.margeGesamt||0;
+      if(!seen[x.date]){seen[x.date]=1;hrs+=x.date===t?(elapsedWorkHoursTodayFor(e)||0):(workHoursForDate(e,x.date)||0);}});
+    var fk=typeof figFokus==='function'?figFokus(e):'OEM',fn=fk==='UPS'?q.ups:fk==='WKA'?q.wka:q.oem,fd=fk==='UPS'?q.ups+q.une:fk==='WKA'?q.wka+q.wne:q.oem+q.ne,opt=q.oem+q.ups+q.wka,tg=empTargets(e)||{};
+    out.push({e:e,opt:opt,my:q.my,oemR:Math.max(0,q.oem-q.my),ups:q.ups,wka:q.wka,marge:q.m,hrs:hrs,oph:hrs>0?opt/hrs:0,soll:3.5*hrs,
+      fo:fd>0?fn/fd*100:null,cm:(q.ye+q.sy+q.my)>0?q.my/(q.ye+q.sy+q.my)*100:null,tw:(q.tw+q.ye+q.sy+q.my)>0?q.tw/(q.tw+q.ye+q.sy+q.my)*100:null,sm:(q.ye+q.sy+q.my)>0?(q.sy+q.my)/(q.ye+q.sy+q.my)*100:null,ao:opt>0?q.oem/opt*100:null,
+      z:{oph:tg.optH&&tg.optH.val,fo:tg.crOEM&&tg.crOEM.val,cm:tg.crMegaYes&&tg.crMegaYes.val,tw:tg.crTeilweise&&tg.crTeilweise.val,sm:tg.crSyMy&&tg.crSyMy.val,ao:tg.anteilOEM&&tg.anteilOEM.val},q:q,fk:fk});});
+  out.sort(function(a,b){return v==='monat'?(b.oph-a.oph):(b.opt-a.opt||b.marge-a.marge);});return out;}
+function dshLiveCard(){var v=DSH_LIVE,R=dshLiveRows(v),c=settings.liveConfig||{},N=R.length;
+  var seg='<span class="dsh-seg">'+[['tag','Tag'],['woche','Woche'],['monat','Monat']].map(function(x){return '<button type="button" class="'+(v===x[0]?'on':'')+'" onclick="dshLiveSet(\''+x[0]+'\')">'+x[1]+'</button>';}).join('')+'</span>';
+  var h='<div class="card" id="dshLiveBox"><div class="card-title">Live<span class="dsh-tr"><span class="dsh-cr" style="margin-left:0">'+(v==='tag'?'heute':v==='woche'?'Montag bis heute':'1. bis heute')+' · alle Agents mit Zahlen</span>'+seg+'</span></div>';
+  if(!N)return h+'<div class="kal-note" style="padding:24px;text-align:center">Für diesen Zeitraum gibt es noch keine Zahlen.</div></div>';
+  var S={opt:0,hrs:0,m:0,soll:0,fn:0,fd:0,my:0,ysm:0};R.forEach(function(r){S.opt+=r.opt;S.hrs+=r.hrs;S.m+=r.marge;S.soll+=r.soll;var q=r.q;S.my+=q.my;S.ysm+=q.ye+q.sy+q.my;
+    if(r.fk==='UPS'){S.fn+=q.ups;S.fd+=q.ups+q.une;}else if(r.fk==='WKA'){S.fn+=q.wka;S.fd+=q.wka+q.wne;}else{S.fn+=q.oem;S.fd+=q.oem+q.ne;}});
+  var e0=function(x){return '€'+Math.round(x||0).toLocaleString('de-DE');},p0=function(x){return x==null?'–':Math.round(x)+' %';};
+  var tile=function(l,val,sub,ko){return '<div class="dsh-qt'+(ko?' dsh-ko':'')+'"><div class="l">'+l+'</div><div class="v big">'+val+'</div><div class="kv"><span>'+sub+'</span></div></div>';};
+  // ── Diagramm wie die Live-Ansicht, in den Dashboard-Farben ──
+  var CM='#3A3530',CO='#5C564F',CU='#A89C8E',CW='#D3C8B6',isM=v==='monat';
+  var G='display:grid;grid-template-columns:110px repeat('+N+',minmax(0,1fr));gap:6px;align-items:center';
+  // allgemeines Soll (Vollzeit, 28 am Tag)
+  var t0=today(),vz=R.map(function(r){return r.e;}).sort(function(a2,b2){return (workHoursForDate(b2,t0)||0)-(workHoursForDate(a2,t0)||0);})[0],vzS=0;
+  if(isM)vzS=3.5;else if(vz){var dw0=(new Date(t0+'T12:00:00').getDay()+6)%7,f0=v==='tag'?t0:kalAdd(t0,-dw0),hh=0;for(var d0=f0;d0<=t0;d0=kalAdd(d0,1)){hh+=d0===t0?(elapsedWorkHoursTodayFor(vz)||0):(workHoursForDate(vz,d0)||0);}vzS=3.5*hh;}
+  var val=function(r){return isM?r.oph:r.opt;},sol=function(r){return isM?((r.z.oph!=null&&r.z.oph!=='')?+r.z.oph:3.5):r.soll;};
+  var mx=Math.max.apply(null,R.map(val).concat(R.map(sol)).concat([vzS,isM?4:10]))*1.12,st=isM?1:(mx>60?20:mx>30?10:5),yMax=Math.ceil(mx/st)*st,H=380,Yp=function(x){return x/yMax*H;};
+  var und=R.filter(function(r){return val(r)<sol(r);}).length;
+  var lg=[[CM,'OEM MY'],[CO,'OEM'],[CU,'UPS'],[CW,'WKA']].map(function(x){return '<span><i style="display:inline-block;width:9px;height:9px;border-radius:2px;background:'+x[0]+';margin-right:5px"></i>'+x[1]+'</span>';}).join('')
+    +'<span><i style="display:inline-block;width:11px;height:9px;border:1.5px dashed #A89C8E;border-radius:2px;margin-right:5px;vertical-align:-1px"></i>persönliches Soll</span><span><i style="display:inline-block;width:16px;border-top:2px dashed #D9541E;margin-right:5px;vertical-align:3px"></i>'+(isM?'Soll 3,5 je Std.':'Soll für 28 am Tag')+'</span>';
+  h+='<div style="background:#EFECE5;border-radius:12px;padding:12px 14px 14px"><div style="display:flex;align-items:center;font-size:11.5px;color:var(--text2);margin-bottom:12px;flex-wrap:wrap;gap:8px"><span><b style="color:#C9502F">'+und+' von '+N+' Agents</b> unter ihrem Soll</span><span style="margin-left:auto;display:flex;gap:14px;flex-wrap:wrap">'+lg+'</span></div>';
+  var ax='';for(var yv=0;yv<=yMax+1e-9;yv+=st){ax+='<div style="position:absolute;left:0;right:0;bottom:'+Yp(yv).toFixed(1)+'px;border-top:1px solid '+(yv===0?'#BDB3A6':'rgba(0,0,0,.06)')+'"></div><span style="position:absolute;right:calc(100% + 8px);bottom:'+(Yp(yv)-7).toFixed(1)+'px;font-size:11px;color:var(--text3)">'+(isM?yv.toLocaleString('de-DE'):yv)+'</span>';}
+  var now=new Date(),hm=('0'+now.getHours()).slice(-2)+':'+('0'+now.getMinutes()).slice(-2);
+  var sline=vzS>0?'<div style="position:absolute;left:0;right:0;bottom:'+Yp(vzS).toFixed(1)+'px;border-top:2px dashed #D9541E;z-index:3"><span style="position:absolute;right:0;top:-20px;background:#D9541E;color:#fff;font-size:11px;font-weight:700;border-radius:5px;padding:1px 7px;white-space:nowrap">'+(isM?'Soll 3,5 je Std.':v==='woche'?'Soll Woche · '+Math.round(vzS)+' (28 am Tag)':'Soll '+hm+' · '+Math.round(vzS)+' (für 28 am Tag)')+'</span></div>':'';
+  var cols=R.map(function(r){var x=val(r),hb=Math.max(2,Yp(x)),sh=Yp(sol(r)),tot=r.opt||1,lo=x<sol(r);
+    var sg=[[r.wka,CW],[r.ups,CU],[r.oemR,CO],[r.my,CM]].filter(function(q2){return q2[0]>0;}).map(function(q2){return '<i style="display:block;height:'+(q2[0]/tot*hb).toFixed(1)+'px;background:'+q2[1]+'"></i>';}).join('');
+    return '<div style="position:relative;height:'+H+'px;display:flex;flex-direction:column;justify-content:flex-end;align-items:center">'+(sh>0?'<div style="position:absolute;left:8%;right:8%;bottom:0;height:'+sh.toFixed(1)+'px;border:1.5px dashed #A89C8E;border-bottom:0;border-radius:6px 6px 0 0;background:rgba(255,255,255,.35)"></div>':'')
+      +'<b style="position:relative;font-size:13px;margin-bottom:3px;color:'+(lo?'#C9502F':'var(--text)')+'">'+(isM?x.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1}):x)+'</b><span style="position:relative;display:flex;flex-direction:column;width:62%;border-radius:5px 5px 0 0;overflow:hidden">'+sg+'</span></div>';}).join('');
+  h+='<div style="'+G+';align-items:end"><div style="height:'+H+'px;position:relative"><span style="position:absolute;left:2px;top:50%;transform:rotate(-90deg) translateX(-50%);transform-origin:0 0;font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text3);white-space:nowrap;text-transform:uppercase">'+(isM?'Opt. je Stunde':'Optimierungen')+'</span></div>'
+    +'<div style="grid-column:2 / span '+N+';position:relative;height:'+H+'px">'+ax+sline+'<div style="position:absolute;inset:0;display:grid;grid-template-columns:repeat('+N+',minmax(0,1fr));gap:6px;align-items:end">'+cols+'</div></div></div>';
+  var line=function(l,f,mt){return '<div style="'+G+';margin-top:'+(mt||4)+'px"><span class="dlv-l">'+l+'</span>'+R.map(f).join('')+'</div>';};
+  h+='<style>.dlv-c{display:block;text-align:center;font-size:12px;font-weight:700;border-radius:6px;padding:3px 0;white-space:nowrap;overflow:hidden}.dlv-l{font-size:11px;font-weight:700;letter-spacing:.05em;color:var(--text3);text-transform:uppercase}.dlv-n{font-size:12.5px;font-weight:700;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}</style>';
+  h+=line('Marge',function(r){return '<span class="dlv-c" style="color:var(--text);background:none">'+(r.marge>=1000?'€'+(r.marge/1000).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+'k':e0(r.marge))+'</span>';},8);
+  h+=line('Ø / Opt.',function(r){return '<span class="dlv-c" style="color:var(--text3);background:none;font-weight:600">'+(r.opt?e0(r.marge/r.opt):'–')+'</span>';},2);
+  h+='<div style="border-top:1px solid #D3C8B6;margin-top:10px;padding-top:10px">';
+  h+='<div style="'+G+'"><span class="dlv-l">Agents</span>'+R.map(function(r){return '<span class="dlv-n" title="'+esc(r.e.name)+'">'+esc(String(r.e.name).split(' ')[0])+'</span>';}).join('')+'</div>';
+  // KPI-Zeilen: erreicht hellbeige, knapp mittelbraun, nicht erreicht fast schwarz, schlechtester Wert rot
+  var kn=function(k,d){return c[k]!=null?+c[k]:d;},zz=function(r,k,fb){return r.z[k]!=null&&r.z[k]!==''?+r.z[k]:(c[fb]!=null?+c[fb]:null);};
+  var kpi=function(l,get,zf,knapp,low,fmt){var vals=R.map(get),wi=-1,wv=null;vals.forEach(function(x,i){if(x==null)return;if(wv==null||(low?x>wv:x<wv)){wv=x;wi=i;}});
+    return line(l,function(r,i){var x=vals[i];if(x==null)return '<span class="dlv-c" style="color:#B4AC9C;background:none">–</span>';var t=fmt?fmt(x):Math.round(x)+' %',z=zf(r),stl;
+      if(i===wi&&N>1&&!(z!=null&&(low?x<=z:x>=z)))stl='background:#C62828;color:#fff';else if(z==null)stl='background:none;color:var(--text2)';else{var ok=low?x<=z:x>=z,mid=low?x<=z+knapp:x>=z-knapp;stl=ok?'background:#D3C8B6;color:#5C564F':mid?'background:#A89C8E;color:#fff':'background:#3A3530;color:#fff';}
+      return '<span class="dlv-c" style="'+stl+'">'+t+'</span>';});};
+  h+=kpi('Opt. je Std.',function(r){return r.hrs>0?r.oph:null;},function(r){return r.z.oph!=null&&r.z.oph!==''?+r.z.oph:(c.optProStd!=null?+c.optProStd:3.5);},0.3,false,function(x){return x.toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1});});
+  h+=kpi('CR Fokus',function(r){return r.fo;},function(r){return zz(r,'fo','crOEM');},kn('knappOEM',5));
+  h+=kpi('CR TW',function(r){return r.tw;},function(r){return zz(r,'tw','crTW');},kn('knappTW',5),true);
+  h+=kpi('CR SY/MY',function(r){return r.sm;},function(r){return zz(r,'sm','crSM');},kn('knappSM',5));
+  h+=kpi('CR MY',function(r){return r.cm;},function(r){return zz(r,'cm','crMY');},kn('knappMY',3));
+  h+=kpi('Anteil OEM',function(r){return r.ao;},function(r){return zz(r,'ao','crAO');},kn('knappAO',5));
+  h+='</div>';
+  h+='</div>';
+  // Kacheln mit Team-Aufteilung wie bei „Margenerhöhung“
+  var TM={};DSH_TEAMS.forEach(function(t){TM[t]=R.filter(function(r){return dshTeamOf(r.e)===t;});});
+  var agg=function(L){var a={opt:0,hrs:0,soll:0,m:0,fn:0,fd:0,my:0,ysm:0,n:L.length,zf:[],zm:[]};L.forEach(function(r){var q=r.q;a.opt+=r.opt;a.hrs+=r.hrs;a.soll+=r.soll;a.m+=r.marge;a.my+=q.my;a.ysm+=q.ye+q.sy+q.my;
+      if(r.fk==='UPS'){a.fn+=q.ups;a.fd+=q.ups+q.une;}else if(r.fk==='WKA'){a.fn+=q.wka;a.fd+=q.wka+q.wne;}else{a.fn+=q.oem;a.fd+=q.oem+q.ne;}if(r.z.fo!=null)a.zf.push(+r.z.fo);if(r.z.cm!=null)a.zm.push(+r.z.cm);});
+    a.fo=a.fd>0?a.fn/a.fd*100:null;a.cm=a.ysm>0?a.my/a.ysm*100:null;a.oph=a.hrs>0?a.opt/a.hrs:0;a.mpo=a.opt>0?a.m/a.opt:null;var av=function(x){return x.length?x.reduce(function(p,q){return p+q;},0)/x.length:null;};a.zfo=av(a.zf);a.zmy=av(a.zm);return a;};
+  var A0=agg(R),TA={};DSH_TEAMS.forEach(function(t){TA[t]=agg(TM[t]);});
+  var f1=function(x){return x.toLocaleString('de-DE',{minimumFractionDigits:2,maximumFractionDigits:2});},ek=function(x){return x>=1000?'€'+(x/1000).toLocaleString('de-DE',{minimumFractionDigits:1,maximumFractionDigits:1})+'k':e0(x);};
+  var teams=function(h1,h2,fn){var r='<div class="tm"><div class="th"><span>Team</span><span>'+h1+'</span><span></span><span>'+h2+'</span></div>';
+    DSH_TEAMS.forEach(function(t){var a=TA[t];if(!a.n){r+='<div class="tr"><span class="n">'+t+'</span><span class="na">keine Daten</span></div>';return;}var x=fn(a);
+      if(x==null){r+='<div class="tr"><span class="n">'+t+'</span><span class="na">'+(t==='VLC'?'nur OEM':'keine Daten')+'</span></div>';return;}
+      r+='<div class="tr"><span class="n">'+t+'</span><span class="t"><i class="'+(x.lo?'lo':'')+'" style="width:'+Math.max(0,Math.min(100,x.w)).toFixed(1)+'%"></i></span><span class="c'+(x.lo?' dsh-lo':'')+'">'+x.c+'</span><span class="m">'+(x.m||'')+'</span></div>';});return r+'</div>';};
+  var T1=function(l,val,kv,body,ko){return '<div class="dsh-qt'+(ko?' dsh-ko':'')+'"><div class="l">'+l+'</div><div class="v big">'+val+'</div><div class="kv"><span>'+kv+'</span></div>'+body+'</div>';};
+  var mxM=Math.max.apply(null,DSH_TEAMS.map(function(t){return TA[t].m;}).concat([1])),mxP=Math.max.apply(null,DSH_TEAMS.map(function(t){return TA[t].mpo||0;}).concat([1]));
+  h+='<div class="dsh-q" style="margin-top:12px">'
+    +(v==='monat'?T1('Gesamt · Monat',f1(A0.oph),'Opt. je Stunde · '+A0.opt.toLocaleString('de-DE')+' Opt. in '+Math.round(A0.hrs).toLocaleString('de-DE')+' Std.',teams('Opt./Std.','Opt.',function(a){return {w:a.oph/4.5*100,c:a.oph.toLocaleString('de-DE',{maximumFractionDigits:1,minimumFractionDigits:1}),m:a.opt,lo:a.oph<3.5};}),true)
+      :T1('Gesamt · '+(v==='tag'?'heute':'Woche'),A0.opt.toLocaleString('de-DE'),'Optimierungen · Soll bis jetzt '+Math.round(A0.soll).toLocaleString('de-DE'),teams('Soll','Opt.',function(a){var pc=a.soll>0?a.opt/a.soll*100:0;return {w:pc,c:Math.round(pc)+' %',m:a.opt,lo:pc<100};}),true))
+    +T1('CR Fokus',p0(A0.fo),'je Agent sein Schwerpunkt',teams('CR','',function(a){return a.fo==null?null:{w:a.fo,c:p0(a.fo),lo:a.zfo!=null&&a.fo<a.zfo};}))
+    +T1('CR MY',p0(A0.cm),'Mega Yes an OEM-Abschlüssen',teams('CR','',function(a){return a.cm==null?null:{w:a.cm*2,c:p0(a.cm),lo:a.zmy!=null&&a.cm<a.zmy};}))
+    +T1('Marge',e0(A0.m),'Ø '+e0(A0.m/N)+' je Agent',teams('Marge','Ø/Agent',function(a){return {w:a.m/mxM*100,c:ek(a.m),m:ek(a.m/a.n)};}))
+    +T1('Ø je Optimierung',e0(A0.mpo||0),v==='tag'?'heute':v==='woche'?'diese Woche':'dieser Monat',teams('Ø/Opt.','',function(a){return a.mpo==null?null:{w:a.mpo/mxP*100,c:e0(a.mpo),lo:A0.mpo!=null&&a.mpo<A0.mpo*0.9};}))
+    +'</div>';
+  return h+'</div>';}
 function renderDashboard(){
   var ma=document.getElementById('mainArea');if(!ma)return;
   _dshPlanCache={};
@@ -8912,6 +9046,7 @@ function renderDashboard(){
   tiles+=DSH_AREAS.map(function(k,i){var v=parts[i],c=dshCr(S,k),mp=dshMpo(S,k),lo=under(k,c)&&Z[k]!=null,lm=under('MPO',mp);
     return '<div class="dsh-qt"><div class="l"><i class="dsh-dot" style="background:'+DSH_AC[i]+'"></i>'+k+'<span class="pc">'+(psum>0?Math.round(v/psum*100):0)+' %</span></div><div class="v big">'+dshEur(v)+'</div><div class="kv"><span>CR <b class="'+(lo?'dsh-lo':'')+'">'+dshPct(c)+'</b></span><span>Ø je Auftrag <b class="'+(lm?'dsh-lo':'')+'">'+dshEur1(mp)+'</b></span></div>'+tileTeams(k)+'</div>';}).join('')+dshDonutTile(parts,psum,S)+'</div>';
   var main='<div class="card"><div class="card-title">Margenerhöhung<span class="dsh-tr"><span class="dsh-cr" style="margin-left:0">Kacheln: '+(dshPeriod==='days'?'heute':dshPeriod==='weeks'?'laufende Woche':dshPeriod==='months'?'laufender Monat':'Geschäftsjahr '+R.lbl+' bis heute')+'</span>'+pseg+'</span></div>'+dshChart(all,dshPeriod)+tiles+'</div>';
+  h+=dshLiveCard();
   h+=main;
   // ── 2 · Team-Steckbriefe: eine Kennzahl, Gesamt + SE/SR/OB/VLC ──
   h+=dshTeamBox(all,T);

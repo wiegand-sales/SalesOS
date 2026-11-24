@@ -3157,7 +3157,7 @@ var KPI_TARGETS={
   crTeilweise:{val:25, dir:'lte', label:'TW'},
   crSuperYes:{val:12, dir:'gte', label:'SY'},
   crMegaYes: {val:8,  dir:'gte', label:'MY'},
-  optPerH:   {val:2.0,dir:'gte', label:'Opt./Std.'},
+  optPerH:   {val:3.5,dir:'gte', label:'Opt./Std.'}, // B4: Ersatzwert 3,5
 };
 var CR_GOOD=KPI_TARGETS.crOEM.val;
 
@@ -3673,9 +3673,20 @@ function wochenzielKachelnHtml(){
   var todayStr=today();
   var curKw=isoWeekNum(new Date(todayStr+'T00:00:00Z'));
 
+  // Soll eines Monatsanteils einer KW (Tage des Monats in dieser Woche x Opt./Tag x Marge/Opt.)
+  function portion(mk2,from){
+    var wi=-1;getMonthWeeksZiel(mk2).forEach(function(w,i){if(w.from===from)wi=i;});if(wi<0)return 0;
+    var wm2=getMonthWeeksZiel(mk2)[wi],rec2=zielStore[mk2]||{},z=0;
+    employees.filter(function(e){return empActiveInZielMonth(e,mk2)&&!e.isPureCoach;}).forEach(function(e){
+      var r=rec2[e.id]||{};
+      var days=(r.weeks&&r.weeks[wi]!=null)?r.weeks[wi]:wm2.defaultDays;
+      if(typeof ztEmpMonth==='function'){var zx=ztEmpMonth(e,mk2);if(zx.weeks[wi])days=zx.weeks[wi].n;}
+      z+=days*(r.optTag!=null?r.optTag:0)*(r.margeOpt!=null?r.margeOpt:0);
+    });
+    return z;
+  }
   function tileFor(mk,seenKw){
     var weeks=getMonthWeeksZiel(mk);
-    var rec=zielStore[mk]||{};
     var visible=employees.filter(function(e){return empActiveInZielMonth(e,mk)&&!e.isPureCoach;});
     var out='';
     weeks.forEach(function(wm,wi){
@@ -3683,15 +3694,12 @@ function wochenzielKachelnHtml(){
       seenKw[wm.kw]=true;
       var target=0,ist=0;
       var isFuture=wm.from>todayStr;
-      visible.forEach(function(e){
-        var r=rec[e.id]||{};
-        var days=(r.weeks&&r.weeks[wi]!=null)?r.weeks[wi]:wm.defaultDays;
-        if(typeof ztEmpMonth==='function'){var zx=ztEmpMonth(e,mk);if(zx.weeks[wi])days=zx.weeks[wi].n;}
-        var optTag=r.optTag!=null?r.optTag:0;
-        var margeOpt=r.margeOpt!=null?r.margeOpt:0;
-        target+=days*optTag*margeOpt;
-        if(!isFuture)ist+=istForEmpWeek(e.id,wm.from,wm.to);
-      });
+      // B5: KW über den Monatswechsel – Ist zählt die ganze Woche, also auch das Soll beider Monatsanteile
+      var m1=wm.from.slice(0,7),m2=wm.to.slice(0,7);
+      target=portion(m1,wm.from)+(m2!==m1?portion(m2,wm.from):0);
+      if(!isFuture){var vis={};visible.forEach(function(e){vis[e.id]=e;});
+        if(m2!==m1)employees.forEach(function(e){if(!e.isPureCoach&&(empActiveInZielMonth(e,m1)||empActiveInZielMonth(e,m2)))vis[e.id]=e;});
+        Object.keys(vis).forEach(function(id){ist+=istForEmpWeek(vis[id].id,wm.from,wm.to);});}
       var pct=target>0?Math.round(ist/target*100):(ist>0?100:0);
       var isCur=wm.kw===curKw;
       if(isFuture){
@@ -4001,8 +4009,10 @@ function pavg(id,key,days){
 }
 function checkAlerts(id){
   var alerts=[];
+  // B3: Maßstab sind die persönlichen Ziele (Provisionsvereinbarung/Stammdaten), nicht der Team-Durchschnitt
+  var emp=employees.find(function(e){return e.id===id;}),T=emp?empTargets(emp):{};
   function check(key,perfKey,label,days){
-    var t=KPI_TARGETS[key];if(!t)return;
+    var t=T[key];if(!t||t.val==null||t.val===''||isNaN(+t.val))return;t={val:+t.val,dir:t.dir||'gte',label:(KPI_TARGETS[key]||{}).label};
     var v=pavg(id,perfKey,days||7);if(v===null)return;
     var fail=t.dir==='gte'?v<t.val:v>t.val;
     if(fail)alerts.push({key:label||t.label,val:(perfKey==='optPerH'?v.toFixed(1):v.toFixed(0)+'%'),ziel:(perfKey==='optPerH'?t.val:t.val+'%'),dir:t.dir});
@@ -4062,14 +4072,15 @@ function empTargets(emp){
     if(provKpi&&provKey&&Object.prototype.hasOwnProperty.call(provKpi,provKey))return provKpi[provKey]!=null&&provKpi[provKey]!==''?+provKpi[provKey]:null;
     if(t[key]!=null)return t[key];
     if(provKpi&&provKpi[provKey]!=null)return provKpi[provKey];
-    return (g[key]&&g[key].val!=null)?g[key].val:fallback;
+    var gk=key==='crTW'?'crTeilweise':key; // B4: Team-Ziel CR TW heißt crTeilweise
+    return (g[gk]&&g[gk].val!=null)?g[gk].val:fallback;
   }
   return {
     crOEM:      {val:pval('crOEM','crOem',55),          dir:dir('crOEMDir','crOEM','gte')},
     crTeilweise:{val:pval('crTW','tw',25),            dir:dir('crTWDir','crTeilweise','lte')},
     crSuperYes: {val:pval('crSuperYes','sy',12),      dir:dir('crSYDir','crSuperYes','gte')},
     crMegaYes:  {val:pval('crMegaYes','my',8),        dir:dir('crMYDir','crMegaYes','gte')},
-    optPerH:     {val:pval('optPerH','optH',2.0),         dir:dir('optPerHDir','optPerH','gte')},
+    optPerH:     {val:pval('optPerH','optH',3.5),         dir:dir('optPerHDir','optPerH','gte')},
     optPerDay:   {val:val('optPerDay',16),          dir:dir('optPerDayDir','optPerDay','gte')},
     crYes:       {val:pval('crYes','crYes',null),             dir:provKpi?'lte':dir('crYesDir','crYes','lte')}, // CR YES ist ein Max.-Wert
     crSyMy:      {val:pval('crSyMy','syMy',null),             dir:dir('crSyMyDir','crSyMy','gte')},
@@ -4742,7 +4753,7 @@ function personalBestEvents(empId){
   fields.forEach(function(f){
     var max=null;
     rows.forEach(function(r){
-      var v=r[f.key];
+      var v=/^cr/.test(f.key)?perfKpiWin(null,[r],f.key):r[f.key]; // B1: CR je Tag aus Rohzahlen
       if(v===undefined||v===null)return;
       if(max!==null&&v>max){
         events.push({date:r.date,label:'Bestwert '+f.label+': '+f.fmt(v)+' (bisher: '+f.fmt(max)+')'});
@@ -4762,12 +4773,13 @@ function kpiMilestones(empId){
   defs.forEach(function(d){
     var tgt=t[d.k];
     if(!tgt||tgt.val==null)return;
+    var hv=null;
     var hit=perf.find(function(p){
-      var v=p[d.k];
+      var v=perfKpiWin(emp,[p],d.k); // B1: CR je Tag aus Rohzahlen
       if(v===undefined||v===null)return false;
-      return tgt.dir==='lte'?v<=tgt.val:v>=tgt.val;
+      hv=v;return tgt.dir==='lte'?v<=tgt.val:v>=tgt.val;
     });
-    if(hit)out.push({date:hit.date,label:d.l+'-Ziel erstmals erreicht ('+Math.round(hit[d.k])+'%)'});
+    if(hit)out.push({date:hit.date,label:d.l+'-Ziel erstmals erreicht ('+Math.round(hv)+'%)'});
   });
   return out;
 }
@@ -4777,13 +4789,16 @@ function roleBenchmark(empId,metricKey,days){
   var emp=employees.find(function(e){return e.id===empId;});
   if(!emp)return null;
   var peers=employees.filter(function(e){return e.role===emp.role&&e.active!==false;});
-  var vals=[];
+  var vals=[],pool=[];
   peers.forEach(function(e){
     var p=getPerf(e.id,days);
     if(!p.length)return;
+    pool=pool.concat(p);
     var avg=p.reduce(function(a,x){return a+(x[metricKey]||0);},0)/p.length;
     vals.push(avg);
   });
+  // B1: CR aus den summierten Rohzahlen aller Kollegen der Rolle (erst summieren, dann teilen)
+  if(/^cr/.test(metricKey))return pool.length?perfKpiWin(null,pool,metricKey):null;
   if(!vals.length)return null;
   return vals.reduce(function(a,b){return a+b;},0)/vals.length;
 }
@@ -5756,7 +5771,8 @@ function buildOverviewTab(liste,section,skipBanner,skipChart,hideMemberCol){
       liste=visible.slice();
     } else if(overviewChartEmpId.indexOf('group:')===0){
       var grp=overviewChartEmpId.slice(6);
-      liste=visible.filter(function(e){return e.role===grp||e.phase===grp;});
+      // B2: Onboarding ohne VLC (VLC immer getrennt vom Onboarding)
+      liste=visible.filter(function(e){return grp==='Onboarding'?(e.phase==='Onboarding'&&e.role!=='VLC'):(e.role===grp||e.phase===grp);});
     } else {
       liste=visible.filter(function(e){return e.id===overviewChartEmpId;});
     }
@@ -7262,7 +7278,7 @@ function renderTab(){
         html+='<span id="arr-'+cardId+'" style="width:34px;height:34px;border-radius:var(--r-md);border:1px solid var(--border2);background:#F7F5F0;display:flex;align-items:center;justify-content:center;color:var(--text2);font-size:12px;transition:transform .2s">▾</span></span></div>';
         html+='<div id="body-'+cardId+'" style="display:none;border:1px solid #E4E0D6;border-top:none;border-radius:0 0 10px 10px;background:#F7F5F0;margin:-1px 8px 0;padding:14px 14px 10px">';
         if(!hasPts)html+='<div style="font-size:13px;color:var(--text2);padding:2px 0 8px">Für diesen Call wurden keine Einzelpunkte gespeichert.</div>';
-        else CALL_CATS.forEach(function(cat){
+        else qaCatsFor(r).forEach(function(cat){ // B8: Kategorien passend zum Bewertungsstand (vor/nach 11.11.)
           var v=catAvg(r,cat);
           var rv=Math.round(v);
           html+='<div style="display:grid;grid-template-columns:minmax(170px,220px) 1fr 48px;align-items:center;gap:14px;height:30px;border-bottom:1px solid #eae7e0;font-size:13.5px">'
@@ -7321,7 +7337,7 @@ function renderTab(){
           }
         });
       },120);
-    })(showCall?[showCall]:[],CALL_CATS);
+    })(showCall?[showCall]:[],qaCatsFor(showCall)); // B8
   }
 
 
@@ -7446,8 +7462,10 @@ function renderTab(){
           if(g.targetDate)metaParts.push('Ziel-Datum: '+fd(g.targetDate));
           if(g.metricKey){
             var recentP=getPerf(emp.id,30);
-            var curVal=recentP.length?recentP.reduce(function(a,x){return a+(x[g.metricKey]||0);},0)/recentP.length:null;
-            metaParts.push('Aktuell (Ø 30 Tage): '+(curVal!==null?Math.round(curVal)+'%':'—')+' → Ziel: '+g.targetValue+'% ('+focusMetricLabel(g.metricKey)+')');
+            // B1: CR aus Rohzahlen der 30 Tage (erst summieren, dann teilen)
+            var curVal=goalIsDev(g.metricKey)?goalDevVal(emp.id,String(g.metricKey).slice(4)):perfKpiWin(emp,recentP,g.metricKey);
+            var _gu=goalUnit(g.metricKey);
+            metaParts.push('Aktuell (Ø 30 Tage): '+(curVal!=null?(Math.round(curVal*10)/10).toString().replace('.',',')+_gu:'—')+' → Ziel: '+g.targetValue+_gu+' ('+focusMetricLabel(g.metricKey)+')');
           }
           html+='<div style="background:var(--s-tint);border:1px solid var(--border2);border-radius:var(--r-md);padding:12px 14px">'
             +'<div style="display:flex;align-items:center;gap:10px">'
@@ -7609,11 +7627,12 @@ function renderTab(){
     };
     var sessions=(protocols[emp.id]||[]).slice().sort(function(a,b){return b.date.localeCompare(a.date);});
     var completedSessions=sessions.filter(function(s){return s.status!=='geplant'||s.date<=today();});
+    var doneSessions=sessions.filter(function(s){return s.status!=='geplant';}); // B9: überfällige geplante zählen nicht als abgeschlossen
     var plannedSessions=sessions.filter(function(s){return s.status==='geplant'&&s.date>today();}).sort(function(a,b){return a.date.localeCompare(b.date);});
 
     // Zähle abgeschlossene Sessions pro Topic (geplante zählen noch nicht mit)
     var tc={};SDIMS.forEach(function(d){tc[d.key]=0;});
-    completedSessions.forEach(function(s){(s.topics||[]).forEach(function(t){t=TOPIC_ALIAS[t]||t;if(tc[t]!==undefined)tc[t]++;});});
+    doneSessions.forEach(function(s){(s.topics||[]).forEach(function(t){t=TOPIC_ALIAS[t]||t;if(tc[t]!==undefined)tc[t]++;});});
     var maxVal=Math.max(1,Math.max.apply(null,SDIMS.map(function(d){return tc[d.key];})));
     var catSum={skill:0,will:0,result:0};
     SDIMS.forEach(function(d){catSum[d.cat]+=tc[d.key];});
@@ -7621,7 +7640,7 @@ function renderTab(){
     // ── Coaching-Übersicht: EINE Karte, links Spinnendiagramm + Aktionen, rechts Zusammenfassung (oben) ──
     html+='<div class="card" style="margin-bottom:22px">';
     html+='<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:4px">';
-    html+='<div class="card-title" style="margin:0"><i class="ti ti-chart-radar"></i> Coaching-Übersicht <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+completedSessions.length+' abgeschlossene Sessions</span></div>';
+    html+='<div class="card-title" style="margin:0"><i class="ti ti-chart-radar"></i> Coaching-Übersicht <span style="font-weight:400;font-size:12px;color:var(--text3);text-transform:none;letter-spacing:0">· '+doneSessions.length+' abgeschlossene Sessions</span></div>';
     html+='</div>';
     html+='<div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;align-items:flex-start;margin-top:12px">';
 
@@ -7633,7 +7652,7 @@ function renderTab(){
     html+='<div style="display:flex;flex-direction:column;gap:8px">';
     ['skill','will','result'].forEach(function(cat){
       var s=catSum[cat];
-      var catDurMin=completedSessions.filter(function(sess){
+      var catDurMin=doneSessions.filter(function(sess){
         return (sess.topics||[]).some(function(t){t=TOPIC_ALIAS[t]||t;var dim=SDIMS.find(function(d){return d.key===t;});return dim&&dim.cat===cat;});
       }).reduce(function(sum,sess){return sum+(sessionDuration(sess.uhrzeit,sess.endUhrzeit)||0);},0);
       html+='<div style="background:'+SCCAT[cat].bg+';border:1px solid '+SCCAT[cat].col+';border-radius:var(--r-lg);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
@@ -7642,10 +7661,10 @@ function renderTab(){
       html+='</div>';
     });
     (function(){
-      var totalDurationMin=completedSessions.reduce(function(sum,s){return sum+(sessionDuration(s.uhrzeit,s.endUhrzeit)||0);},0);
+      var totalDurationMin=doneSessions.reduce(function(sum,s){return sum+(sessionDuration(s.uhrzeit,s.endUhrzeit)||0);},0);
       html+='<div style="background:var(--bg2);border:1px solid var(--border2);border-radius:var(--r-lg);padding:12px 14px;display:flex;align-items:center;justify-content:space-between">';
-      html+='<div><div style="font-size:11px;font-weight:700;color:var(--text)">GESAMT</div><div style="font-size:11px;color:var(--text2);opacity:0.8;margin-top:1px">'+completedSessions.length+' Sessions'+(totalDurationMin?' · '+formatDuration(totalDurationMin):'')+'</div></div>';
-      html+='<div style="font-size:20px;font-weight:700;color:var(--text)">'+completedSessions.length+'</div>';
+      html+='<div><div style="font-size:11px;font-weight:700;color:var(--text)">GESAMT</div><div style="font-size:11px;color:var(--text2);opacity:0.8;margin-top:1px">'+doneSessions.length+' Sessions'+(totalDurationMin?' · '+formatDuration(totalDurationMin):'')+'</div></div>';
+      html+='<div style="font-size:20px;font-weight:700;color:var(--text)">'+doneSessions.length+'</div>';
       html+='</div>';
     })();
     html+='</div>';
@@ -8064,6 +8083,8 @@ function renderTab(){
       var teamEmps=myTeam?employees.filter(function(e){return e.team===myTeam&&e.id!==selectedEmp&&e.active!==false;}):[];
       var teamAvgVals=periods.map(function(p){
         if(p.from>todayStr||!teamEmps.length)return null;
+        // B1: CR-Kennzahlen aus den summierten Rohzahlen des Teams (nicht Ø der Einzel-CRs); Zählwerte bleiben Ø je Kopf
+        if(/^cr/.test(empChartMetric)){var tv=metricValFromSums(empChartMetric,chartSumsForRange(teamEmps,p.from,p.to));return tv!=null?+tv.toFixed(1):null;}
         var dayVals=teamEmps.map(function(te){return metricValFromSums(empChartMetric,chartSumsForRange([te],p.from,p.to));}).filter(function(v){return v!==null;});
         return dayVals.length?+(dayVals.reduce(function(a,b){return a+b;},0)/dayVals.length).toFixed(1):null;
       });
@@ -8228,14 +8249,14 @@ function renderTab(){
       (function(){
         var panel=document.getElementById('coachImpactPanel');
         if(!panel)return;
-        var relevant=(protocols[selectedEmp]||[]).filter(function(s){return (s.status!=='geplant'||s.date<=today())&&s.focusMetric===empChartMetric;});
+        var relevant=(protocols[selectedEmp]||[]).filter(function(s){return s.status!=='geplant'&&s.focusMetric===empChartMetric;}); // B9
         var fullPerf=(performance[selectedEmp]||[]).slice().sort(function(a,b){return a.date.localeCompare(b.date);});
+        // B1: CR aus den Rohzahlen des Fensters (erst summieren, dann teilen), Zählwerte als Ø je Tag
         function avgWindow(centerDate,daysBefore,daysAfter){
           var fromS=addDaysUTC(centerDate,-daysBefore);
           var toS=addDaysUTC(centerDate,daysAfter);
           var rows=fullPerf.filter(function(p){return p.date>=fromS&&p.date<toS;});
-          var vals2=rows.map(function(p){return p[empChartMetric];}).filter(function(v){return v!==undefined&&v!==null;});
-          return vals2.length?(vals2.reduce(function(a,b){return a+b;},0)/vals2.length):null;
+          return perfKpiWin(empObj,rows,empChartMetric);
         }
         var sortedRelevant=relevant.slice().sort(function(a,b){return b.date.localeCompare(a.date);});
         function buildRow(s){
@@ -8600,7 +8621,7 @@ function dshCoachBox(all,T){
 // ── Plan: Tagesziele je Mitarbeiter aus der Zielvereinbarung, verteilt nach Wochenarbeitszeit ──
 // Monatsziel je Mitarbeiter = Einsatztage x Opt./Tag x Marge/Opt.; verteilt auf seine Arbeitstage
 // (Kalender aus der Zielvereinbarung, sonst Mo–Fr ohne Feiertage) im Verhältnis seiner Arbeitsstunden.
-// Monate ohne Zielvereinbarung nutzen das „Ziel NL“ des Monats, verteilt nach Arbeitstagen.
+// Monate ohne Zielvereinbarung nutzen das „Ziel NL“ des Monats, verteilt nach Arbeitstagen (Teamfilter: Anteil nach Arbeitsstunden, B6).
 var _dshPlanCache={};
 function dshPlanMonth(list,mk){
   var key=mk+'|'+list.map(function(e){return e.id;}).join(',');
@@ -8625,7 +8646,11 @@ function dshPlanMonth(list,mk){
     });
   } else if(zielNlTargets[mk]>0){
     src='nl';var wd=Object.keys(days).filter(function(d){return dshIsWork(d)&&!fe[d];});
-    wd.forEach(function(d){days[d]=zielNlTargets[mk]/wd.length;});
+    // B6 (Peter 24.11.: „NL-Ziel anteilig“): Teilmenge (Teamfilter) bekommt den Anteil ihrer Arbeitsstunden am Tag
+    var allL=dshAll(),ids={};list.forEach(function(e){ids[e.id]=1;});
+    var full=allL.every(function(e){return ids[e.id];});
+    function hrs(L,d){var h=0;L.forEach(function(e){if(e.startDate&&d<e.startDate)return;if(e.endDate&&d>e.endDate)return;h+=workHoursForDate(e,d)||0;});return h;}
+    wd.forEach(function(d){var sh=1;if(!full){var ha=hrs(allL,d);sh=ha>0?hrs(list,d)/ha:0;}days[d]=zielNlTargets[mk]/wd.length*sh;});
   }
   return (_dshPlanCache[key]={days:days,src:src});
 }
@@ -10468,10 +10493,10 @@ function openCoachingEval(empId,editEvalId){
   setEdit(e0||null);renderList();
 
   // ── Ziele ──
-  function goalCur(g){if(!g.metricKey)return null;if(goalIsDev(g.metricKey))return goalDevVal(empId,String(g.metricKey).slice(4));var rp=getPerf(empId,30);if(!rp.length)return null;var vs=rp.map(function(x){return x[g.metricKey];}).filter(function(v){return v!=null&&!isNaN(v);});return vs.length?vs.reduce(function(a,b){return a+(+b);},0)/vs.length:null;}
+  function goalCur(g){if(!g.metricKey)return null;if(goalIsDev(g.metricKey))return goalDevVal(empId,String(g.metricKey).slice(4));var rp=getPerf(empId,30);if(!rp.length)return null;return perfKpiWin(employees.find(function(x){return x.id===empId;}),rp,g.metricKey);} // B1: CR aus Rohzahlen
   function goalStart(g){if(!g.metricKey||!g.createdAt)return null;if(goalIsDev(g.metricKey))return goalDevVal(empId,String(g.metricKey).slice(4),String(g.createdAt).slice(0,10));var c=localYmd(new Date(g.createdAt))||String(g.createdAt).slice(0,10);var f0=addDaysUTC(c,-30);
-    var vs=(performance[empId]||[]).filter(function(x){return x.date>=f0&&x.date<c;}).map(function(x){return x[g.metricKey];}).filter(function(v){return v!=null&&!isNaN(v);});
-    return vs.length?vs.reduce(function(a,b){return a+(+b);},0)/vs.length:null;}
+    var rs=(performance[empId]||[]).filter(function(x){return x.date>=f0&&x.date<c;});
+    return rs.length?perfKpiWin(employees.find(function(x){return x.id===empId;}),rs,g.metricKey):null;}
   function renderGoals(){
     var el=$('cevGoalList');if(!el)return;
     var list=(goals[empId]||[]).slice().sort(function(a,b){var oa=(a.status==='erreicht'||a.status==='verfehlt')?1:0,ob=(b.status==='erreicht'||b.status==='verfehlt')?1:0;return oa-ob||String(a.targetDate||'9999').localeCompare(String(b.targetDate||'9999'));});
